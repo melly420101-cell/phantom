@@ -2,209 +2,154 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MIL-OS: SYSTEM_DECAY_INTERFACE</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>PHANTOM_TERMINAL</title>
     <style>
         :root {
-            --bg-color: #0d0101; 
-            --crt-red: #ff1a1a; 
-            --dim-red: #440000;
-            --terminal-green: #33ff33;
+            --glow-red: #ff1a1a;
+            --bg-black: #050000;
         }
 
         body {
-            background-color: var(--bg-color);
-            color: var(--crt-red);
+            background-color: var(--bg-black);
+            color: var(--glow-red);
             font-family: 'Courier New', Courier, monospace;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
             margin: 0;
-            overflow: hidden;
-        }
-
-        body::before {
-            content: " ";
-            display: block;
-            position: absolute;
-            top: 0; left: 0; bottom: 0; right: 0;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.2) 50%), 
-                        repeating-linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
-            background-size: 100% 3px, 3px 100%;
-            z-index: 10;
-            pointer-events: none;
-        }
-
-        #container {
+            padding: 20px;
             display: flex;
-            gap: 20px;
-            padding: 30px;
-            border: 2px solid var(--dim-red);
-            background: rgba(20, 0, 0, 0.8);
-            box-shadow: 0 0 40px #500;
-            position: relative;
-            animation: flicker 0.15s infinite;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
         }
 
-        #sidebar {
-            width: 200px;
-            border-left: 1px solid var(--dim-red);
-            padding-left: 20px;
+        .terminal-frame {
+            border: 2px solid var(--glow-red);
+            padding: 20px;
+            box-shadow: 0 0 15px rgba(255, 26, 26, 0.2);
+            display: flex;
+            flex-direction: row; /* Desktop side-by-side */
+            gap: 40px;
+            max-width: 900px;
+            width: 100%;
+        }
+
+        canvas {
+            max-width: 400px;
+            width: 100%;
+            height: auto;
+        }
+
+        .stats-panel {
+            flex: 1;
             display: flex;
             flex-direction: column;
             justify-content: center;
         }
 
-        .stat-group { margin-bottom: 25px; }
-        .stat-label { font-size: 14px; letter-spacing: 2px; margin-bottom: 5px; display: block; }
-        
-        .progress-bg {
-            height: 12px;
-            background: #200;
-            border: 1px solid var(--dim-red);
-            position: relative;
-            overflow: hidden;
+        /* MOBILE FIXES */
+        @media (max-width: 768px) {
+            .terminal-frame {
+                flex-direction: column; /* Stacks everything vertically */
+                align-items: center;
+                padding: 10px;
+            }
+            
+            canvas {
+                max-width: 300px; /* Shrinks wheel for small screens */
+            }
+
+            .stats-panel {
+                width: 100%;
+                text-align: center;
+            }
         }
 
-        .progress-fill {
+        .bar-bg {
+            background: #220000;
+            height: 20px;
+            width: 100%;
+            margin: 10px 0;
+            border: 1px solid var(--glow-red);
+        }
+
+        .bar-fill {
             height: 100%;
-            background: var(--crt-red);
-            box-shadow: 0 0 10px var(--crt-red);
-            width: 0%;
-            transition: width 1s ease-in-out;
-        }
-
-        #bar-weird { background: linear-gradient(90deg, #f0f, #ff1a1a); }
-        #bar-rot { background: linear-gradient(90deg, #550, #220); border: 1px solid #770; }
-        #bar-grit { background: #666; filter: contrast(200%) grayscale(1); }
-
-        h1 { font-size: 1rem; margin: 0 0 10px 0; border-bottom: 1px solid var(--crt-red); padding-bottom: 5px; }
-
-        @keyframes flicker {
-            0% { opacity: 0.98; }
-            50% { opacity: 1; }
-            100% { opacity: 0.97; }
-        }
-
-        .glitch-text { animation: textGlitch 2s infinite; }
-        @keyframes textGlitch {
-            0% { transform: translate(0); }
-            2% { transform: translate(-2px, 1px); color: #0f0; }
-            4% { transform: translate(2px, -1px); color: #f0f; }
-            6% { transform: translate(0); }
+            background: var(--glow-red);
+            box-shadow: 0 0 10px var(--glow-red);
         }
     </style>
 </head>
 <body>
 
-<div id="container">
-    <div>
-        <h1 class="glitch-text">PERSONNEL_ID: <span id="user-name">GENERIC_UNIT</span></h1>
-        <div id="wheel-container"></div>
-    </div>
+    <div class="terminal-frame">
+        <div id="wheel-area">
+            <h2 id="char-name">: LOADING...</h2>
+            <canvas id="radarChart"></canvas>
+        </div>
 
-    <div id="sidebar">
-        <div class="stat-group">
-            <span class="stat-label">WEIRD_INDEX</span>
-            <div class="progress-bg"><div id="bar-weird" class="progress-fill"></div></div>
-        </div>
-        <div class="stat-group">
-            <span class="stat-label">GRIT_STAMINA</span>
-            <div class="progress-bg"><div id="bar-grit" class="progress-fill"></div></div>
-        </div>
-        <div class="stat-group">
-            <span class="stat-label">ROT_DECAY</span>
-            <div class="progress-bg"><div id="bar-rot" class="progress-fill"></div></div>
-        </div>
-        <div style="font-size: 10px; color: #500; margin-top: 20px;">
-            > SCANNING BIOMETRICS...<br>
-            > DECAY DETECTED IN SECTOR 7<br>
-            > NOISE RATIO: 0.82
+        <div class="stats-panel">
+            <h3>WEIRD_INDEX</h3>
+            <div class="bar-bg"><div id="weird-bar" class="bar-fill" style="width: 0%"></div></div>
+            
+            <h3>GRIT_STAMINA</h3>
+            <div class="bar-bg"><div id="grit-bar" class="bar-fill" style="width: 0%"></div></div>
+            
+            <h3>ROT_DECAY</h3>
+            <div class="bar-bg"><div id="rot-bar" class="bar-fill" style="width: 0%"></div></div>
         </div>
     </div>
-</div>
 
-<script>
-    // 1. DATA EXTRACTION
-    const params = new URLSearchParams(window.location.search);
-    const charName = params.get('name') || "GENERIC_UNIT";
-    const weirdVal = params.get('weird') || 0;
-    const gritVal = params.get('grit') || 100;
-    const rotVal = params.get('rot') || 0;
-
-    // Pull 8 emotions (0-10 scale)
-    const emoStats = [
-        params.get('joy') || params.get('ecst') || 5, 
-        params.get('trust') || params.get('adm') || 5,
-        params.get('fear') || params.get('terror') || 5,
-        params.get('surp') || params.get('amazement') || 5,
-        params.get('sadness') || params.get('grief') || 5,
-        params.get('disgust') || params.get('loathing') || 5,
-        params.get('anger') || params.get('rage') || 5,
-        params.get('anticipation') || params.get('vig') || 5
-    ];
-
-    // 2. VISUAL CONFIG
-    const width = 400;
-    const height = 400;
-    const maxRadius = 160;
-    const emotions = ["Joy", "Trust", "Fear", "Surprise", "Sadness", "Disgust", "Anger", "Anticipation"];
-
-    const svg = d3.select("#wheel-container")
-        .append("svg")
-        .attr("width", width)
-        .attr("height", height)
-        .append("g")
-        .attr("transform", `translate(${width / 2},${height / 2})`);
-
-    function generateCharacter(name, w, g, r, emoArray) {
-        document.getElementById('user-name').innerText = name;
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Extract stats from the URL sent by the Discord Bot
+        const params = new URLSearchParams(window.location.search);
         
-        // Update Progress Bars
-        document.getElementById('bar-weird').style.width = w + "%";
-        document.getElementById('bar-grit').style.width = g + "%";
-        document.getElementById('bar-rot').style.width = r + "%";
+        document.getElementById('char-name').innerText = ": " + (params.get('name') || "UNKNOWN_SUBJECT");
+        
+        const grit = params.get('grit') || 100;
+        const weird = params.get('weird') || 0;
+        const rot = params.get('rot') || 0;
 
-        // Clear and Draw Wheel
-        svg.selectAll("*").remove();
-        const angleStep = (Math.PI * 2) / emotions.length;
+        // Update the visual bars
+        document.getElementById('grit-bar').style.width = grit + "%";
+        document.getElementById('weird-bar').style.width = weird + "%";
+        document.getElementById('rot-bar').style.width = rot + "%";
 
-        emoArray.forEach((val, i) => {
-            const angle = i * angleStep;
-            const dynamicRadius = (val / 10) * maxRadius;
-
-            const petal = d3.arc()
-                .innerRadius(0)
-                .outerRadius(dynamicRadius)
-                .startAngle(angle - angleStep / 2.2)
-                .endAngle(angle + angleStep / 2.2);
-
-            svg.append("path")
-                .attr("d", petal)
-                .attr("fill", "rgba(255, 26, 26, 0.2)")
-                .attr("stroke", "#ff1a1a")
-                .attr("stroke-width", 1.5)
-                .attr("stroke-dasharray", (r > 50) ? "2,2" : "none")
-                .style("opacity", 0.8);
-
-            const labelRadius = maxRadius + 25;
-            svg.append("text")
-                .attr("x", Math.cos(angle - Math.PI/2) * labelRadius)
-                .attr("y", Math.sin(angle - Math.PI/2) * labelRadius)
-                .attr("text-anchor", "middle")
-                .attr("fill", "#ff1a1a")
-                .style("font-size", "10px")
-                .text(emotions[i].toUpperCase());
+        // Initialize Radar Chart
+        const ctx = document.getElementById('radarChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'radar',
+            data: {
+                labels: ['JOY', 'TRUST', 'FEAR', 'SURPRISE', 'SADNESS', 'DISGUST', 'ANGER', 'ANTICIPATION'],
+                datasets: [{
+                    data: [
+                        params.get('joy') || 5, params.get('trust') || 5, 
+                        params.get('fear') || 5, params.get('surp') || 5,
+                        params.get('sad') || 5, params.get('disg') || 5,
+                        params.get('rage') || 5, params.get('anti') || 5
+                    ],
+                    backgroundColor: 'rgba(255, 26, 26, 0.3)',
+                    borderColor: '#ff1a1a',
+                    borderWidth: 2,
+                    // If Rot is high, make the lines dashed
+                    borderDash: rot > 50 ? [5, 5] : []
+                }]
+            },
+            options: {
+                scales: {
+                    r: {
+                        angleLines: { color: '#440000' },
+                        grid: { color: '#440000' },
+                        pointLabels: { color: '#ff1a1a', font: { size: 10 } },
+                        ticks: { display: false },
+                        suggestedMin: 0,
+                        suggestedMax: 100
+                    }
+                },
+                plugins: { legend: { display: false } }
+            }
         });
-        
-        svg.append("circle").attr("r", maxRadius).attr("fill", "none").attr("stroke", "#400").attr("stroke-dasharray", "5,5");
-    }
-
-    // 3. EXECUTE
-    generateCharacter(charName, weirdVal, gritVal, rotVal, emoStats);
-</script>
-
+    </script>
 </body>
 </html>
