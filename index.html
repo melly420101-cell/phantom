@@ -3,11 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PHANTOM_TERMINAL</title>
+    <title>PHANTOM_TERMINAL_V2</title>
     <style>
         :root {
             --glow-red: #ff1a1a;
-            --bg-black: #050000;
+            --dim-red: #440000;
+            --bg-black: #000000;
         }
 
         body {
@@ -20,15 +21,17 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            overflow-x: hidden;
+            /* Prevents sideways scrolling on phone */
+            overflow-x: hidden; 
         }
 
         .terminal-frame {
             border: 2px solid var(--glow-red);
             padding: 20px;
+            /* Initial glow on the frame */
             box-shadow: 0 0 15px rgba(255, 26, 26, 0.2);
             display: flex;
-            flex-direction: row; /* Desktop side-by-side */
+            flex-direction: row; /* Desktop layout */
             gap: 40px;
             max-width: 900px;
             width: 100%;
@@ -47,36 +50,35 @@
             justify-content: center;
         }
 
-        /* MOBILE FIXES */
-        @media (max-width: 768px) {
-            .terminal-frame {
-                flex-direction: column; /* Stacks everything vertically */
-                align-items: center;
-                padding: 10px;
-            }
-            
-            canvas {
-                max-width: 300px; /* Shrinks wheel for small screens */
-            }
-
-            .stats-panel {
-                width: 100%;
-                text-align: center;
-            }
-        }
+        /* --- DARK MILITARY BAR STYLES --- */
+        h3 { margin: 15px 0 5px; font-size: 14px; text-transform: uppercase; letter-spacing: 2px; }
 
         .bar-bg {
-            background: #220000;
+            background: #0a0000; /* Near pure black background */
             height: 20px;
             width: 100%;
-            margin: 10px 0;
-            border: 1px solid var(--glow-red);
+            margin-bottom: 15px;
+            border: 1px solid var(--dim-red); /* Dim red outline for empty slots */
+            position: relative;
         }
 
         .bar-fill {
             height: 100%;
             background: var(--glow-red);
-            box-shadow: 0 0 10px var(--glow-red);
+            /* THE GLOW EFFECT */
+            box-shadow: 0 0 15px var(--glow-red), 0 0 5px #ffffff; 
+            transition: width 0.3s ease-in-out;
+        }
+
+        /* --- MOBILE RESPONSIVE LAYOUT (Stacks elements vertically) --- */
+        @media (max-width: 768px) {
+            .terminal-frame {
+                flex-direction: column; /* Moves stats below the wheel */
+                align-items: center;
+                padding: 10px;
+            }
+            canvas { max-width: 300px; } /* Shrinks wheel on phone */
+            .stats-panel { width: 100%; text-align: center; }
         }
     </style>
 </head>
@@ -93,16 +95,16 @@
             <div class="bar-bg"><div id="weird-bar" class="bar-fill" style="width: 0%"></div></div>
             
             <h3>GRIT_STAMINA</h3>
-            <div class="bar-bg"><div id="grit-bar" class="bar-fill" style="width: 0%"></div></div>
+            <div class="bar-bg"><div id="grit-bar" class="bar-fill" style="width: 100%"></div></div>
             
             <h3>ROT_DECAY</h3>
-            <div class="bar-bg"><div id="rot-bar" class="bar-fill" style="width: 0%"></div></div>
+            <div class="bar-bg"><div id="rot-bar" class="bar-fill" style="width: 5%"></div></div>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        // Extract stats from the URL sent by the Discord Bot
+        // Use the JavaScript provided in the user prompt for logic
         const params = new URLSearchParams(window.location.search);
         
         document.getElementById('char-name').innerText = ": " + (params.get('name') || "UNKNOWN_SUBJECT");
@@ -111,29 +113,31 @@
         const weird = params.get('weird') || 0;
         const rot = params.get('rot') || 0;
 
-        // Update the visual bars
         document.getElementById('grit-bar').style.width = grit + "%";
         document.getElementById('weird-bar').style.width = weird + "%";
         document.getElementById('rot-bar').style.width = rot + "%";
 
-        // Initialize Radar Chart
+        const emotionalData = [
+            params.get('joy') || 10, params.get('trust') || 10,
+            params.get('fear') || 10, params.get('surp') || 10,
+            params.get('grief') || 10, params.get('disg') || 10,
+            params.get('rage') || 10, params.get('anti') || 10
+        ];
+
+        const hasMeltdown = emotionalData.some(val => val >= 100);
+
         const ctx = document.getElementById('radarChart').getContext('2d');
         new Chart(ctx, {
             type: 'radar',
             data: {
                 labels: ['JOY', 'TRUST', 'FEAR', 'SURPRISE', 'SADNESS', 'DISGUST', 'ANGER', 'ANTICIPATION'],
                 datasets: [{
-                    data: [
-                        params.get('joy') || 5, params.get('trust') || 5, 
-                        params.get('fear') || 5, params.get('surp') || 5,
-                        params.get('sad') || 5, params.get('disg') || 5,
-                        params.get('rage') || 5, params.get('anti') || 5
-                    ],
-                    backgroundColor: 'rgba(255, 26, 26, 0.3)',
-                    borderColor: '#ff1a1a',
-                    borderWidth: 2,
-                    // If Rot is high, make the lines dashed
-                    borderDash: rot > 50 ? [5, 5] : []
+                    data: emotionalData,
+                    backgroundColor: hasMeltdown ? 'rgba(255, 255, 255, 0.5)' : 'rgba(255, 26, 26, 0.3)',
+                    borderColor: hasMeltdown ? '#ffffff' : '#ff1a1a',
+                    borderWidth: hasMeltdown ? 4 : 2,
+                    borderDash: rot > 50 ? [5, 5] : [],
+                    pointBackgroundColor: '#ff1a1a'
                 }]
             },
             options: {
@@ -141,7 +145,10 @@
                     r: {
                         angleLines: { color: '#440000' },
                         grid: { color: '#440000' },
-                        pointLabels: { color: '#ff1a1a', font: { size: 10 } },
+                        pointLabels: { 
+                            color: hasMeltdown ? '#ffffff' : '#ff1a1a', 
+                            font: { size: 10 } 
+                        },
                         ticks: { display: false },
                         suggestedMin: 0,
                         suggestedMax: 100
