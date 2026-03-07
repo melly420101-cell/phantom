@@ -3,46 +3,130 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PHANTOM_TERMINAL_V2</title>
+    <title>DEEP_BUNKER_TERMINAL_V4.2</title>
     <style>
+        /* --- CORE MILITARY THEME --- */
         :root {
+            --crt-green: rgba(20, 255, 20, 0.1); 
             --glow-red: #ff1a1a;
+            --mid-red: #8B0000;
             --dim-red: #440000;
-            --bg-black: #000000;
+            --bg-black: #050000;
+            --text-gray: #aaaaaa;
+        }
+
+        @font-face {
+            font-family: 'VHS';
+            src: url('https://fonts.cdnfonts.com/s/16060/VCR_OSD_MONO_1.001.woff') format('woff');
         }
 
         body {
-            background-color: var(--bg-black);
+            background-color: #111; 
             color: var(--glow-red);
-            font-family: 'Courier New', Courier, monospace;
+            font-family: 'VHS', 'Courier New', monospace;
             margin: 0;
-            padding: 20px;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            /* Prevents sideways scrolling on phone */
-            overflow-x: hidden; 
+            overflow-x: hidden; /* Prevent horizontal scroll on mobile */
         }
 
-        .terminal-frame {
-            border: 2px solid var(--glow-red);
-            padding: 20px;
-            /* Initial glow on the frame */
-            box-shadow: 0 0 15px rgba(255, 26, 26, 0.2);
+        /* --- THE CRT MONITOR FRAME --- */
+        .crt-monitor {
+            background: #222; 
+            border: 10px solid #2a2a2a; /* Slightly thinner for mobile */
+            border-radius: 20px;
+            padding: 5px;
+            position: relative;
+            box-shadow: 0 0 50px rgba(0,0,0,0.8) inset, 0 10px 20px rgba(0,0,0,0.5);
             display: flex;
-            flex-direction: row; /* Desktop layout */
-            gap: 40px;
-            max-width: 900px;
-            width: 100%;
+            width: 95%; /* Responsive width */
+            max-width: 850px;
         }
 
-        canvas {
-            max-width: 400px;
+        /* The actual screen area */
+        .screen {
+            background-color: var(--bg-black);
             width: 100%;
-            height: auto;
+            height: 100%;
+            border-radius: 10px;
+            position: relative;
+            overflow-y: auto; /* Allow scrolling if content overflows */
+            display: flex;
+            flex-direction: column;
+            padding: 15px;
         }
 
+        /* --- SCANLINES & CURVATURE --- */
+        .screen::after {
+            content: " ";
+            position: absolute;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
+                        linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        /* --- LAYOUT & COMPONENTS --- */
+        .main-container {
+            display: flex;
+            flex-direction: row; /* Desktop side-by-side */
+            gap: 20px;
+            flex-grow: 1;
+        }
+
+        #wheel-area {
+            flex: 0 0 45%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #radarChart {
+            width: 100% !important;
+            height: auto !important;
+            filter: drop-shadow(0 0 10px var(--glow-red));
+        }
+
+        /* --- MOBILE RESPONSIVE TWEAKS --- */
+        @media (max-width: 600px) {
+            .main-container {
+                flex-direction: column; /* Stack vertically on mobile */
+                align-items: center;
+            }
+            #wheel-area {
+                flex: 0 0 auto;
+                width: 80%;
+            }
+            .stats-panel {
+                width: 100%;
+            }
+            h2 { font-size: 14px; }
+        }
+
+        /* --- ANIMATIONS & INTERACTION --- */
+        @keyframes flicker {
+            0% { opacity: 0.95; }
+            5% { opacity: 0.98; }
+            100% { opacity: 1; }
+        }
+
+        .main-container { animation: flicker 0.15s infinite; }
+
+        @keyframes glitch {
+            0% { transform: translate(0); }
+            20% { transform: translate(-2px, 2px); filter: hue-rotate(90deg); }
+            40% { transform: translate(2px, -2px); }
+            60% { transform: translate(-2px, -2px); opacity: 0.8; }
+            100% { transform: translate(0); }
+        }
+
+        .glitching { animation: glitch 0.3s ease-in-out; }
+
+        /* --- STATS PANEL --- */
         .stats-panel {
             flex: 1;
             display: flex;
@@ -50,64 +134,91 @@
             justify-content: center;
         }
 
-        /* --- DARK MILITARY BAR STYLES --- */
-        h3 { margin: 15px 0 5px; font-size: 14px; text-transform: uppercase; letter-spacing: 2px; }
+        h3 { 
+            margin: 5px 0; font-size: 12px; 
+            text-transform: uppercase; letter-spacing: 1px;
+            color: var(--text-gray); 
+            text-shadow: 0 0 5px var(--mid-red);
+            padding: 10px 0; /* Larger touch target for mobile */
+        }
+
+        h3:active { /* Mobile touch feedback */
+            color: #ffffff;
+            text-shadow: 0 0 10px var(--glow-red);
+        }
 
         .bar-bg {
-            background: #0a0000; /* Near pure black background */
-            height: 20px;
+            background: #000000;
+            height: 14px;
             width: 100%;
-            margin-bottom: 15px;
-            border: 1px solid var(--dim-red); /* Dim red outline for empty slots */
-            position: relative;
+            border: 1px solid var(--dim-red);
+            margin-bottom: 10px;
+        }
+
+        @keyframes breathing {
+            0% { box-shadow: 0 0 5px var(--glow-red); }
+            50% { box-shadow: 0 0 15px var(--glow-red); }
+            100% { box-shadow: 0 0 5px var(--glow-red); }
         }
 
         .bar-fill {
             height: 100%;
             background: var(--glow-red);
-            /* THE GLOW EFFECT */
-            box-shadow: 0 0 15px var(--glow-red), 0 0 5px #ffffff; 
-            transition: width 0.3s ease-in-out;
+            animation: breathing 4s infinite ease-in-out;
+            transition: width 0.5s ease;
         }
 
-        /* --- MOBILE RESPONSIVE LAYOUT (Stacks elements vertically) --- */
-        @media (max-width: 768px) {
-            .terminal-frame {
-                flex-direction: column; /* Moves stats below the wheel */
-                align-items: center;
-                padding: 10px;
-            }
-            canvas { max-width: 300px; } /* Shrinks wheel on phone */
-            .stats-panel { width: 100%; text-align: center; }
+        .footer {
+            margin-top: 20px;
+            border-top: 1px solid var(--dim-red);
+            padding-top: 5px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 8px;
+            color: var(--dim-red);
         }
     </style>
 </head>
 <body>
 
-    <div class="terminal-frame">
-        <div id="wheel-area">
-            <h2 id="char-name">: LOADING...</h2>
-            <canvas id="radarChart"></canvas>
-        </div>
+    <div class="crt-monitor">
+        <div class="screen">
+            <h2 id="char-name">> Subject: LOADING...</h2>
+            <div class="main-container">
+                <div id="wheel-area">
+                    <canvas id="radarChart"></canvas>
+                </div>
 
-        <div class="stats-panel">
-            <h3>WEIRD_INDEX</h3>
-            <div class="bar-bg"><div id="weird-bar" class="bar-fill" style="width: 0%"></div></div>
-            
-            <h3>GRIT_STAMINA</h3>
-            <div class="bar-bg"><div id="grit-bar" class="bar-fill" style="width: 100%"></div></div>
-            
-            <h3>ROT_DECAY</h3>
-            <div class="bar-bg"><div id="rot-bar" class="bar-fill" style="width: 5%"></div></div>
+                <div class="stats-panel">
+                    <div class="stat-group">
+                        <h3 onclick="triggerGlitch()">WEIRD_INDEX</h3>
+                        <div class="bar-bg"><div id="weird-bar" class="bar-fill" style="width: 0%"></div></div>
+                    </div>
+                    
+                    <div class="stat-group">
+                        <h3 onclick="triggerGlitch()">GRIT_STAMINA</h3>
+                        <div class="bar-bg"><div id="grit-bar" class="bar-fill" style="width: 0%"></div></div>
+                    </div>
+                    
+                    <div class="stat-group">
+                        <h3 onclick="triggerGlitch()">ROT_DECAY</h3>
+                        <div class="bar-bg"><div id="rot-bar" class="bar-fill" style="width: 0%"></div></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer">
+                <div>[STATUS: ACTIVE]</div>
+                <div>SIGNAL: WEAK // v4.2</div>
+            </div>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        // Use the JavaScript provided in the user prompt for logic
         const params = new URLSearchParams(window.location.search);
-        
-        document.getElementById('char-name').innerText = ": " + (params.get('name') || "UNKNOWN_SUBJECT");
+        const charName = params.get('name') || "UNKNOWN_SUBJECT";
+        document.getElementById('char-name').innerText = "> Subject: " + charName.toUpperCase();
         
         const grit = params.get('grit') || 100;
         const weird = params.get('weird') || 0;
@@ -117,26 +228,26 @@
         document.getElementById('weird-bar').style.width = weird + "%";
         document.getElementById('rot-bar').style.width = rot + "%";
 
-        const emotionalData = [
-            params.get('joy') || 10, params.get('trust') || 10,
-            params.get('fear') || 10, params.get('surp') || 10,
-            params.get('grief') || 10, params.get('disg') || 10,
-            params.get('rage') || 10, params.get('anti') || 10
-        ];
-
-        const hasMeltdown = emotionalData.some(val => val >= 100);
+        function triggerGlitch() {
+            const canvas = document.getElementById('radarChart');
+            canvas.classList.add('glitching');
+            setTimeout(() => canvas.classList.remove('glitching'), 300);
+        }
 
         const ctx = document.getElementById('radarChart').getContext('2d');
         new Chart(ctx, {
             type: 'radar',
             data: {
-                labels: ['JOY', 'TRUST', 'FEAR', 'SURPRISE', 'SADNESS', 'DISGUST', 'ANGER', 'ANTICIPATION'],
+                labels: ['JOY', 'TRUST', 'FEAR', 'SURP', 'GRIEF', 'DISG', 'RAGE', 'ANTI'],
                 datasets: [{
-                    data: emotionalData,
-                    backgroundColor: hasMeltdown ? 'rgba(255, 255, 255, 0.5)' : 'rgba(255, 26, 26, 0.3)',
-                    borderColor: hasMeltdown ? '#ffffff' : '#ff1a1a',
-                    borderWidth: hasMeltdown ? 4 : 2,
-                    borderDash: rot > 50 ? [5, 5] : [],
+                    data: [
+                        params.get('joy')||10, params.get('trust')||10, params.get('fear')||10, 
+                        params.get('surp')||10, params.get('grief')||10, params.get('disg')||10, 
+                        params.get('rage')||10, params.get('anti')||10
+                    ],
+                    backgroundColor: 'rgba(255, 26, 26, 0.2)',
+                    borderColor: '#ff1a1a',
+                    borderWidth: 2,
                     pointBackgroundColor: '#ff1a1a'
                 }]
             },
@@ -145,10 +256,7 @@
                     r: {
                         angleLines: { color: '#440000' },
                         grid: { color: '#440000' },
-                        pointLabels: { 
-                            color: hasMeltdown ? '#ffffff' : '#ff1a1a', 
-                            font: { size: 10 } 
-                        },
+                        pointLabels: { color: '#ff1a1a', font: { size: 8, family: 'VHS' } },
                         ticks: { display: false },
                         suggestedMin: 0,
                         suggestedMax: 100
