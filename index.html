@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>PHANTOM_TERMINAL_V5.2_CORRUPTION</title>
     <style>
-        /* --- MILITARY TERMINAL THEME (same as before, with additions for lore) --- */
+        /* --- MILITARY TERMINAL THEME --- */
         :root {
             --crt-green: #14ff14;
             --glow-red: #ff1a1a;
@@ -150,7 +150,7 @@
         #radarChart {
             width: 100% !important;
             height: auto !important;
-            max-width: 300px;
+            max-width: 280px; /* slightly smaller on mobile */
             filter: drop-shadow(0 0 10px var(--glow-red));
         }
 
@@ -185,6 +185,70 @@
             background: var(--glow-red);
             box-shadow: 0 0 10px var(--glow-red);
             transition: width 0.2s ease;
+        }
+
+        /* Sliders panel */
+        .sliders-panel {
+            width: 100%;
+            border-top: 2px solid var(--dim-red);
+            padding-top: 15px;
+            margin-top: 10px;
+        }
+
+        .slider-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .slider-label {
+            width: 70px;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            color: var(--glow-red);
+        }
+
+        .slider-container {
+            flex: 1;
+            position: relative;
+            height: 30px;
+            display: flex;
+            align-items: center;
+        }
+
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 8px;
+            background: black;
+            border: 2px solid var(--mid-red);
+            outline: none;
+        }
+
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 24px;
+            height: 24px;
+            background: var(--glow-red);
+            border: 2px solid white;
+            cursor: pointer;
+            box-shadow: 0 0 10px var(--glow-red);
+        }
+
+        input[type=range]::-moz-range-thumb {
+            width: 24px;
+            height: 24px;
+            background: var(--glow-red);
+            border: 2px solid white;
+            cursor: pointer;
+        }
+
+        .slider-value {
+            width: 45px;
+            text-align: right;
+            font-size: 0.9rem;
+            color: var(--glow-red);
         }
 
         .bond-selector {
@@ -346,6 +410,12 @@
                 padding: 18px 12px;
                 font-size: 1rem;
             }
+            .slider-row {
+                flex-wrap: wrap;
+            }
+            .slider-label {
+                width: 60px;
+            }
             .footer {
                 font-size: 0.8rem;
                 flex-wrap: wrap;
@@ -362,7 +432,7 @@
         <div class="corrupted-overlay"></div>
         <h2 id="char-name">> INITIALIZING...</h2>
 
-        <!-- MAIN VIEW (Radar + Stats) -->
+        <!-- MAIN VIEW (Radar + Stats + Sliders) -->
         <div id="mainView" class="main-container">
             <div class="top-row">
                 <div id="wheel-area">
@@ -388,6 +458,67 @@
                 <select id="bondSelect" onchange="loadBond()">
                     <option value="">-- SELECT BOND --</option>
                 </select>
+            </div>
+
+            <!-- Emotion sliders for local OC -->
+            <div class="sliders-panel">
+                <h3 style="margin-top:0;">> LOCAL EMOTIONS</h3>
+                <div class="slider-row" id="slider-joy">
+                    <span class="slider-label">JOY</span>
+                    <div class="slider-container">
+                        <input type="range" min="0" max="100" value="10" class="emotion-slider" id="joy-slider">
+                    </div>
+                    <span class="slider-value" id="joy-value">10</span>
+                </div>
+                <div class="slider-row" id="slider-trust">
+                    <span class="slider-label">TRUST</span>
+                    <div class="slider-container">
+                        <input type="range" min="0" max="100" value="10" class="emotion-slider" id="trust-slider">
+                    </div>
+                    <span class="slider-value" id="trust-value">10</span>
+                </div>
+                <div class="slider-row" id="slider-fear">
+                    <span class="slider-label">FEAR</span>
+                    <div class="slider-container">
+                        <input type="range" min="0" max="100" value="10" class="emotion-slider" id="fear-slider">
+                    </div>
+                    <span class="slider-value" id="fear-value">10</span>
+                </div>
+                <div class="slider-row" id="slider-surp">
+                    <span class="slider-label">SURP</span>
+                    <div class="slider-container">
+                        <input type="range" min="0" max="100" value="10" class="emotion-slider" id="surp-slider">
+                    </div>
+                    <span class="slider-value" id="surp-value">10</span>
+                </div>
+                <div class="slider-row" id="slider-grief">
+                    <span class="slider-label">GRIEF</span>
+                    <div class="slider-container">
+                        <input type="range" min="0" max="100" value="10" class="emotion-slider" id="grief-slider">
+                    </div>
+                    <span class="slider-value" id="grief-value">10</span>
+                </div>
+                <div class="slider-row" id="slider-disg">
+                    <span class="slider-label">DISG</span>
+                    <div class="slider-container">
+                        <input type="range" min="0" max="100" value="10" class="emotion-slider" id="disg-slider">
+                    </div>
+                    <span class="slider-value" id="disg-value">10</span>
+                </div>
+                <div class="slider-row" id="slider-rage">
+                    <span class="slider-label">RAGE</span>
+                    <div class="slider-container">
+                        <input type="range" min="0" max="100" value="10" class="emotion-slider" id="rage-slider">
+                    </div>
+                    <span class="slider-value" id="rage-value">10</span>
+                </div>
+                <div class="slider-row" id="slider-anti">
+                    <span class="slider-label">ANTI</span>
+                    <div class="slider-container">
+                        <input type="range" min="0" max="100" value="10" class="emotion-slider" id="anti-slider">
+                    </div>
+                    <span class="slider-value" id="anti-value">10</span>
+                </div>
             </div>
 
             <div class="button-group">
@@ -460,8 +591,13 @@
     const rot = parseInt(params.get('rot')) || 0;
     const isCorrupted = rot >= 80;
 
-    // Current lore data (empty initially)
+    // Current lore data
     let currentLore = {};
+
+    // Sliders
+    const emotions = ['joy','trust','fear','surp','grief','disg','rage','anti'];
+    const sliders = {};
+    const valueSpans = {};
 
     function glitchText(text) {
         if (!isCorrupted) return text;
@@ -501,6 +637,34 @@
         return `rgb(${r}, ${g}, ${b})`;
     }
 
+    // ---------- SLIDER SETUP ----------
+    function getSliderValues() {
+        return emotions.map(emo => parseInt(sliders[emo].value) || 10);
+    }
+
+    function updateRadarFromSliders() {
+        if (radarChart && radarChart.data.datasets.length > 0) {
+            radarChart.data.datasets[0].data = getSliderValues();
+            radarChart.update();
+        }
+    }
+
+    emotions.forEach(emo => {
+        const slider = document.getElementById(`${emo}-slider`);
+        const valueSpan = document.getElementById(`${emo}-value`);
+        if (slider && valueSpan) {
+            sliders[emo] = slider;
+            valueSpans[emo] = valueSpan;
+            const initial = parseInt(params.get(emo)) || 10;
+            slider.value = initial;
+            valueSpan.innerText = initial;
+            slider.addEventListener('input', function() {
+                valueSpan.innerText = this.value;
+                updateRadarFromSliders();
+            });
+        }
+    });
+
     // ---------- RADAR DATA ----------
     function getEmoData(prefix) {
         return [
@@ -517,7 +681,7 @@
 
     let datasets = [{
         label: 'LOCAL',
-        data: getEmoData(''),
+        data: getSliderValues(), // from sliders
         backgroundColor: isCorrupted ? 'rgba(255, 255, 255, 0.1)' : 'rgba(255, 26, 26, 0.3)',
         borderColor: isCorrupted ? '#fff' : '#ff1a1a',
         pointBackgroundColor: function(context) {
@@ -525,8 +689,8 @@
             return getLocalColor(value);
         },
         pointBorderColor: '#fff',
-        pointRadius: 4,
-        pointHoverRadius: 6,
+        pointRadius: 6,          // larger points for visibility
+        pointHoverRadius: 8,
         dragData: false
     }];
 
@@ -542,8 +706,8 @@
                 return getTargetColor(value);
             },
             pointBorderColor: '#fff',
-            pointRadius: 4,
-            pointHoverRadius: 6,
+            pointRadius: 6,
+            pointHoverRadius: 8,
             dragData: false
         });
         document.getElementById('bondSelector').style.display = 'none';
@@ -571,15 +735,20 @@
                         color: isCorrupted ? '#fff' : '#ff1a1a',
                         font: { family: 'VHS', size: 10 }
                     },
-                    ticks: { display: false },
-                    min: 0,        // <-- FIX: force outer ring to represent 100
-                    max: 100
+                    ticks: {
+                        display: false,
+                        stepSize: 20,
+                        callback: function(value) { return value; }
+                    },
+                    min: 0,
+                    max: 100,
+                    beginAtZero: true
                 }
             },
             elements: {
                 point: {
-                    radius: 4,
-                    hoverRadius: 6
+                    radius: 6,
+                    hoverRadius: 8
                 }
             }
         }
@@ -596,14 +765,14 @@
         document.getElementById('mainView').classList.add('hidden-panel');
         document.getElementById('loreView').classList.remove('hidden-panel');
         document.getElementById('editLoreView').classList.add('hidden-panel');
-        loadLoreToView(); // refresh displayed lore
+        loadLoreToView();
     }
 
     function showEditLore() {
         document.getElementById('mainView').classList.add('hidden-panel');
         document.getElementById('loreView').classList.add('hidden-panel');
         document.getElementById('editLoreView').classList.remove('hidden-panel');
-        loadLoreToForm(); // populate form with current lore
+        loadLoreToForm();
     }
 
     // ---------- LORE FETCHING ----------
@@ -614,7 +783,6 @@
             const response = await fetch(url);
             if (!response.ok) throw new Error('Failed to fetch lore');
             currentLore = await response.json();
-            // Update view fields
             document.getElementById('lore-name').innerText = currentLore.name || '—';
             document.getElementById('lore-age').innerText = currentLore.age || '—';
             document.getElementById('lore-gender').innerText = currentLore.gender || '—';
@@ -631,7 +799,6 @@
     }
 
     function loadLoreToForm() {
-        // Populate edit form with currentLore (or empty)
         document.getElementById('edit-name').value = currentLore.name || '';
         document.getElementById('edit-age').value = currentLore.age || '';
         document.getElementById('edit-gender').value = currentLore.gender || '';
@@ -671,9 +838,8 @@
             });
             const result = await response.json();
             if (result.success) {
-                currentLore = lore; // update local copy
-                showMainView(); // optionally return to main view
-                // could also show a success message
+                currentLore = lore;
+                showMainView();
             } else {
                 alert('Failed to save lore');
             }
@@ -683,7 +849,7 @@
         }
     }
 
-    // ---------- BOND FETCHING (unchanged) ----------
+    // ---------- BOND FETCHING ----------
     async function fetchBonds() {
         if (!userId || !charName) return;
         try {
@@ -745,29 +911,28 @@
                     return getTargetColor(value);
                 },
                 pointBorderColor: '#fff',
-                pointRadius: 4,
-                pointHoverRadius: 6,
+                pointRadius: 6,
+                pointHoverRadius: 8,
                 dragData: false
             });
         }
         radarChart.update();
     }
 
-    // ---------- SYNC, REFRESH, COPY LINK (unchanged) ----------
+    // ---------- SYNC TO BOT ----------
     async function syncToBot() {
         const btn = document.getElementById('syncBtn');
         btn.disabled = true;
         btn.innerText = '> SYNCING...';
 
-        const currentValues = radarChart.data.datasets[0].data;
-        const emotions = {};
-        const labels = ['joy','trust','fear','surp','grief','disg','rage','anti'];
-        labels.forEach((l, i) => emotions[l] = currentValues[i]);
+        const currentValues = getSliderValues();
+        const emotionsObj = {};
+        emotions.forEach((emo, i) => emotionsObj[emo] = currentValues[i]);
 
         const payload = {
             userId: userId,
             characterName: charName,
-            emotions: emotions,
+            emotions: emotionsObj,
             secret: SYNC_SECRET
         };
 
@@ -795,6 +960,7 @@
         }
     }
 
+    // ---------- REFRESH DATA FROM BOT ----------
     async function refreshData() {
         const btn = document.getElementById('refreshBtn');
         btn.disabled = true;
@@ -815,6 +981,13 @@
             }
             const data = await response.json();
 
+            // Update sliders and radar
+            emotions.forEach((emo, i) => {
+                if (sliders[emo]) {
+                    sliders[emo].value = data[emo];
+                    valueSpans[emo].innerText = data[emo];
+                }
+            });
             radarChart.data.datasets[0].data = [
                 data.joy, data.trust, data.fear, data.surp,
                 data.grief, data.disg, data.rage, data.anti
@@ -837,9 +1010,10 @@
         }
     }
 
+    // ---------- COPY SHARE LINK ----------
     function copyShareLink() {
-        const currentValues = radarChart.data.datasets[0].data;
-        const labels = ['joy','trust','fear','surp','grief','disg','rage','anti'];
+        const currentValues = getSliderValues();
+        const labels = emotions;
         labels.forEach((l, i) => params.set(l, currentValues[i]));
 
         if (radarChart.data.datasets.length > 1) {
@@ -864,13 +1038,20 @@
         setTimeout(() => btn.innerText = '> COPY LINK', 1500);
     }
 
-    // ---------- SSE (unchanged) ----------
+    // ---------- SSE ----------
     function setupSSE() {
         if (!userId || !charName) return;
         const eventSource = new EventSource(`${API_BASE}/api/events?userId=${encodeURIComponent(userId)}&charName=${encodeURIComponent(charName)}&secret=${encodeURIComponent(SYNC_SECRET)}`);
         eventSource.onmessage = function(event) {
             try {
                 const data = JSON.parse(event.data);
+                // Update sliders and radar
+                emotions.forEach((emo, i) => {
+                    if (sliders[emo]) {
+                        sliders[emo].value = data[emo];
+                        valueSpans[emo].innerText = data[emo];
+                    }
+                });
                 radarChart.data.datasets[0].data = [
                     data.joy, data.trust, data.fear, data.surp,
                     data.grief, data.disg, data.rage, data.anti
