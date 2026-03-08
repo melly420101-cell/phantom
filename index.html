@@ -31,7 +31,7 @@
             align-items: center;
             min-height: 100vh;
             overflow: hidden;
-            touch-action: none;
+            touch-action: pan-y; /* allow vertical scrolling if needed */
             font-size: 16px;
         }
 
@@ -45,7 +45,8 @@
             box-shadow: 0 0 50px rgba(0,0,0,0.8) inset, 0 10px 20px rgba(0,0,0,0.5);
             display: flex;
             width: 95%;
-            max-width: 850px;
+            max-width: 900px;
+            max-height: 95vh;
             transition: all 0.1s;
         }
 
@@ -55,14 +56,14 @@
             height: 100%;
             border-radius: 10px;
             position: relative;
-            overflow: hidden;
+            overflow-y: auto; /* allow scrolling for many sliders */
             display: flex;
             flex-direction: column;
             padding: 15px;
             animation: flicker var(--screen-flicker);
         }
 
-        /* Heavy scanlines */
+        /* Scanlines */
         .screen::after {
             content: " ";
             position: absolute;
@@ -74,7 +75,6 @@
             z-index: 100;
         }
 
-        /* Extra static for corrupted mode */
         .corrupted-overlay {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -130,24 +130,128 @@
         /* --- LAYOUT --- */
         .main-container {
             display: flex;
-            flex-direction: row;
+            flex-direction: column;
             gap: 20px;
             flex-grow: 1;
         }
 
+        .top-row {
+            display: flex;
+            flex-direction: row;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
         #wheel-area {
-            flex: 0 0 50%;
+            flex: 1 1 250px;
+            min-width: 200px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            position: relative;
         }
 
         #radarChart {
             width: 100% !important;
             height: auto !important;
+            max-width: 300px;
             filter: drop-shadow(0 0 10px var(--glow-red));
-            touch-action: none;
+        }
+
+        .stats-panel {
+            flex: 1 1 200px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .stat-group {
+            margin-bottom: 10px;
+        }
+
+        h3 {
+            margin: 5px 0;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            color: var(--text-gray);
+            letter-spacing: 1px;
+        }
+
+        .bar-bg {
+            background: #000;
+            height: 16px;
+            width: 100%;
+            border: 2px solid var(--dim-red);
+        }
+
+        .bar-fill {
+            height: 100%;
+            background: var(--glow-red);
+            box-shadow: 0 0 10px var(--glow-red);
+            transition: width 0.2s ease;
+        }
+
+        /* Emotion sliders section */
+        .sliders-panel {
+            width: 100%;
+            border-top: 2px solid var(--dim-red);
+            padding-top: 15px;
+            margin-top: 10px;
+        }
+
+        .slider-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .slider-label {
+            width: 70px;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            color: var(--glow-red);
+        }
+
+        .slider-container {
+            flex: 1;
+            position: relative;
+            height: 30px;
+            display: flex;
+            align-items: center;
+        }
+
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 8px;
+            background: black;
+            border: 2px solid var(--mid-red);
+            outline: none;
+        }
+
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 24px;
+            height: 24px;
+            background: var(--glow-red);
+            border: 2px solid white;
+            cursor: pointer;
+            box-shadow: 0 0 10px var(--glow-red);
+        }
+
+        input[type=range]::-moz-range-thumb {
+            width: 24px;
+            height: 24px;
+            background: var(--glow-red);
+            border: 2px solid white;
+            cursor: pointer;
+        }
+
+        .slider-value {
+            width: 45px;
+            text-align: right;
+            font-size: 0.9rem;
+            color: var(--glow-red);
         }
 
         .bond-selector {
@@ -177,7 +281,7 @@
         .button-group {
             display: flex;
             gap: 12px;
-            margin-top: 15px;
+            margin: 20px 0 10px;
             flex-wrap: wrap;
             justify-content: center;
             z-index: 110;
@@ -212,36 +316,6 @@
             color: var(--text-gray);
         }
 
-        .stats-panel {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-
-        h3 {
-            margin: 5px 0;
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            color: var(--text-gray);
-            letter-spacing: 1px;
-        }
-
-        .bar-bg {
-            background: #000;
-            height: 20px;
-            width: 100%;
-            border: 2px solid var(--dim-red);
-            margin-bottom: 15px;
-        }
-
-        .bar-fill {
-            height: 100%;
-            background: var(--glow-red);
-            box-shadow: 0 0 10px var(--glow-red);
-            transition: width 0.3s ease;
-        }
-
         .footer {
             margin-top: 20px;
             border-top: 2px solid var(--dim-red);
@@ -255,48 +329,39 @@
 
         /* Mobile adjustments */
         @media (max-width: 600px) {
-            .main-container {
+            .top-row {
                 flex-direction: column;
                 align-items: center;
             }
             #wheel-area {
-                flex: 0 0 auto;
                 width: 100%;
+            }
+            .slider-row {
+                flex-wrap: wrap;
+            }
+            .slider-label {
+                width: 60px;
             }
             .terminal-btn {
                 padding: 16px 12px;
                 font-size: 0.9rem;
                 min-width: 120px;
             }
-            .bond-selector select {
-                padding: 14px 10px;
-                font-size: 1rem;
-            }
         }
     </style>
 </head>
 <body>
 
-    <div class="crt-monitor" id="monitor-frame">
-        <div class="screen" id="screen-body">
-            <div class="corrupted-overlay"></div>
-            <h2 id="char-name">> INITIALIZING...</h2>
-            
-            <div class="main-container">
+<div class="crt-monitor" id="monitor-frame">
+    <div class="screen" id="screen-body">
+        <div class="corrupted-overlay"></div>
+        <h2 id="char-name">> INITIALIZING...</h2>
+
+        <div class="main-container">
+            <!-- Top row: radar + core stats -->
+            <div class="top-row">
                 <div id="wheel-area">
                     <canvas id="radarChart"></canvas>
-
-                    <!-- Bond selector (hidden initially) -->
-                    <div class="bond-selector" id="bondSelector" style="display: none;">
-                        <select id="bondSelect" onchange="loadBond()">
-                            <option value="">-- SELECT BOND --</option>
-                        </select>
-                    </div>
-
-                    <div class="button-group">
-                        <button class="terminal-btn" onclick="syncToBot()" id="syncBtn">> SYNC TO BOT</button>
-                        <button class="terminal-btn" onclick="copyShareLink()">> COPY LINK</button>
-                    </div>
                 </div>
 
                 <div class="stats-panel">
@@ -315,269 +380,362 @@
                 </div>
             </div>
 
-            <div class="footer">
-                <div id="status-text">> STATUS: ONLINE</div>
-                <div id="version-text">> v5.2_STABLE</div>
+            <!-- Bond selector (hidden if target present) -->
+            <div class="bond-selector" id="bondSelector" style="display: none;">
+                <select id="bondSelect" onchange="loadBond()">
+                    <option value="">-- SELECT BOND --</option>
+                </select>
+            </div>
+
+            <!-- Emotion sliders -->
+            <div class="sliders-panel" id="slidersPanel">
+                <div class="slider-row" id="slider-joy">
+                    <span class="slider-label">JOY</span>
+                    <div class="slider-container">
+                        <input type="range" min="0" max="100" value="10" class="emotion-slider" id="joy-slider">
+                    </div>
+                    <span class="slider-value" id="joy-value">10</span>
+                </div>
+                <div class="slider-row" id="slider-trust">
+                    <span class="slider-label">TRUST</span>
+                    <div class="slider-container">
+                        <input type="range" min="0" max="100" value="10" class="emotion-slider" id="trust-slider">
+                    </div>
+                    <span class="slider-value" id="trust-value">10</span>
+                </div>
+                <div class="slider-row" id="slider-fear">
+                    <span class="slider-label">FEAR</span>
+                    <div class="slider-container">
+                        <input type="range" min="0" max="100" value="10" class="emotion-slider" id="fear-slider">
+                    </div>
+                    <span class="slider-value" id="fear-value">10</span>
+                </div>
+                <div class="slider-row" id="slider-surp">
+                    <span class="slider-label">SURP</span>
+                    <div class="slider-container">
+                        <input type="range" min="0" max="100" value="10" class="emotion-slider" id="surp-slider">
+                    </div>
+                    <span class="slider-value" id="surp-value">10</span>
+                </div>
+                <div class="slider-row" id="slider-grief">
+                    <span class="slider-label">GRIEF</span>
+                    <div class="slider-container">
+                        <input type="range" min="0" max="100" value="10" class="emotion-slider" id="grief-slider">
+                    </div>
+                    <span class="slider-value" id="grief-value">10</span>
+                </div>
+                <div class="slider-row" id="slider-disg">
+                    <span class="slider-label">DISG</span>
+                    <div class="slider-container">
+                        <input type="range" min="0" max="100" value="10" class="emotion-slider" id="disg-slider">
+                    </div>
+                    <span class="slider-value" id="disg-value">10</span>
+                </div>
+                <div class="slider-row" id="slider-rage">
+                    <span class="slider-label">RAGE</span>
+                    <div class="slider-container">
+                        <input type="range" min="0" max="100" value="10" class="emotion-slider" id="rage-slider">
+                    </div>
+                    <span class="slider-value" id="rage-value">10</span>
+                </div>
+                <div class="slider-row" id="slider-anti">
+                    <span class="slider-label">ANTI</span>
+                    <div class="slider-container">
+                        <input type="range" min="0" max="100" value="10" class="emotion-slider" id="anti-slider">
+                    </div>
+                    <span class="slider-value" id="anti-value">10</span>
+                </div>
+            </div>
+
+            <!-- Action buttons -->
+            <div class="button-group">
+                <button class="terminal-btn" onclick="syncToBot()" id="syncBtn">> SYNC TO BOT</button>
+                <button class="terminal-btn" onclick="copyShareLink()">> COPY LINK</button>
             </div>
         </div>
+
+        <div class="footer">
+            <div id="status-text">> STATUS: ONLINE</div>
+            <div id="version-text">> v5.2_STABLE</div>
+        </div>
     </div>
+</div>
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-dragdata@2.2.3/dist/chartjs-plugin-dragdata.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<!-- No dragData plugin needed anymore -->
+<script>
+    // ---------- CONFIG ----------
+    const API_BASE = "https://phantom-bot-production-fef1.up.railway.app";
+    const SYNC_SECRET = "mySuperSecret123";  // Change to match Railway env
 
-    <script>
-        // ---------- CONFIG ----------
-        // Your Railway app URL – update if it changes
-        const API_BASE = "https://phantom-bot-production-fef1.up.railway.app";
-        
-        // !!! IMPORTANT: Replace this with the SYNC_SECRET you set in Railway environment variables !!!
-        const SYNC_SECRET = "mySuperSecret123";  // <-- CHANGE THIS TO YOUR ACTUAL SECRET
+    const params = new URLSearchParams(window.location.search);
+    const userId = params.get('userId');
+    const charName = params.get('charName') || params.get('name');
+    const rot = parseInt(params.get('rot')) || 0;
+    const isCorrupted = rot >= 80;
 
-        const params = new URLSearchParams(window.location.search);
-        const userId = params.get('userId');
-        const charName = params.get('charName') || params.get('name');
-        const rot = parseInt(params.get('rot')) || 0;
-        const isCorrupted = rot >= 80;
+    // Glitch effect on text
+    function glitchText(text) {
+        if (!isCorrupted) return text;
+        return text.replace(/e/gi, "3").replace(/a/gi, "4").replace(/o/gi, "0").replace(/i/gi, "1").replace(/s/gi, "5");
+    }
 
-        // Glitch effect on text
-        function glitchText(text) {
-            if (!isCorrupted) return text;
-            return text.replace(/e/gi, "3").replace(/a/gi, "4").replace(/o/gi, "0").replace(/i/gi, "1").replace(/s/gi, "5");
+    if (isCorrupted) {
+        document.body.classList.add('rot-critical');
+        document.getElementById('status-text').innerText = "> STATUS: CORRUPTED";
+        document.getElementById('version-text').innerText = "> v5.2_UNSTABLE";
+    }
+
+    const rawName = params.get('name') || "SUBJECT_NULL";
+    document.getElementById('char-name').innerText = glitchText(`> SUBJECT: ${rawName.toUpperCase()}`);
+
+    // Stats bars
+    document.getElementById('grit-bar').style.width = (params.get('grit') || 100) + "%";
+    document.getElementById('rot-bar').style.width = rot + "%";
+    document.getElementById('weird-bar').style.width = (params.get('weird') || 0) + "%";
+
+    // ---------- SLIDER SETUP ----------
+    // Map emotion names to slider and value elements
+    const emotions = ['joy','trust','fear','surp','grief','disg','rage','anti'];
+    const sliders = {};
+    const valueSpans = {};
+    emotions.forEach(emo => {
+        const slider = document.getElementById(`${emo}-slider`);
+        const valueSpan = document.getElementById(`${emo}-value`);
+        if (slider && valueSpan) {
+            sliders[emo] = slider;
+            valueSpans[emo] = valueSpan;
+            // Set initial from URL or default 10
+            const initial = parseInt(params.get(emo)) || 10;
+            slider.value = initial;
+            valueSpan.innerText = initial;
+
+            // Add event listener to update radar and value display
+            slider.addEventListener('input', function() {
+                valueSpan.innerText = this.value;
+                updateRadarFromSliders();
+            });
         }
+    });
 
-        if (isCorrupted) {
-            document.body.classList.add('rot-critical');
-            document.getElementById('status-text').innerText = "> STATUS: CORRUPTED";
-            document.getElementById('version-text').innerText = "> v5.2_UNSTABLE";
+    // Helper to get current slider values as array
+    function getSliderValues() {
+        return emotions.map(emo => parseInt(sliders[emo].value) || 10);
+    }
+
+    // Update radar's local dataset when sliders change
+    function updateRadarFromSliders() {
+        if (radarChart && radarChart.data.datasets.length > 0) {
+            radarChart.data.datasets[0].data = getSliderValues();
+            radarChart.update();
         }
+    }
 
-        const rawName = params.get('name') || "SUBJECT_NULL";
-        document.getElementById('char-name').innerText = glitchText(`> SUBJECT: ${rawName.toUpperCase()}`);
+    // ---------- RADAR CHART (read‑only, updated by sliders) ----------
+    function getEmoData(prefix) {
+        // For target dataset (read from URL or bond selection)
+        return [
+            parseInt(params.get(prefix + 'joy')) || 10,
+            parseInt(params.get(prefix + 'trust')) || 10,
+            parseInt(params.get(prefix + 'fear')) || 10,
+            parseInt(params.get(prefix + 'surp')) || 10,
+            parseInt(params.get(prefix + 'grief')) || 10,
+            parseInt(params.get(prefix + 'disg')) || 10,
+            parseInt(params.get(prefix + 'rage')) || 10,
+            parseInt(params.get(prefix + 'anti')) || 10
+        ];
+    }
 
-        // Stats bars
-        document.getElementById('grit-bar').style.width = (params.get('grit') || 100) + "%";
-        document.getElementById('rot-bar').style.width = rot + "%";
-        document.getElementById('weird-bar').style.width = (params.get('weird') || 0) + "%";
+    // Initial datasets
+    let datasets = [{
+        label: 'LOCAL',
+        data: getSliderValues(), // from sliders (already set from URL)
+        backgroundColor: isCorrupted ? 'rgba(255, 255, 255, 0.1)' : 'rgba(255, 26, 26, 0.3)',
+        borderColor: isCorrupted ? '#fff' : '#ff1a1a',
+        pointBackgroundColor: isCorrupted ? '#fff' : '#ff1a1a',
+        pointRadius: 4,       // smaller, just for visualization
+        pointHoverRadius: 6
+    }];
 
-        // Helper to get emotion data from params (with prefix)
-        function getEmoData(prefix) {
-            return [
-                parseInt(params.get(prefix + 'joy')) || 10,
-                parseInt(params.get(prefix + 'trust')) || 10,
-                parseInt(params.get(prefix + 'fear')) || 10,
-                parseInt(params.get(prefix + 'surp')) || 10,
-                parseInt(params.get(prefix + 'grief')) || 10,
-                parseInt(params.get(prefix + 'disg')) || 10,
-                parseInt(params.get(prefix + 'rage')) || 10,
-                parseInt(params.get(prefix + 'anti')) || 10
-            ];
+    const targetName = params.get('target_oc');
+    if (targetName) {
+        datasets.push({
+            label: 'TARGET',
+            data: getEmoData('t_'),
+            backgroundColor: 'rgba(20, 255, 20, 0.2)',
+            borderColor: '#14ff14',
+            pointBackgroundColor: '#14ff14',
+            pointRadius: 4,
+            pointHoverRadius: 6
+        });
+        document.getElementById('bondSelector').style.display = 'none';
+    } else {
+        document.getElementById('bondSelector').style.display = 'flex';
+        fetchBonds();
+    }
+
+    const ctx = document.getElementById('radarChart').getContext('2d');
+    const radarChart = new Chart(ctx, {
+        type: 'radar',
+        data: {
+            labels: ['JOY', 'TRUST', 'FEAR', 'SURP', 'GRIEF', 'DISG', 'RAGE', 'ANTI'],
+            datasets: datasets
+        },
+        options: {
+            plugins: {
+                legend: { display: false }
+            },
+            scales: {
+                r: {
+                    angleLines: { color: isCorrupted ? '#fff' : '#440000' },
+                    grid: { color: isCorrupted ? '#fff' : '#440000' },
+                    pointLabels: {
+                        color: isCorrupted ? '#fff' : '#ff1a1a',
+                        font: { family: 'VHS', size: 10 }
+                    },
+                    ticks: { display: false },
+                    suggestedMin: 0,
+                    suggestedMax: 100
+                }
+            },
+            elements: {
+                point: { radius: 4, hoverRadius: 6 }
+            }
         }
+    });
 
-        // Initial datasets
-        let datasets = [{
-            label: 'LOCAL',
-            data: getEmoData(''),
-            backgroundColor: isCorrupted ? 'rgba(255, 255, 255, 0.1)' : 'rgba(255, 26, 26, 0.3)',
-            borderColor: isCorrupted ? '#fff' : '#ff1a1a',
-            pointBackgroundColor: isCorrupted ? '#fff' : '#ff1a1a',
-            pointRadius: 8,
-            pointHoverRadius: 12,
-            dragData: true
-        }];
+    // ---------- BOND FETCHING (same as before) ----------
+    async function fetchBonds() {
+        if (!userId || !charName) return;
+        try {
+            const url = `${API_BASE}/api/relationships?userId=${encodeURIComponent(userId)}&charName=${encodeURIComponent(charName)}&secret=${encodeURIComponent(SYNC_SECRET)}`;
+            const response = await fetch(url);
+            const bonds = await response.json();
+            const select = document.getElementById('bondSelect');
+            select.innerHTML = '<option value="">-- SELECT BOND --</option>';
+            bonds.forEach(bond => {
+                const option = document.createElement('option');
+                option.value = bond.userId;
+                option.textContent = bond.characterName.toUpperCase();
+                option.dataset.joy = bond.emotions.joy;
+                option.dataset.trust = bond.emotions.trust;
+                option.dataset.fear = bond.emotions.fear;
+                option.dataset.surp = bond.emotions.surp;
+                option.dataset.grief = bond.emotions.grief;
+                option.dataset.disg = bond.emotions.disg;
+                option.dataset.rage = bond.emotions.rage;
+                option.dataset.anti = bond.emotions.anti;
+                select.appendChild(option);
+            });
+        } catch (e) {
+            console.error('Failed to fetch bonds', e);
+        }
+    }
 
-        const targetName = params.get('target_oc');
-        if (targetName) {
-            datasets.push({
-                label: 'TARGET',
-                data: getEmoData('t_'),
+    function loadBond() {
+        const select = document.getElementById('bondSelect');
+        const option = select.selectedOptions[0];
+        if (!option.value) {
+            if (radarChart.data.datasets.length > 1) {
+                radarChart.data.datasets.pop();
+                radarChart.update();
+            }
+            return;
+        }
+        const targetData = [
+            parseInt(option.dataset.joy) || 10,
+            parseInt(option.dataset.trust) || 10,
+            parseInt(option.dataset.fear) || 10,
+            parseInt(option.dataset.surp) || 10,
+            parseInt(option.dataset.grief) || 10,
+            parseInt(option.dataset.disg) || 10,
+            parseInt(option.dataset.rage) || 10,
+            parseInt(option.dataset.anti) || 10
+        ];
+        if (radarChart.data.datasets.length > 1) {
+            radarChart.data.datasets[1].data = targetData;
+            radarChart.data.datasets[1].label = option.textContent;
+        } else {
+            radarChart.data.datasets.push({
+                label: option.textContent,
+                data: targetData,
                 backgroundColor: 'rgba(20, 255, 20, 0.2)',
                 borderColor: '#14ff14',
                 pointBackgroundColor: '#14ff14',
-                pointRadius: 8,
-                pointHoverRadius: 12,
-                dragData: false
+                pointRadius: 4,
+                pointHoverRadius: 6
             });
-            document.getElementById('bondSelector').style.display = 'none';
-        } else {
-            document.getElementById('bondSelector').style.display = 'flex';
-            fetchBonds();
         }
+        radarChart.update();
+    }
 
-        const ctx = document.getElementById('radarChart').getContext('2d');
-        const radarChart = new Chart(ctx, {
-            type: 'radar',
-            data: {
-                labels: ['JOY', 'TRUST', 'FEAR', 'SURP', 'GRIEF', 'DISG', 'RAGE', 'ANTI'],
-                datasets: datasets
-            },
-            options: {
-                plugins: {
-                    legend: { display: false },
-                    dragData: {
-                        round: 0,
-                        showTooltip: true,
-                        onDragStart: () => document.getElementById('radarChart').classList.add('glitching'),
-                        onDragEnd: () => document.getElementById('radarChart').classList.remove('glitching')
-                    }
-                },
-                scales: {
-                    r: {
-                        angleLines: { color: isCorrupted ? '#fff' : '#440000' },
-                        grid: { color: isCorrupted ? '#fff' : '#440000' },
-                        pointLabels: {
-                            color: isCorrupted ? '#fff' : '#ff1a1a',
-                            font: { family: 'VHS', size: 10 }
-                        },
-                        ticks: { display: false },
-                        suggestedMin: 0,
-                        suggestedMax: 100
-                    }
-                },
-                elements: {
-                    point: {
-                        radius: 8,
-                        hoverRadius: 12,
-                        hitRadius: 15
-                    }
-                }
-            }
-        });
+    // ---------- SYNC TO BOT (using slider values) ----------
+    async function syncToBot() {
+        const btn = document.getElementById('syncBtn');
+        btn.disabled = true;
+        btn.innerText = '> SYNCING...';
 
-        // ---------- BOND FETCHING ----------
-        async function fetchBonds() {
-            if (!userId || !charName) return;
-            try {
-                const url = `${API_BASE}/api/relationships?userId=${encodeURIComponent(userId)}&charName=${encodeURIComponent(charName)}&secret=${encodeURIComponent(SYNC_SECRET)}`;
-                const response = await fetch(url);
-                const bonds = await response.json();
-                const select = document.getElementById('bondSelect');
-                select.innerHTML = '<option value="">-- SELECT BOND --</option>';
-                bonds.forEach(bond => {
-                    const option = document.createElement('option');
-                    option.value = bond.userId;
-                    option.textContent = bond.characterName.toUpperCase();
-                    option.dataset.joy = bond.emotions.joy;
-                    option.dataset.trust = bond.emotions.trust;
-                    option.dataset.fear = bond.emotions.fear;
-                    option.dataset.surp = bond.emotions.surp;
-                    option.dataset.grief = bond.emotions.grief;
-                    option.dataset.disg = bond.emotions.disg;
-                    option.dataset.rage = bond.emotions.rage;
-                    option.dataset.anti = bond.emotions.anti;
-                    select.appendChild(option);
-                });
-            } catch (e) {
-                console.error('Failed to fetch bonds', e);
+        const currentValues = getSliderValues();
+        const emotionsObj = {};
+        emotions.forEach((emo, i) => emotionsObj[emo] = currentValues[i]);
+
+        const payload = {
+            userId: userId,
+            characterName: charName,
+            emotions: emotionsObj,
+            secret: SYNC_SECRET
+        };
+
+        try {
+            const response = await fetch(`${API_BASE}/api/sync`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const result = await response.json();
+            if (result.success) {
+                btn.innerText = '> SYNC COMPLETE';
+            } else {
+                btn.innerText = '> SYNC FAILED';
+                console.error(result.error);
             }
+        } catch (e) {
+            btn.innerText = '> CONNECTION ERROR';
+            console.error(e);
+        } finally {
+            setTimeout(() => {
+                btn.disabled = false;
+                btn.innerText = '> SYNC TO BOT';
+            }, 2000);
         }
+    }
 
-        function loadBond() {
+    // ---------- COPY SHARE LINK (include slider values) ----------
+    function copyShareLink() {
+        const currentValues = getSliderValues();
+        emotions.forEach((emo, i) => params.set(emo, currentValues[i]));
+
+        if (radarChart.data.datasets.length > 1) {
+            const targetData = radarChart.data.datasets[1].data;
+            const targetLabel = radarChart.data.datasets[1].label;
+            params.set('target_oc', targetLabel);
+            emotions.forEach((emo, i) => params.set('t_' + emo, targetData[i]));
             const select = document.getElementById('bondSelect');
-            const option = select.selectedOptions[0];
-            if (!option.value) {
-                if (radarChart.data.datasets.length > 1) {
-                    radarChart.data.datasets.pop();
-                    radarChart.update();
-                }
-                return;
+            if (select.selectedOptions[0] && select.selectedOptions[0].value) {
+                params.set('target_user', select.selectedOptions[0].value);
             }
-            const targetData = [
-                parseInt(option.dataset.joy) || 10,
-                parseInt(option.dataset.trust) || 10,
-                parseInt(option.dataset.fear) || 10,
-                parseInt(option.dataset.surp) || 10,
-                parseInt(option.dataset.grief) || 10,
-                parseInt(option.dataset.disg) || 10,
-                parseInt(option.dataset.rage) || 10,
-                parseInt(option.dataset.anti) || 10
-            ];
-            if (radarChart.data.datasets.length > 1) {
-                radarChart.data.datasets[1].data = targetData;
-                radarChart.data.datasets[1].label = option.textContent;
-            } else {
-                radarChart.data.datasets.push({
-                    label: option.textContent,
-                    data: targetData,
-                    backgroundColor: 'rgba(20, 255, 20, 0.2)',
-                    borderColor: '#14ff14',
-                    pointBackgroundColor: '#14ff14',
-                    pointRadius: 8,
-                    pointHoverRadius: 12,
-                    dragData: false
-                });
-            }
-            radarChart.update();
+        } else {
+            params.delete('target_oc');
+            params.delete('target_user');
+            emotions.forEach(emo => params.delete('t_' + emo));
         }
 
-        // ---------- SYNC TO BOT ----------
-        async function syncToBot() {
-            const btn = document.getElementById('syncBtn');
-            btn.disabled = true;
-            btn.innerText = '> SYNCING...';
-
-            const currentData = radarChart.data.datasets[0].data;
-            const labels = ['joy','trust','fear','surp','grief','disg','rage','anti'];
-            const emotions = {};
-            labels.forEach((l, i) => emotions[l] = currentData[i]);
-
-            const payload = {
-                userId: userId,
-                characterName: charName,
-                emotions: emotions,
-                secret: SYNC_SECRET
-            };
-
-            try {
-                const response = await fetch(`${API_BASE}/api/sync`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                const result = await response.json();
-                if (result.success) {
-                    btn.innerText = '> SYNC COMPLETE';
-                } else {
-                    btn.innerText = '> SYNC FAILED';
-                    console.error(result.error);
-                }
-            } catch (e) {
-                btn.innerText = '> CONNECTION ERROR';
-                console.error(e);
-            } finally {
-                setTimeout(() => {
-                    btn.disabled = false;
-                    btn.innerText = '> SYNC TO BOT';
-                }, 2000);
-            }
-        }
-
-        // ---------- COPY SHARE LINK ----------
-        function copyShareLink() {
-            const currentData = radarChart.data.datasets[0].data;
-            const labels = ['joy','trust','fear','surp','grief','disg','rage','anti'];
-            labels.forEach((l, i) => params.set(l, currentData[i]));
-
-            if (radarChart.data.datasets.length > 1) {
-                const targetData = radarChart.data.datasets[1].data;
-                const targetLabel = radarChart.data.datasets[1].label;
-                params.set('target_oc', targetLabel);
-                labels.forEach((l, i) => params.set('t_' + l, targetData[i]));
-                const select = document.getElementById('bondSelect');
-                if (select.selectedOptions[0] && select.selectedOptions[0].value) {
-                    params.set('target_user', select.selectedOptions[0].value);
-                }
-            } else {
-                params.delete('target_oc');
-                params.delete('target_user');
-                labels.forEach(l => params.delete('t_' + l));
-            }
-
-            const newURL = window.location.origin + window.location.pathname + '?' + params.toString();
-            navigator.clipboard.writeText(newURL);
-            const btn = event.target;
-            btn.innerText = '> LINK COPIED';
-            setTimeout(() => btn.innerText = '> COPY LINK', 1500);
-        }
-    </script>
+        const newURL = window.location.origin + window.location.pathname + '?' + params.toString();
+        navigator.clipboard.writeText(newURL);
+        const btn = event.target;
+        btn.innerText = '> LINK COPIED';
+        setTimeout(() => btn.innerText = '> COPY LINK', 1500);
+    }
+</script>
 </body>
 </html>
