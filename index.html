@@ -30,7 +30,7 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            overflow: hidden;
+            overflow-x: hidden;
             touch-action: pan-y;
             font-size: 16px;
         }
@@ -132,6 +132,7 @@
             flex-grow: 1;
         }
 
+        /* Top row: radar + stats (flex row on desktop) */
         .top-row {
             display: flex;
             flex-direction: row;
@@ -260,18 +261,53 @@
             text-transform: uppercase;
         }
 
+        /* ========== MOBILE OPTIMIZATIONS ========== */
         @media (max-width: 600px) {
             .top-row {
                 flex-direction: column;
-                align-items: center;
+                align-items: stretch;
             }
             #wheel-area {
                 width: 100%;
+                margin-bottom: 10px;
+            }
+            #radarChart {
+                max-width: 100%;   /* allow chart to use full width */
+                height: auto;
+            }
+            .stats-panel {
+                width: 100%;
+            }
+            .stat-group {
+                margin-bottom: 15px;
+            }
+            h3 {
+                font-size: 1rem;   /* larger labels */
+            }
+            .bar-bg {
+                height: 24px;       /* taller bars for easier viewing */
+            }
+            .bond-selector select {
+                width: 100%;        /* full width dropdown */
+                padding: 16px 10px;
+                font-size: 1rem;
+            }
+            .button-group {
+                flex-direction: column;  /* stack buttons vertically */
+                gap: 10px;
+                margin-top: 15px;
             }
             .terminal-btn {
-                padding: 16px 12px;
-                font-size: 0.9rem;
-                min-width: 120px;
+                width: 100%;         /* full width buttons */
+                min-width: unset;
+                padding: 18px 12px;  /* even larger tap target */
+                font-size: 1rem;
+            }
+            .footer {
+                font-size: 0.8rem;
+                flex-wrap: wrap;
+                gap: 10px;
+                justify-content: center;
             }
         }
     </style>
@@ -313,6 +349,7 @@
 
             <div class="button-group">
                 <button class="terminal-btn" onclick="syncToBot()" id="syncBtn">> SYNC TO BOT</button>
+                <button class="terminal-btn" onclick="refreshData()" id="refreshBtn">> REFRESH</button>
                 <button class="terminal-btn" onclick="copyShareLink()">> COPY LINK</button>
             </div>
         </div>
@@ -325,7 +362,7 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<!-- No dragData plugin needed -->
+
 <script>
     // ---------- CONFIG ----------
     const API_BASE = "https://phantom-bot-production-fef1.up.railway.app";
@@ -361,20 +398,18 @@
         if (isCorrupted) return '#fff';
         // Dark red (low) to bright red (high)
         const intensity = value / 100;
-        // RGB: start with #8B0000 (dark red) to #FF1A1A (bright)
-        const r = Math.floor(139 + (255 - 139) * intensity); // 139 to 255
-        const g = Math.floor(0 + (26 - 0) * intensity);      // 0 to 26
-        const b = Math.floor(0 + (26 - 0) * intensity);      // 0 to 26
+        const r = Math.floor(139 + (255 - 139) * intensity);
+        const g = Math.floor(0 + (26 - 0) * intensity);
+        const b = Math.floor(0 + (26 - 0) * intensity);
         return `rgb(${r}, ${g}, ${b})`;
     }
 
     function getTargetColor(value) {
         if (isCorrupted) return '#fff';
-        // Dark green (low) to bright green (high)
         const intensity = value / 100;
-        const r = Math.floor(0 + (20 - 0) * intensity);      // 0 to 20
-        const g = Math.floor(139 + (255 - 139) * intensity); // 139 to 255
-        const b = Math.floor(0 + (20 - 0) * intensity);      // 0 to 20
+        const r = Math.floor(0 + (20 - 0) * intensity);
+        const g = Math.floor(139 + (255 - 139) * intensity);
+        const b = Math.floor(0 + (20 - 0) * intensity);
         return `rgb(${r}, ${g}, ${b})`;
     }
 
@@ -392,7 +427,6 @@
         ];
     }
 
-    // Local dataset – non‑interactive, small points
     let datasets = [{
         label: 'LOCAL',
         data: getEmoData(''),
@@ -534,12 +568,6 @@
     }
 
     // ---------- SYNC TO BOT ----------
-    // (This uses the current local dataset values – but local dataset is read from URL, not sliders)
-    // Since we removed sliders, the local dataset values are fixed from the URL. 
-    // The user would need to update their emotions via Discord's /set_emotions, then reload the page.
-    // We can still sync – it will send the current URL values back to the bot (no change).
-    // Alternatively, we could provide a way to edit emotions in HTML, but user requested no sliders.
-    // We'll keep sync for completeness – it sends the current radar data (which is the bot's last known).
     async function syncToBot() {
         const btn = document.getElementById('syncBtn');
         btn.disabled = true;
@@ -578,6 +606,51 @@
                 btn.disabled = false;
                 btn.innerText = '> SYNC TO BOT';
             }, 2000);
+        }
+    }
+
+    // ---------- REFRESH DATA FROM BOT ----------
+    async function refreshData() {
+        const btn = document.getElementById('refreshBtn');
+        btn.disabled = true;
+        btn.innerText = '> REFRESHING...';
+
+        if (!userId || !charName) {
+            alert('Missing user or character info');
+            btn.disabled = false;
+            btn.innerText = '> REFRESH';
+            return;
+        }
+
+        try {
+            const url = `${API_BASE}/api/character?userId=${encodeURIComponent(userId)}&charName=${encodeURIComponent(charName)}&secret=${encodeURIComponent(SYNC_SECRET)}`;
+            const response = await fetch(url);
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
+            }
+            const data = await response.json();
+
+            // Update radar chart's first dataset (local)
+            radarChart.data.datasets[0].data = [
+                data.joy, data.trust, data.fear, data.surp,
+                data.grief, data.disg, data.rage, data.anti
+            ];
+            radarChart.update();
+
+            // Update stat bars
+            document.getElementById('grit-bar').style.width = data.grit + "%";
+            document.getElementById('rot-bar').style.width = data.rot + "%";
+            document.getElementById('weird-bar').style.width = data.weird + "%";
+
+            btn.innerText = '> REFRESHED';
+        } catch (e) {
+            console.error('Refresh failed:', e);
+            btn.innerText = '> ERROR';
+        } finally {
+            setTimeout(() => {
+                btn.disabled = false;
+                btn.innerText = '> REFRESH';
+            }, 1500);
         }
     }
 
