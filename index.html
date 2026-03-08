@@ -197,12 +197,180 @@
             animation: breathe 3s infinite ease-in-out;
         }
 
+        /* Bond selector */
+        .bond-selector {
+            margin: 15px 0 10px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            font-size: 0.8rem;
+            z-index: 110;
+        }
+
+        .bond-selector select {
+            background: black;
+            color: var(--glow-red);
+            border: 1px solid var(--mid-red);
+            font-family: 'VHS', monospace;
+            padding: 12px 8px;
+            width: 80%;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            border-radius: 0;
+            -webkit-appearance: none;
+            appearance: none;
+            box-shadow: 0 0 10px rgba(255,26,26,0.3);
+        }
+
+        /* ----- NEW LAYOUT ----- */
+        .action-header {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .subject-file-btn {
+            background: transparent;
+            border: 1px solid var(--glow-red);
+            color: var(--glow-red);
+            font-family: 'VHS', monospace;
+            padding: 12px 20px;
+            cursor: pointer;
+            text-transform: uppercase;
+            font-size: 1rem;
+            letter-spacing: 2px;
+            transition: 0.2s;
+            border-radius: 0;
+            box-shadow: 0 0 15px rgba(255,26,26,0.4);
+            text-shadow: 0 0 8px currentColor;
+            animation: breathe 3s infinite ease-in-out;
+            flex: 1;
+            min-width: 160px;
+        }
+
+        .subject-file-btn:hover,
+        .subject-file-btn:active {
+            background: var(--glow-red);
+            color: black;
+            box-shadow: 0 0 30px var(--glow-red);
+        }
+
+        .menu-container {
+            position: relative;
+            display: inline-block;
+        }
+
+        .menu-btn {
+            background: transparent;
+            border: 1px solid var(--glow-red);
+            color: var(--glow-red);
+            font-family: 'VHS', monospace;
+            padding: 12px 20px;
+            cursor: pointer;
+            text-transform: uppercase;
+            font-size: 1.2rem;
+            line-height: 1;
+            transition: 0.2s;
+            border-radius: 0;
+            box-shadow: 0 0 10px rgba(255,26,26,0.3);
+            text-shadow: 0 0 5px currentColor;
+        }
+
+        .menu-btn:hover {
+            background: var(--glow-red);
+            color: black;
+            box-shadow: 0 0 20px var(--glow-red);
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 110%;
+            right: 0;
+            background: #0a0a0a;
+            border: 1px solid var(--mid-red);
+            box-shadow: 0 0 20px rgba(255,26,26,0.3);
+            display: none;
+            flex-direction: column;
+            min-width: 180px;
+            z-index: 200;
+        }
+
+        .dropdown-menu.show {
+            display: flex;
+        }
+
+        .dropdown-item {
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid var(--dim-red);
+            color: var(--glow-red);
+            font-family: 'VHS', monospace;
+            padding: 14px 16px;
+            cursor: pointer;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+            text-align: left;
+            transition: 0.1s;
+        }
+
+        .dropdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .dropdown-item:hover {
+            background: var(--glow-red);
+            color: black;
+        }
+
+        /* Collapsible Local Emotions Panel */
+        .collapse-panel {
+            border: 1px solid var(--dim-red);
+            margin: 10px 0;
+            background: rgba(0,0,0,0.5);
+        }
+
+        .collapse-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            cursor: pointer;
+            background: rgba(139,0,0,0.2);
+            border-bottom: 1px solid var(--dim-red);
+            user-select: none;
+        }
+
+        .collapse-header h3 {
+            margin: 0;
+            font-size: 1rem;
+            color: var(--glow-red);
+            text-shadow: 0 0 5px currentColor;
+        }
+
+        .collapse-indicator {
+            font-size: 1.2rem;
+            color: var(--glow-red);
+            transition: transform 0.2s;
+        }
+
+        .collapse-content {
+            padding: 15px;
+            display: none;
+        }
+
+        .collapse-content.expanded {
+            display: block;
+        }
+
+        /* Sliders inside collapsible */
         .sliders-panel {
             width: 100%;
-            border-top: 1px solid var(--dim-red);
-            padding-top: 15px;
-            margin-top: 10px;
-            box-shadow: 0 -5px 10px rgba(255,26,26,0.1);
         }
 
         .slider-row {
@@ -265,159 +433,29 @@
             text-shadow: 0 0 5px currentColor;
         }
 
-        .bond-selector {
-            margin: 15px 0 10px;
-            width: 100%;
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            font-size: 0.8rem;
-            z-index: 110;
-        }
-
-        .bond-selector select {
-            background: black;
-            color: var(--glow-red);
-            border: 1px solid var(--mid-red);
-            font-family: 'VHS', monospace;
-            padding: 12px 8px;
-            width: 80%;
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            border-radius: 0;
-            -webkit-appearance: none;
-            appearance: none;
-            box-shadow: 0 0 10px rgba(255,26,26,0.3);
-        }
-
-        /* ----- NEW BUTTON LAYOUT ----- */
-        .action-bar {
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-            justify-content: center;
-            gap: 15px;
-            margin: 20px 0 10px;
-            flex-wrap: wrap;
-            position: relative;
-            z-index: 110;
-        }
-
-        .primary-btn {
+        .load-data-btn {
             background: transparent;
             border: 1px solid var(--glow-red);
             color: var(--glow-red);
             font-family: 'VHS', monospace;
-            padding: 16px 24px;
+            padding: 14px 18px;
             cursor: pointer;
             text-transform: uppercase;
             font-size: 1rem;
             letter-spacing: 2px;
-            flex: 0 1 auto;
-            min-width: 180px;
+            width: 100%;
+            margin-top: 15px;
             transition: 0.2s;
             border-radius: 0;
             box-shadow: 0 0 15px rgba(255,26,26,0.4);
             text-shadow: 0 0 8px currentColor;
-            animation: breathe 3s infinite ease-in-out;
         }
 
-        .primary-btn:hover,
-        .primary-btn:active {
+        .load-data-btn:hover,
+        .load-data-btn:active {
             background: var(--glow-red);
             color: black;
             box-shadow: 0 0 30px var(--glow-red);
-        }
-
-        .menu-container {
-            position: relative;
-            display: inline-block;
-        }
-
-        .menu-btn {
-            background: transparent;
-            border: 1px solid var(--glow-red);
-            color: var(--glow-red);
-            font-family: 'VHS', monospace;
-            padding: 16px 20px;
-            cursor: pointer;
-            text-transform: uppercase;
-            font-size: 1.2rem;
-            line-height: 1;
-            transition: 0.2s;
-            border-radius: 0;
-            box-shadow: 0 0 10px rgba(255,26,26,0.3);
-            text-shadow: 0 0 5px currentColor;
-        }
-
-        .menu-btn:hover {
-            background: var(--glow-red);
-            color: black;
-            box-shadow: 0 0 20px var(--glow-red);
-        }
-
-        .dropdown-menu {
-            position: absolute;
-            top: 110%;
-            right: 0;
-            background: #0a0a0a;
-            border: 1px solid var(--mid-red);
-            box-shadow: 0 0 20px rgba(255,26,26,0.3);
-            display: none;
-            flex-direction: column;
-            min-width: 180px;
-            z-index: 200;
-        }
-
-        .dropdown-menu.show {
-            display: flex;
-        }
-
-        .dropdown-item {
-            background: transparent;
-            border: none;
-            border-bottom: 1px solid var(--dim-red);
-            color: var(--glow-red);
-            font-family: 'VHS', monospace;
-            padding: 14px 16px;
-            cursor: pointer;
-            text-transform: uppercase;
-            font-size: 0.9rem;
-            letter-spacing: 1px;
-            text-align: left;
-            transition: 0.1s;
-        }
-
-        .dropdown-item:last-child {
-            border-bottom: none;
-        }
-
-        .dropdown-item:hover {
-            background: var(--glow-red);
-            color: black;
-        }
-
-        /* For mobile, make dropdown full-width-ish */
-        @media (max-width: 600px) {
-            .action-bar {
-                flex-direction: column;
-                align-items: stretch;
-            }
-            .primary-btn {
-                width: 100%;
-            }
-            .menu-container {
-                width: 100%;
-            }
-            .menu-btn {
-                width: 100%;
-                text-align: center;
-            }
-            .dropdown-menu {
-                width: 100%;
-                right: auto;
-                left: 0;
-            }
         }
 
         .footer {
@@ -477,7 +515,38 @@
             display: none !important;
         }
 
-        /* Typing cursor effect */
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .terminal-btn {
+            background: transparent;
+            border: 1px solid var(--glow-red);
+            color: var(--glow-red);
+            font-family: 'VHS', monospace;
+            padding: 14px 18px;
+            cursor: pointer;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+            transition: 0.2s;
+            border-radius: 0;
+            box-shadow: 0 0 10px rgba(255,26,26,0.3);
+            text-shadow: 0 0 5px currentColor;
+        }
+
+        .terminal-btn:hover,
+        .terminal-btn:active {
+            background: var(--glow-red);
+            color: black;
+            box-shadow: 0 0 20px var(--glow-red);
+        }
+
+        /* Typing cursor */
         .typing-cursor::after {
             content: "▋";
             animation: blink 1s infinite;
@@ -486,6 +555,29 @@
         @keyframes blink {
             0%, 50% { opacity: 1; }
             51%, 100% { opacity: 0; }
+        }
+
+        /* Mobile adjustments */
+        @media (max-width: 600px) {
+            .action-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .subject-file-btn {
+                width: 100%;
+            }
+            .menu-container {
+                width: 100%;
+            }
+            .menu-btn {
+                width: 100%;
+                text-align: center;
+            }
+            .dropdown-menu {
+                width: 100%;
+                right: auto;
+                left: 0;
+            }
         }
     </style>
 </head>
@@ -496,7 +588,7 @@
         <div class="corrupted-overlay"></div>
         <h2 id="char-name">> <span id="name-typing"></span><span class="typing-cursor"></span></h2>
 
-        <!-- MAIN VIEW (Radar + Stats + Sliders) -->
+        <!-- MAIN VIEW -->
         <div id="mainView" class="main-container">
             <div class="top-row">
                 <div id="wheel-area">
@@ -524,78 +616,85 @@
                 </select>
             </div>
 
-            <!-- Emotion sliders for local OC -->
-            <div class="sliders-panel">
-                <h3 style="margin-top:0;">> LOCAL EMOTIONS</h3>
-                <div class="slider-row" id="slider-joy">
-                    <span class="slider-label">JOY</span>
-                    <div class="slider-container">
-                        <input type="range" min="0" max="100" value="10" class="emotion-slider" id="joy-slider">
-                    </div>
-                    <span class="slider-value" id="joy-value">10</span>
-                </div>
-                <div class="slider-row" id="slider-trust">
-                    <span class="slider-label">TRUST</span>
-                    <div class="slider-container">
-                        <input type="range" min="0" max="100" value="10" class="emotion-slider" id="trust-slider">
-                    </div>
-                    <span class="slider-value" id="trust-value">10</span>
-                </div>
-                <div class="slider-row" id="slider-fear">
-                    <span class="slider-label">FEAR</span>
-                    <div class="slider-container">
-                        <input type="range" min="0" max="100" value="10" class="emotion-slider" id="fear-slider">
-                    </div>
-                    <span class="slider-value" id="fear-value">10</span>
-                </div>
-                <div class="slider-row" id="slider-surp">
-                    <span class="slider-label">SURP</span>
-                    <div class="slider-container">
-                        <input type="range" min="0" max="100" value="10" class="emotion-slider" id="surp-slider">
-                    </div>
-                    <span class="slider-value" id="surp-value">10</span>
-                </div>
-                <div class="slider-row" id="slider-grief">
-                    <span class="slider-label">GRIEF</span>
-                    <div class="slider-container">
-                        <input type="range" min="0" max="100" value="10" class="emotion-slider" id="grief-slider">
-                    </div>
-                    <span class="slider-value" id="grief-value">10</span>
-                </div>
-                <div class="slider-row" id="slider-disg">
-                    <span class="slider-label">DISG</span>
-                    <div class="slider-container">
-                        <input type="range" min="0" max="100" value="10" class="emotion-slider" id="disg-slider">
-                    </div>
-                    <span class="slider-value" id="disg-value">10</span>
-                </div>
-                <div class="slider-row" id="slider-rage">
-                    <span class="slider-label">RAGE</span>
-                    <div class="slider-container">
-                        <input type="range" min="0" max="100" value="10" class="emotion-slider" id="rage-slider">
-                    </div>
-                    <span class="slider-value" id="rage-value">10</span>
-                </div>
-                <div class="slider-row" id="slider-anti">
-                    <span class="slider-label">ANTI</span>
-                    <div class="slider-container">
-                        <input type="range" min="0" max="100" value="10" class="emotion-slider" id="anti-slider">
-                    </div>
-                    <span class="slider-value" id="anti-value">10</span>
-                </div>
-            </div>
-
-            <!-- New action bar with primary LOAD DATA button and dropdown menu -->
-            <div class="action-bar">
-                <button class="primary-btn" onclick="syncToBot()" id="syncBtn">> LOAD DATA</button>
+            <!-- Action header with SUBJECT FILE button and menu dropdown -->
+            <div class="action-header">
+                <button class="subject-file-btn" onclick="showLoreView()">> SUBJECT FILE</button>
                 <div class="menu-container" id="menuContainer">
                     <button class="menu-btn" id="menuToggle">≡</button>
                     <div class="dropdown-menu" id="dropdownMenu">
                         <button class="dropdown-item" onclick="refreshData()">> REFRESH</button>
                         <button class="dropdown-item" onclick="copyShareLink()">> COPY LINK</button>
-                        <button class="dropdown-item" onclick="showLoreView()">> SUBJECT FILE</button>
                         <button class="dropdown-item" onclick="showEditLore()">> EDIT LORE</button>
                     </div>
+                </div>
+            </div>
+
+            <!-- Collapsible Local Emotions Panel -->
+            <div class="collapse-panel" id="localEmotionsPanel">
+                <div class="collapse-header" id="collapseHeader">
+                    <h3>> LOCAL EMOTIONS</h3>
+                    <span class="collapse-indicator" id="collapseIndicator">▼</span>
+                </div>
+                <div class="collapse-content" id="collapseContent">
+                    <div class="sliders-panel">
+                        <div class="slider-row" id="slider-joy">
+                            <span class="slider-label">JOY</span>
+                            <div class="slider-container">
+                                <input type="range" min="0" max="100" value="10" class="emotion-slider" id="joy-slider">
+                            </div>
+                            <span class="slider-value" id="joy-value">10</span>
+                        </div>
+                        <div class="slider-row" id="slider-trust">
+                            <span class="slider-label">TRUST</span>
+                            <div class="slider-container">
+                                <input type="range" min="0" max="100" value="10" class="emotion-slider" id="trust-slider">
+                            </div>
+                            <span class="slider-value" id="trust-value">10</span>
+                        </div>
+                        <div class="slider-row" id="slider-fear">
+                            <span class="slider-label">FEAR</span>
+                            <div class="slider-container">
+                                <input type="range" min="0" max="100" value="10" class="emotion-slider" id="fear-slider">
+                            </div>
+                            <span class="slider-value" id="fear-value">10</span>
+                        </div>
+                        <div class="slider-row" id="slider-surp">
+                            <span class="slider-label">SURP</span>
+                            <div class="slider-container">
+                                <input type="range" min="0" max="100" value="10" class="emotion-slider" id="surp-slider">
+                            </div>
+                            <span class="slider-value" id="surp-value">10</span>
+                        </div>
+                        <div class="slider-row" id="slider-grief">
+                            <span class="slider-label">GRIEF</span>
+                            <div class="slider-container">
+                                <input type="range" min="0" max="100" value="10" class="emotion-slider" id="grief-slider">
+                            </div>
+                            <span class="slider-value" id="grief-value">10</span>
+                        </div>
+                        <div class="slider-row" id="slider-disg">
+                            <span class="slider-label">DISG</span>
+                            <div class="slider-container">
+                                <input type="range" min="0" max="100" value="10" class="emotion-slider" id="disg-slider">
+                            </div>
+                            <span class="slider-value" id="disg-value">10</span>
+                        </div>
+                        <div class="slider-row" id="slider-rage">
+                            <span class="slider-label">RAGE</span>
+                            <div class="slider-container">
+                                <input type="range" min="0" max="100" value="10" class="emotion-slider" id="rage-slider">
+                            </div>
+                            <span class="slider-value" id="rage-value">10</span>
+                        </div>
+                        <div class="slider-row" id="slider-anti">
+                            <span class="slider-label">ANTI</span>
+                            <div class="slider-container">
+                                <input type="range" min="0" max="100" value="10" class="emotion-slider" id="anti-slider">
+                            </div>
+                            <span class="slider-value" id="anti-value">10</span>
+                        </div>
+                    </div>
+                    <button class="load-data-btn" onclick="syncToBot()" id="syncBtn">> LOAD DATA</button>
                 </div>
             </div>
         </div>
@@ -615,7 +714,7 @@
                 <div class="lore-field"><div class="lore-label">FACTION</div><div id="lore-faction" class="lore-value">—</div></div>
                 <div class="lore-field"><div class="lore-label">GOALS</div><div id="lore-goals" class="lore-value">—</div></div>
             </div>
-            <div class="button-group" style="margin-top:20px;">
+            <div class="button-group">
                 <button class="terminal-btn" onclick="showMainView()">> RETURN</button>
             </div>
         </div>
@@ -635,7 +734,7 @@
                 <div class="lore-field"><div class="lore-label">FACTION</div><input type="text" id="edit-faction" class="lore-input" placeholder="FACTION"></div>
                 <div class="lore-field"><div class="lore-label">GOALS</div><textarea id="edit-goals" class="lore-input" placeholder="GOALS"></textarea></div>
             </div>
-            <div class="button-group" style="margin-top:20px;">
+            <div class="button-group">
                 <button class="terminal-btn" onclick="saveLore()">> SAVE LORE</button>
                 <button class="terminal-btn" onclick="showMainView()">> CANCEL</button>
             </div>
@@ -682,14 +781,13 @@
 
     const rawName = params.get('name') || "SUBJECT_NULL";
     const finalName = glitchText(`> SUBJECT: ${rawName.toUpperCase()}`);
-    // We'll handle typing in window.onload
 
     // Stats bars
     document.getElementById('grit-bar').style.width = (params.get('grit') || 100) + "%";
     document.getElementById('rot-bar').style.width = rot + "%";
     document.getElementById('weird-bar').style.width = (params.get('weird') || 0) + "%";
 
-    // ---------- COLOR SATURATION BASED ON VALUE ----------
+    // ---------- COLOR SATURATION ----------
     function getLocalColor(value) {
         if (isCorrupted) return '#fff';
         const intensity = value / 100;
@@ -846,7 +944,7 @@
         loadLoreToForm();
     }
 
-    // ---------- LORE FETCHING ----------
+    // ---------- LORE ----------
     async function loadLoreToView() {
         if (!userId || !charName) return;
         try {
@@ -990,7 +1088,7 @@
         radarChart.update();
     }
 
-    // ---------- SYNC TO BOT (renamed to LOAD DATA) ----------
+    // ---------- SYNC (LOAD DATA) ----------
     async function syncToBot() {
         const btn = document.getElementById('syncBtn');
         btn.disabled = true;
@@ -1031,21 +1129,16 @@
         }
     }
 
-    // ---------- REFRESH DATA FROM BOT ----------
+    // ---------- REFRESH ----------
     async function refreshData() {
-        const btn = document.getElementById('refreshBtn'); // we'll need to reference it in dropdown, but it's not a button id anymore; we'll handle inside dropdown click
-        // We'll find the dropdown item that calls this function; it's fine.
         if (!userId || !charName) {
             alert('Missing user or character info');
             return;
         }
-
         try {
             const url = `${API_BASE}/api/character?userId=${encodeURIComponent(userId)}&charName=${encodeURIComponent(charName)}&secret=${encodeURIComponent(SYNC_SECRET)}`;
             const response = await fetch(url);
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status}`);
-            }
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
             const data = await response.json();
 
             emotions.forEach((emo, i) => {
@@ -1064,7 +1157,6 @@
             document.getElementById('rot-bar').style.width = data.rot + "%";
             document.getElementById('weird-bar').style.width = data.weird + "%";
 
-            // Optional: show a brief message
             alert('Data refreshed');
         } catch (e) {
             console.error('Refresh failed:', e);
@@ -1072,7 +1164,7 @@
         }
     }
 
-    // ---------- COPY SHARE LINK ----------
+    // ---------- COPY LINK ----------
     function copyShareLink() {
         const currentValues = getSliderValues();
         const labels = emotions;
@@ -1108,28 +1200,40 @@
             dropdown.classList.toggle('show');
         });
 
-        // Close dropdown when clicking outside
         document.addEventListener('click', function(event) {
             if (!menuToggle.contains(event.target) && !dropdown.contains(event.target)) {
                 dropdown.classList.remove('show');
             }
         });
+    });
 
-        // Prevent dropdown from closing when clicking inside it (handled by button actions)
+    // ---------- COLLAPSIBLE PANEL ----------
+    document.addEventListener('DOMContentLoaded', function() {
+        const header = document.getElementById('collapseHeader');
+        const content = document.getElementById('collapseContent');
+        const indicator = document.getElementById('collapseIndicator');
+
+        header.addEventListener('click', function() {
+            content.classList.toggle('expanded');
+            indicator.textContent = content.classList.contains('expanded') ? '▼' : '►';
+        });
+
+        // Start expanded (optional)
+        content.classList.add('expanded');
+        indicator.textContent = '▼';
     });
 
     // ---------- TYPING ANIMATION ----------
     window.addEventListener('load', function() {
         const typingSpan = document.getElementById('name-typing');
-        const fullText = finalName; // e.g., "> SUBJECT: RAIDEN"
+        const fullText = finalName;
         let i = 0;
         function typeNext() {
             if (i < fullText.length) {
                 typingSpan.textContent += fullText.charAt(i);
                 i++;
-                setTimeout(typeNext, 50); // typing speed
+                setTimeout(typeNext, 50);
             } else {
-                // remove cursor after typing
                 document.querySelector('.typing-cursor').style.display = 'none';
             }
         }
