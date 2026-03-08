@@ -125,16 +125,6 @@
             100% { transform: translate(0); }
         }
 
-        /* Pulse animation for maxed emotions */
-        .max-emotion {
-            animation: pulse 1s infinite;
-        }
-        @keyframes pulse {
-            0% { filter: drop-shadow(0 0 5px cyan); }
-            50% { filter: drop-shadow(0 0 15px magenta); }
-            100% { filter: drop-shadow(0 0 5px cyan); }
-        }
-
         .main-container {
             display: flex;
             flex-direction: column;
@@ -195,69 +185,6 @@
             background: var(--glow-red);
             box-shadow: 0 0 10px var(--glow-red);
             transition: width 0.2s ease;
-        }
-
-        .sliders-panel {
-            width: 100%;
-            border-top: 2px solid var(--dim-red);
-            padding-top: 15px;
-            margin-top: 10px;
-        }
-
-        .slider-row {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-
-        .slider-label {
-            width: 70px;
-            text-transform: uppercase;
-            font-size: 0.8rem;
-            color: var(--glow-red);
-        }
-
-        .slider-container {
-            flex: 1;
-            position: relative;
-            height: 30px;
-            display: flex;
-            align-items: center;
-        }
-
-        input[type=range] {
-            -webkit-appearance: none;
-            width: 100%;
-            height: 8px;
-            background: black;
-            border: 2px solid var(--mid-red);
-            outline: none;
-        }
-
-        input[type=range]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 24px;
-            height: 24px;
-            background: var(--glow-red);
-            border: 2px solid white;
-            cursor: pointer;
-            box-shadow: 0 0 10px var(--glow-red);
-        }
-
-        input[type=range]::-moz-range-thumb {
-            width: 24px;
-            height: 24px;
-            background: var(--glow-red);
-            border: 2px solid white;
-            cursor: pointer;
-        }
-
-        .slider-value {
-            width: 45px;
-            text-align: right;
-            font-size: 0.9rem;
-            color: var(--glow-red);
         }
 
         .bond-selector {
@@ -341,12 +268,6 @@
             #wheel-area {
                 width: 100%;
             }
-            .slider-row {
-                flex-wrap: wrap;
-            }
-            .slider-label {
-                width: 60px;
-            }
             .terminal-btn {
                 padding: 16px 12px;
                 font-size: 0.9rem;
@@ -390,65 +311,6 @@
                 </select>
             </div>
 
-            <div class="sliders-panel" id="slidersPanel">
-                <div class="slider-row" id="slider-joy">
-                    <span class="slider-label">JOY</span>
-                    <div class="slider-container">
-                        <input type="range" min="0" max="100" value="10" class="emotion-slider" id="joy-slider">
-                    </div>
-                    <span class="slider-value" id="joy-value">10</span>
-                </div>
-                <div class="slider-row" id="slider-trust">
-                    <span class="slider-label">TRUST</span>
-                    <div class="slider-container">
-                        <input type="range" min="0" max="100" value="10" class="emotion-slider" id="trust-slider">
-                    </div>
-                    <span class="slider-value" id="trust-value">10</span>
-                </div>
-                <div class="slider-row" id="slider-fear">
-                    <span class="slider-label">FEAR</span>
-                    <div class="slider-container">
-                        <input type="range" min="0" max="100" value="10" class="emotion-slider" id="fear-slider">
-                    </div>
-                    <span class="slider-value" id="fear-value">10</span>
-                </div>
-                <div class="slider-row" id="slider-surp">
-                    <span class="slider-label">SURP</span>
-                    <div class="slider-container">
-                        <input type="range" min="0" max="100" value="10" class="emotion-slider" id="surp-slider">
-                    </div>
-                    <span class="slider-value" id="surp-value">10</span>
-                </div>
-                <div class="slider-row" id="slider-grief">
-                    <span class="slider-label">GRIEF</span>
-                    <div class="slider-container">
-                        <input type="range" min="0" max="100" value="10" class="emotion-slider" id="grief-slider">
-                    </div>
-                    <span class="slider-value" id="grief-value">10</span>
-                </div>
-                <div class="slider-row" id="slider-disg">
-                    <span class="slider-label">DISG</span>
-                    <div class="slider-container">
-                        <input type="range" min="0" max="100" value="10" class="emotion-slider" id="disg-slider">
-                    </div>
-                    <span class="slider-value" id="disg-value">10</span>
-                </div>
-                <div class="slider-row" id="slider-rage">
-                    <span class="slider-label">RAGE</span>
-                    <div class="slider-container">
-                        <input type="range" min="0" max="100" value="10" class="emotion-slider" id="rage-slider">
-                    </div>
-                    <span class="slider-value" id="rage-value">10</span>
-                </div>
-                <div class="slider-row" id="slider-anti">
-                    <span class="slider-label">ANTI</span>
-                    <div class="slider-container">
-                        <input type="range" min="0" max="100" value="10" class="emotion-slider" id="anti-slider">
-                    </div>
-                    <span class="slider-value" id="anti-value">10</span>
-                </div>
-            </div>
-
             <div class="button-group">
                 <button class="terminal-btn" onclick="syncToBot()" id="syncBtn">> SYNC TO BOT</button>
                 <button class="terminal-btn" onclick="copyShareLink()">> COPY LINK</button>
@@ -463,8 +325,7 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-dragdata@2.2.3/dist/chartjs-plugin-dragdata.min.js"></script>
-
+<!-- No dragData plugin needed -->
 <script>
     // ---------- CONFIG ----------
     const API_BASE = "https://phantom-bot-production-fef1.up.railway.app";
@@ -490,40 +351,34 @@
     const rawName = params.get('name') || "SUBJECT_NULL";
     document.getElementById('char-name').innerText = glitchText(`> SUBJECT: ${rawName.toUpperCase()}`);
 
+    // Stats bars
     document.getElementById('grit-bar').style.width = (params.get('grit') || 100) + "%";
     document.getElementById('rot-bar').style.width = rot + "%";
     document.getElementById('weird-bar').style.width = (params.get('weird') || 0) + "%";
 
-    const emotions = ['joy','trust','fear','surp','grief','disg','rage','anti'];
-    const sliders = {};
-    const valueSpans = {};
-    emotions.forEach(emo => {
-        const slider = document.getElementById(`${emo}-slider`);
-        const valueSpan = document.getElementById(`${emo}-value`);
-        if (slider && valueSpan) {
-            sliders[emo] = slider;
-            valueSpans[emo] = valueSpan;
-            const initial = parseInt(params.get(emo)) || 10;
-            slider.value = initial;
-            valueSpan.innerText = initial;
-            slider.addEventListener('input', function() {
-                valueSpan.innerText = this.value;
-                updateRadarFromSliders();
-            });
-        }
-    });
-
-    function getSliderValues() {
-        return emotions.map(emo => parseInt(sliders[emo].value) || 10);
+    // ---------- COLOR SATURATION BASED ON VALUE ----------
+    function getLocalColor(value) {
+        if (isCorrupted) return '#fff';
+        // Dark red (low) to bright red (high)
+        const intensity = value / 100;
+        // RGB: start with #8B0000 (dark red) to #FF1A1A (bright)
+        const r = Math.floor(139 + (255 - 139) * intensity); // 139 to 255
+        const g = Math.floor(0 + (26 - 0) * intensity);      // 0 to 26
+        const b = Math.floor(0 + (26 - 0) * intensity);      // 0 to 26
+        return `rgb(${r}, ${g}, ${b})`;
     }
 
-    function updateRadarFromSliders() {
-        if (radarChart && radarChart.data.datasets.length > 0) {
-            radarChart.data.datasets[0].data = getSliderValues();
-            radarChart.update();
-        }
+    function getTargetColor(value) {
+        if (isCorrupted) return '#fff';
+        // Dark green (low) to bright green (high)
+        const intensity = value / 100;
+        const r = Math.floor(0 + (20 - 0) * intensity);      // 0 to 20
+        const g = Math.floor(139 + (255 - 139) * intensity); // 139 to 255
+        const b = Math.floor(0 + (20 - 0) * intensity);      // 0 to 20
+        return `rgb(${r}, ${g}, ${b})`;
     }
 
+    // ---------- RADAR DATA ----------
     function getEmoData(prefix) {
         return [
             parseInt(params.get(prefix + 'joy')) || 10,
@@ -537,41 +392,20 @@
         ];
     }
 
-    // Custom point styling based on value and corruption
-    function getLocalPointColor(value) {
-        if (isCorrupted) return '#fff';
-        if (value === 100) return '#00ffff'; // cyan for max
-        return '#ff1a1a';
-    }
-    function getLocalPointRadius(value) {
-        if (value === 100) return 10; // larger
-        return 8;
-    }
-    function getTargetPointColor(value) {
-        if (value === 100) return '#ff00ff'; // magenta for max
-        return '#14ff14';
-    }
-    function getTargetPointRadius(value) {
-        if (value === 100) return 10;
-        return 8;
-    }
-
+    // Local dataset – non‑interactive, small points
     let datasets = [{
         label: 'LOCAL',
-        data: getSliderValues(),
+        data: getEmoData(''),
         backgroundColor: isCorrupted ? 'rgba(255, 255, 255, 0.1)' : 'rgba(255, 26, 26, 0.3)',
         borderColor: isCorrupted ? '#fff' : '#ff1a1a',
         pointBackgroundColor: function(context) {
             const value = context.dataset.data[context.dataIndex];
-            return getLocalPointColor(value);
+            return getLocalColor(value);
         },
         pointBorderColor: '#fff',
-        pointRadius: function(context) {
-            const value = context.dataset.data[context.dataIndex];
-            return getLocalPointRadius(value);
-        },
-        pointHoverRadius: 12,
-        dragData: true
+        pointRadius: 4,
+        pointHoverRadius: 6,
+        dragData: false
     }];
 
     const targetName = params.get('target_oc');
@@ -583,14 +417,11 @@
             borderColor: '#14ff14',
             pointBackgroundColor: function(context) {
                 const value = context.dataset.data[context.dataIndex];
-                return getTargetPointColor(value);
+                return getTargetColor(value);
             },
             pointBorderColor: '#fff',
-            pointRadius: function(context) {
-                const value = context.dataset.data[context.dataIndex];
-                return getTargetPointRadius(value);
-            },
-            pointHoverRadius: 12,
+            pointRadius: 4,
+            pointHoverRadius: 6,
             dragData: false
         });
         document.getElementById('bondSelector').style.display = 'none';
@@ -608,13 +439,7 @@
         },
         options: {
             plugins: {
-                legend: { display: false },
-                dragData: {
-                    round: 0,
-                    showTooltip: true,
-                    onDragStart: () => document.getElementById('radarChart').classList.add('glitching'),
-                    onDragEnd: () => document.getElementById('radarChart').classList.remove('glitching')
-                }
+                legend: { display: false }
             },
             scales: {
                 r: {
@@ -631,12 +456,14 @@
             },
             elements: {
                 point: {
-                    hoverRadius: 12
+                    radius: 4,
+                    hoverRadius: 6
                 }
             }
         }
     });
 
+    // ---------- BOND FETCHING ----------
     async function fetchBonds() {
         if (!userId || !charName) return;
         try {
@@ -687,7 +514,6 @@
         if (radarChart.data.datasets.length > 1) {
             radarChart.data.datasets[1].data = targetData;
             radarChart.data.datasets[1].label = option.textContent;
-            // Need to update point styles? The dataset's pointBackgroundColor function will be called automatically on update.
         } else {
             radarChart.data.datasets.push({
                 label: option.textContent,
@@ -696,33 +522,38 @@
                 borderColor: '#14ff14',
                 pointBackgroundColor: function(context) {
                     const value = context.dataset.data[context.dataIndex];
-                    return getTargetPointColor(value);
+                    return getTargetColor(value);
                 },
                 pointBorderColor: '#fff',
-                pointRadius: function(context) {
-                    const value = context.dataset.data[context.dataIndex];
-                    return getTargetPointRadius(value);
-                },
-                pointHoverRadius: 12,
+                pointRadius: 4,
+                pointHoverRadius: 6,
                 dragData: false
             });
         }
         radarChart.update();
     }
 
+    // ---------- SYNC TO BOT ----------
+    // (This uses the current local dataset values – but local dataset is read from URL, not sliders)
+    // Since we removed sliders, the local dataset values are fixed from the URL. 
+    // The user would need to update their emotions via Discord's /set_emotions, then reload the page.
+    // We can still sync – it will send the current URL values back to the bot (no change).
+    // Alternatively, we could provide a way to edit emotions in HTML, but user requested no sliders.
+    // We'll keep sync for completeness – it sends the current radar data (which is the bot's last known).
     async function syncToBot() {
         const btn = document.getElementById('syncBtn');
         btn.disabled = true;
         btn.innerText = '> SYNCING...';
 
-        const currentValues = getSliderValues();
-        const emotionsObj = {};
-        emotions.forEach((emo, i) => emotionsObj[emo] = currentValues[i]);
+        const currentValues = radarChart.data.datasets[0].data;
+        const emotions = {};
+        const labels = ['joy','trust','fear','surp','grief','disg','rage','anti'];
+        labels.forEach((l, i) => emotions[l] = currentValues[i]);
 
         const payload = {
             userId: userId,
             characterName: charName,
-            emotions: emotionsObj,
+            emotions: emotions,
             secret: SYNC_SECRET
         };
 
@@ -750,15 +581,17 @@
         }
     }
 
+    // ---------- COPY SHARE LINK ----------
     function copyShareLink() {
-        const currentValues = getSliderValues();
-        emotions.forEach((emo, i) => params.set(emo, currentValues[i]));
+        const currentValues = radarChart.data.datasets[0].data;
+        const labels = ['joy','trust','fear','surp','grief','disg','rage','anti'];
+        labels.forEach((l, i) => params.set(l, currentValues[i]));
 
         if (radarChart.data.datasets.length > 1) {
             const targetData = radarChart.data.datasets[1].data;
             const targetLabel = radarChart.data.datasets[1].label;
             params.set('target_oc', targetLabel);
-            emotions.forEach((emo, i) => params.set('t_' + emo, targetData[i]));
+            labels.forEach((l, i) => params.set('t_' + l, targetData[i]));
             const select = document.getElementById('bondSelect');
             if (select.selectedOptions[0] && select.selectedOptions[0].value) {
                 params.set('target_user', select.selectedOptions[0].value);
@@ -766,7 +599,7 @@
         } else {
             params.delete('target_oc');
             params.delete('target_user');
-            emotions.forEach(emo => params.delete('t_' + emo));
+            labels.forEach(l => params.delete('t_' + l));
         }
 
         const newURL = window.location.origin + window.location.pathname + '?' + params.toString();
