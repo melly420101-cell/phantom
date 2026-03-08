@@ -5,13 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>PHANTOM_TERMINAL_V5.2_CORRUPTION</title>
     <style>
-        /* --- MILITARY TERMINAL THEME --- */
+        /* --- GRIMDARK MILITARY HUD TERMINAL --- */
         :root {
-            --crt-green: #14ff14;
             --glow-red: #ff1a1a;
             --mid-red: #8B0000;
             --dim-red: #440000;
-            --bg-black: #050000;
+            --bg-black: #000000;
             --text-gray: #aaaaaa;
             --screen-flicker: 0.15s infinite;
         }
@@ -35,13 +34,14 @@
             font-size: 16px;
         }
 
+        /* CRT monitor frame – darker, thinner */
         .crt-monitor {
-            background: #222;
-            border: 10px solid #2a2a2a;
-            border-radius: 20px;
+            background: #0a0a0a;
+            border: 5px solid #1a1a1a;
+            border-radius: 15px;
             padding: 5px;
             position: relative;
-            box-shadow: 0 0 50px rgba(0,0,0,0.8) inset, 0 10px 20px rgba(0,0,0,0.5);
+            box-shadow: 0 0 30px rgba(255,26,26,0.2) inset, 0 0 20px rgba(255,26,26,0.3);
             display: flex;
             width: 95%;
             max-width: 900px;
@@ -53,21 +53,23 @@
             background-color: var(--bg-black);
             width: 100%;
             height: 100%;
-            border-radius: 10px;
+            border-radius: 8px;
             position: relative;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
             padding: 15px;
             animation: flicker var(--screen-flicker);
+            box-shadow: 0 0 15px rgba(255,26,26,0.2) inset;
         }
 
+        /* Red scanlines – thinner, more subtle */
         .screen::after {
             content: " ";
             position: absolute;
             top: 0; left: 0; bottom: 0; right: 0;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%),
-                        linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(255, 26, 26, 0.03) 50%),
+                        linear-gradient(90deg, rgba(255, 26, 26, 0.02), rgba(0, 0, 0, 0), rgba(255, 26, 26, 0.02));
             background-size: 100% 4px, 3px 100%;
             pointer-events: none;
             z-index: 100;
@@ -76,7 +78,7 @@
         .corrupted-overlay {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: repeating-linear-gradient(0deg, transparent 0px, transparent 1px, rgba(255,255,255,0.05) 2px);
+            background: repeating-linear-gradient(0deg, transparent 0px, transparent 1px, rgba(255,26,26,0.05) 2px);
             opacity: 0;
             pointer-events: none;
             z-index: 90;
@@ -93,7 +95,7 @@
         }
 
         .rot-critical .bar-fill {
-            filter: hue-rotate(320deg) brightness(1.5);
+            filter: hue-rotate(0deg) brightness(1.5); /* keep red, just brighter */
         }
 
         @keyframes noise {
@@ -121,8 +123,15 @@
 
         @keyframes glitch {
             0% { transform: translate(0); }
-            20% { transform: translate(-4px, 2px); filter: hue-rotate(90deg); }
+            20% { transform: translate(-4px, 2px); filter: hue-rotate(30deg); }
             100% { transform: translate(0); }
+        }
+
+        /* Breathing glow for bars */
+        @keyframes breathe {
+            0% { box-shadow: 0 0 5px var(--glow-red), 0 0 10px var(--glow-red); }
+            50% { box-shadow: 0 0 15px var(--glow-red), 0 0 25px var(--glow-red); }
+            100% { box-shadow: 0 0 5px var(--glow-red), 0 0 10px var(--glow-red); }
         }
 
         .main-container {
@@ -150,8 +159,9 @@
         #radarChart {
             width: 100% !important;
             height: auto !important;
-            max-width: 280px; /* slightly smaller on mobile */
-            filter: drop-shadow(0 0 10px var(--glow-red));
+            max-width: 280px;
+            filter: drop-shadow(0 0 8px var(--glow-red));
+            animation: breathe 3s infinite ease-in-out;
         }
 
         .stats-panel {
@@ -171,13 +181,15 @@
             text-transform: uppercase;
             color: var(--text-gray);
             letter-spacing: 1px;
+            text-shadow: 0 0 5px rgba(255,26,26,0.5);
         }
 
         .bar-bg {
             background: #000;
             height: 16px;
             width: 100%;
-            border: 2px solid var(--dim-red);
+            border: 1px solid var(--mid-red);
+            box-shadow: 0 0 8px rgba(255,26,26,0.3);
         }
 
         .bar-fill {
@@ -185,14 +197,16 @@
             background: var(--glow-red);
             box-shadow: 0 0 10px var(--glow-red);
             transition: width 0.2s ease;
+            animation: breathe 3s infinite ease-in-out;
         }
 
         /* Sliders panel */
         .sliders-panel {
             width: 100%;
-            border-top: 2px solid var(--dim-red);
+            border-top: 1px solid var(--dim-red);
             padding-top: 15px;
             margin-top: 10px;
+            box-shadow: 0 -5px 10px rgba(255,26,26,0.1);
         }
 
         .slider-row {
@@ -207,6 +221,7 @@
             text-transform: uppercase;
             font-size: 0.8rem;
             color: var(--glow-red);
+            text-shadow: 0 0 5px currentColor;
         }
 
         .slider-container {
@@ -220,28 +235,30 @@
         input[type=range] {
             -webkit-appearance: none;
             width: 100%;
-            height: 8px;
+            height: 6px;
             background: black;
-            border: 2px solid var(--mid-red);
+            border: 1px solid var(--mid-red);
             outline: none;
+            box-shadow: 0 0 8px rgba(255,26,26,0.3);
         }
 
         input[type=range]::-webkit-slider-thumb {
             -webkit-appearance: none;
-            width: 24px;
-            height: 24px;
+            width: 20px;
+            height: 20px;
             background: var(--glow-red);
-            border: 2px solid white;
+            border: 1px solid white;
             cursor: pointer;
-            box-shadow: 0 0 10px var(--glow-red);
+            box-shadow: 0 0 15px var(--glow-red);
         }
 
         input[type=range]::-moz-range-thumb {
-            width: 24px;
-            height: 24px;
+            width: 20px;
+            height: 20px;
             background: var(--glow-red);
-            border: 2px solid white;
+            border: 1px solid white;
             cursor: pointer;
+            box-shadow: 0 0 15px var(--glow-red);
         }
 
         .slider-value {
@@ -249,6 +266,7 @@
             text-align: right;
             font-size: 0.9rem;
             color: var(--glow-red);
+            text-shadow: 0 0 5px currentColor;
         }
 
         .bond-selector {
@@ -264,7 +282,7 @@
         .bond-selector select {
             background: black;
             color: var(--glow-red);
-            border: 2px solid var(--mid-red);
+            border: 1px solid var(--mid-red);
             font-family: 'VHS', monospace;
             padding: 12px 8px;
             width: 80%;
@@ -273,6 +291,7 @@
             border-radius: 0;
             -webkit-appearance: none;
             appearance: none;
+            box-shadow: 0 0 10px rgba(255,26,26,0.3);
         }
 
         .button-group {
@@ -286,7 +305,7 @@
 
         .terminal-btn {
             background: transparent;
-            border: 2px solid var(--glow-red);
+            border: 1px solid var(--glow-red);
             color: var(--glow-red);
             font-family: 'VHS', monospace;
             padding: 14px 18px;
@@ -298,12 +317,15 @@
             min-width: 140px;
             transition: 0.2s;
             border-radius: 0;
+            box-shadow: 0 0 10px rgba(255,26,26,0.3);
+            text-shadow: 0 0 5px currentColor;
         }
 
         .terminal-btn:hover,
         .terminal-btn:active {
             background: var(--glow-red);
             color: black;
+            box-shadow: 0 0 20px var(--glow-red);
         }
 
         .terminal-btn:disabled {
@@ -311,20 +333,22 @@
             cursor: not-allowed;
             border-color: var(--text-gray);
             color: var(--text-gray);
+            box-shadow: none;
         }
 
         .footer {
             margin-top: 20px;
-            border-top: 2px solid var(--dim-red);
+            border-top: 1px solid var(--dim-red);
             padding-top: 8px;
             display: flex;
             justify-content: space-between;
             font-size: 0.7rem;
             color: var(--dim-red);
             text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
-        /* Lore view and edit styles */
+        /* Lore view and edit styles – keep consistent */
         .lore-panel {
             width: 100%;
             margin-top: 20px;
@@ -338,25 +362,28 @@
             text-transform: uppercase;
             letter-spacing: 1px;
             margin-bottom: 3px;
+            text-shadow: 0 0 5px rgba(255,26,26,0.3);
         }
         .lore-value {
             font-size: 1rem;
             color: var(--glow-red);
-            background: rgba(0,0,0,0.3);
+            background: rgba(0,0,0,0.5);
             padding: 8px;
-            border: 1px solid var(--dim-red);
+            border: 1px solid var(--mid-red);
             word-wrap: break-word;
+            box-shadow: 0 0 8px rgba(255,26,26,0.2);
         }
         .lore-input {
             width: 100%;
             background: black;
             color: var(--glow-red);
-            border: 2px solid var(--mid-red);
+            border: 1px solid var(--mid-red);
             font-family: 'VHS', monospace;
             padding: 12px;
             font-size: 0.9rem;
             border-radius: 0;
             box-sizing: border-box;
+            box-shadow: 0 0 8px rgba(255,26,26,0.2);
         }
         textarea.lore-input {
             min-height: 80px;
@@ -368,7 +395,7 @@
             display: none !important;
         }
 
-        /* Mobile adjustments */
+        /* Mobile adjustments – keep responsive */
         @media (max-width: 600px) {
             .top-row {
                 flex-direction: column;
@@ -621,19 +648,21 @@
     // ---------- COLOR SATURATION BASED ON VALUE ----------
     function getLocalColor(value) {
         if (isCorrupted) return '#fff';
+        // Keep it in the red family, just vary brightness
         const intensity = value / 100;
-        const r = Math.floor(139 + (255 - 139) * intensity);
-        const g = Math.floor(0 + (26 - 0) * intensity);
-        const b = Math.floor(0 + (26 - 0) * intensity);
+        const r = 255;
+        const g = Math.floor(26 * intensity);
+        const b = Math.floor(26 * intensity);
         return `rgb(${r}, ${g}, ${b})`;
     }
 
     function getTargetColor(value) {
         if (isCorrupted) return '#fff';
+        // Keep target greenish, but vary brightness
         const intensity = value / 100;
-        const r = Math.floor(0 + (20 - 0) * intensity);
-        const g = Math.floor(139 + (255 - 139) * intensity);
-        const b = Math.floor(0 + (20 - 0) * intensity);
+        const r = Math.floor(20 * intensity);
+        const g = 255;
+        const b = Math.floor(20 * intensity);
         return `rgb(${r}, ${g}, ${b})`;
     }
 
@@ -689,7 +718,7 @@
             return getLocalColor(value);
         },
         pointBorderColor: '#fff',
-        pointRadius: 6,          // larger points for visibility
+        pointRadius: 6,
         pointHoverRadius: 8,
         dragData: false
     }];
