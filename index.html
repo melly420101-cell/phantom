@@ -34,7 +34,6 @@
             font-size: 16px;
         }
 
-        /* CRT monitor frame – darker, thinner */
         .crt-monitor {
             background: #0a0a0a;
             border: 5px solid #1a1a1a;
@@ -63,7 +62,6 @@
             box-shadow: 0 0 15px rgba(255,26,26,0.2) inset;
         }
 
-        /* Red scanlines – thinner, more subtle */
         .screen::after {
             content: " ";
             position: absolute;
@@ -95,7 +93,7 @@
         }
 
         .rot-critical .bar-fill {
-            filter: hue-rotate(0deg) brightness(1.5); /* keep red, just brighter */
+            filter: hue-rotate(0deg) brightness(1.5);
         }
 
         @keyframes noise {
@@ -127,7 +125,6 @@
             100% { transform: translate(0); }
         }
 
-        /* Breathing glow for bars */
         @keyframes breathe {
             0% { box-shadow: 0 0 5px var(--glow-red), 0 0 10px var(--glow-red); }
             50% { box-shadow: 0 0 15px var(--glow-red), 0 0 25px var(--glow-red); }
@@ -200,7 +197,6 @@
             animation: breathe 3s infinite ease-in-out;
         }
 
-        /* Sliders panel */
         .sliders-panel {
             width: 100%;
             border-top: 1px solid var(--dim-red);
@@ -294,46 +290,134 @@
             box-shadow: 0 0 10px rgba(255,26,26,0.3);
         }
 
-        .button-group {
+        /* ----- NEW BUTTON LAYOUT ----- */
+        .action-bar {
             display: flex;
-            gap: 12px;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
             margin: 20px 0 10px;
             flex-wrap: wrap;
-            justify-content: center;
+            position: relative;
             z-index: 110;
         }
 
-        .terminal-btn {
+        .primary-btn {
             background: transparent;
             border: 1px solid var(--glow-red);
             color: var(--glow-red);
             font-family: 'VHS', monospace;
-            padding: 14px 18px;
+            padding: 16px 24px;
             cursor: pointer;
             text-transform: uppercase;
-            font-size: 0.8rem;
-            letter-spacing: 1px;
-            flex: 1 1 auto;
-            min-width: 140px;
+            font-size: 1rem;
+            letter-spacing: 2px;
+            flex: 0 1 auto;
+            min-width: 180px;
+            transition: 0.2s;
+            border-radius: 0;
+            box-shadow: 0 0 15px rgba(255,26,26,0.4);
+            text-shadow: 0 0 8px currentColor;
+            animation: breathe 3s infinite ease-in-out;
+        }
+
+        .primary-btn:hover,
+        .primary-btn:active {
+            background: var(--glow-red);
+            color: black;
+            box-shadow: 0 0 30px var(--glow-red);
+        }
+
+        .menu-container {
+            position: relative;
+            display: inline-block;
+        }
+
+        .menu-btn {
+            background: transparent;
+            border: 1px solid var(--glow-red);
+            color: var(--glow-red);
+            font-family: 'VHS', monospace;
+            padding: 16px 20px;
+            cursor: pointer;
+            text-transform: uppercase;
+            font-size: 1.2rem;
+            line-height: 1;
             transition: 0.2s;
             border-radius: 0;
             box-shadow: 0 0 10px rgba(255,26,26,0.3);
             text-shadow: 0 0 5px currentColor;
         }
 
-        .terminal-btn:hover,
-        .terminal-btn:active {
+        .menu-btn:hover {
             background: var(--glow-red);
             color: black;
             box-shadow: 0 0 20px var(--glow-red);
         }
 
-        .terminal-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            border-color: var(--text-gray);
-            color: var(--text-gray);
-            box-shadow: none;
+        .dropdown-menu {
+            position: absolute;
+            top: 110%;
+            right: 0;
+            background: #0a0a0a;
+            border: 1px solid var(--mid-red);
+            box-shadow: 0 0 20px rgba(255,26,26,0.3);
+            display: none;
+            flex-direction: column;
+            min-width: 180px;
+            z-index: 200;
+        }
+
+        .dropdown-menu.show {
+            display: flex;
+        }
+
+        .dropdown-item {
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid var(--dim-red);
+            color: var(--glow-red);
+            font-family: 'VHS', monospace;
+            padding: 14px 16px;
+            cursor: pointer;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+            text-align: left;
+            transition: 0.1s;
+        }
+
+        .dropdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .dropdown-item:hover {
+            background: var(--glow-red);
+            color: black;
+        }
+
+        /* For mobile, make dropdown full-width-ish */
+        @media (max-width: 600px) {
+            .action-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .primary-btn {
+                width: 100%;
+            }
+            .menu-container {
+                width: 100%;
+            }
+            .menu-btn {
+                width: 100%;
+                text-align: center;
+            }
+            .dropdown-menu {
+                width: 100%;
+                right: auto;
+                left: 0;
+            }
         }
 
         .footer {
@@ -348,7 +432,6 @@
             letter-spacing: 1px;
         }
 
-        /* Lore view and edit styles – keep consistent */
         .lore-panel {
             width: 100%;
             margin-top: 20px;
@@ -390,65 +473,19 @@
             resize: vertical;
         }
 
-        /* Hide/show panels */
         .hidden-panel {
             display: none !important;
         }
 
-        /* Mobile adjustments – keep responsive */
-        @media (max-width: 600px) {
-            .top-row {
-                flex-direction: column;
-                align-items: stretch;
-            }
-            #wheel-area {
-                width: 100%;
-                margin-bottom: 10px;
-            }
-            #radarChart {
-                max-width: 100%;
-                height: auto;
-            }
-            .stats-panel {
-                width: 100%;
-            }
-            .stat-group {
-                margin-bottom: 15px;
-            }
-            h3 {
-                font-size: 1rem;
-            }
-            .bar-bg {
-                height: 24px;
-            }
-            .bond-selector select {
-                width: 100%;
-                padding: 16px 10px;
-                font-size: 1rem;
-            }
-            .button-group {
-                flex-direction: column;
-                gap: 10px;
-                margin-top: 15px;
-            }
-            .terminal-btn {
-                width: 100%;
-                min-width: unset;
-                padding: 18px 12px;
-                font-size: 1rem;
-            }
-            .slider-row {
-                flex-wrap: wrap;
-            }
-            .slider-label {
-                width: 60px;
-            }
-            .footer {
-                font-size: 0.8rem;
-                flex-wrap: wrap;
-                gap: 10px;
-                justify-content: center;
-            }
+        /* Typing cursor effect */
+        .typing-cursor::after {
+            content: "▋";
+            animation: blink 1s infinite;
+            margin-left: 2px;
+        }
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
         }
     </style>
 </head>
@@ -457,7 +494,7 @@
 <div class="crt-monitor" id="monitor-frame">
     <div class="screen" id="screen-body">
         <div class="corrupted-overlay"></div>
-        <h2 id="char-name">> INITIALIZING...</h2>
+        <h2 id="char-name">> <span id="name-typing"></span><span class="typing-cursor"></span></h2>
 
         <!-- MAIN VIEW (Radar + Stats + Sliders) -->
         <div id="mainView" class="main-container">
@@ -548,12 +585,18 @@
                 </div>
             </div>
 
-            <div class="button-group">
-                <button class="terminal-btn" onclick="syncToBot()" id="syncBtn">> SYNC TO BOT</button>
-                <button class="terminal-btn" onclick="refreshData()" id="refreshBtn">> REFRESH</button>
-                <button class="terminal-btn" onclick="copyShareLink()">> COPY LINK</button>
-                <button class="terminal-btn" onclick="showLoreView()">> SUBJECT FILE</button>
-                <button class="terminal-btn" onclick="showEditLore()">> EDIT LORE</button>
+            <!-- New action bar with primary LOAD DATA button and dropdown menu -->
+            <div class="action-bar">
+                <button class="primary-btn" onclick="syncToBot()" id="syncBtn">> LOAD DATA</button>
+                <div class="menu-container" id="menuContainer">
+                    <button class="menu-btn" id="menuToggle">≡</button>
+                    <div class="dropdown-menu" id="dropdownMenu">
+                        <button class="dropdown-item" onclick="refreshData()">> REFRESH</button>
+                        <button class="dropdown-item" onclick="copyShareLink()">> COPY LINK</button>
+                        <button class="dropdown-item" onclick="showLoreView()">> SUBJECT FILE</button>
+                        <button class="dropdown-item" onclick="showEditLore()">> EDIT LORE</button>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -572,7 +615,7 @@
                 <div class="lore-field"><div class="lore-label">FACTION</div><div id="lore-faction" class="lore-value">—</div></div>
                 <div class="lore-field"><div class="lore-label">GOALS</div><div id="lore-goals" class="lore-value">—</div></div>
             </div>
-            <div class="button-group">
+            <div class="button-group" style="margin-top:20px;">
                 <button class="terminal-btn" onclick="showMainView()">> RETURN</button>
             </div>
         </div>
@@ -592,7 +635,7 @@
                 <div class="lore-field"><div class="lore-label">FACTION</div><input type="text" id="edit-faction" class="lore-input" placeholder="FACTION"></div>
                 <div class="lore-field"><div class="lore-label">GOALS</div><textarea id="edit-goals" class="lore-input" placeholder="GOALS"></textarea></div>
             </div>
-            <div class="button-group">
+            <div class="button-group" style="margin-top:20px;">
                 <button class="terminal-btn" onclick="saveLore()">> SAVE LORE</button>
                 <button class="terminal-btn" onclick="showMainView()">> CANCEL</button>
             </div>
@@ -638,7 +681,8 @@
     }
 
     const rawName = params.get('name') || "SUBJECT_NULL";
-    document.getElementById('char-name').innerText = glitchText(`> SUBJECT: ${rawName.toUpperCase()}`);
+    const finalName = glitchText(`> SUBJECT: ${rawName.toUpperCase()}`);
+    // We'll handle typing in window.onload
 
     // Stats bars
     document.getElementById('grit-bar').style.width = (params.get('grit') || 100) + "%";
@@ -648,7 +692,6 @@
     // ---------- COLOR SATURATION BASED ON VALUE ----------
     function getLocalColor(value) {
         if (isCorrupted) return '#fff';
-        // Keep it in the red family, just vary brightness
         const intensity = value / 100;
         const r = 255;
         const g = Math.floor(26 * intensity);
@@ -658,7 +701,6 @@
 
     function getTargetColor(value) {
         if (isCorrupted) return '#fff';
-        // Keep target greenish, but vary brightness
         const intensity = value / 100;
         const r = Math.floor(20 * intensity);
         const g = 255;
@@ -710,7 +752,7 @@
 
     let datasets = [{
         label: 'LOCAL',
-        data: getSliderValues(), // from sliders
+        data: getSliderValues(),
         backgroundColor: isCorrupted ? 'rgba(255, 255, 255, 0.1)' : 'rgba(255, 26, 26, 0.3)',
         borderColor: isCorrupted ? '#fff' : '#ff1a1a',
         pointBackgroundColor: function(context) {
@@ -948,11 +990,11 @@
         radarChart.update();
     }
 
-    // ---------- SYNC TO BOT ----------
+    // ---------- SYNC TO BOT (renamed to LOAD DATA) ----------
     async function syncToBot() {
         const btn = document.getElementById('syncBtn');
         btn.disabled = true;
-        btn.innerText = '> SYNCING...';
+        btn.innerText = '> LOADING...';
 
         const currentValues = getSliderValues();
         const emotionsObj = {};
@@ -973,9 +1015,9 @@
             });
             const result = await response.json();
             if (result.success) {
-                btn.innerText = '> SYNC COMPLETE';
+                btn.innerText = '> LOAD COMPLETE';
             } else {
-                btn.innerText = '> SYNC FAILED';
+                btn.innerText = '> LOAD FAILED';
                 console.error(result.error);
             }
         } catch (e) {
@@ -984,21 +1026,17 @@
         } finally {
             setTimeout(() => {
                 btn.disabled = false;
-                btn.innerText = '> SYNC TO BOT';
+                btn.innerText = '> LOAD DATA';
             }, 2000);
         }
     }
 
     // ---------- REFRESH DATA FROM BOT ----------
     async function refreshData() {
-        const btn = document.getElementById('refreshBtn');
-        btn.disabled = true;
-        btn.innerText = '> REFRESHING...';
-
+        const btn = document.getElementById('refreshBtn'); // we'll need to reference it in dropdown, but it's not a button id anymore; we'll handle inside dropdown click
+        // We'll find the dropdown item that calls this function; it's fine.
         if (!userId || !charName) {
             alert('Missing user or character info');
-            btn.disabled = false;
-            btn.innerText = '> REFRESH';
             return;
         }
 
@@ -1010,7 +1048,6 @@
             }
             const data = await response.json();
 
-            // Update sliders and radar
             emotions.forEach((emo, i) => {
                 if (sliders[emo]) {
                     sliders[emo].value = data[emo];
@@ -1027,15 +1064,11 @@
             document.getElementById('rot-bar').style.width = data.rot + "%";
             document.getElementById('weird-bar').style.width = data.weird + "%";
 
-            btn.innerText = '> REFRESHED';
+            // Optional: show a brief message
+            alert('Data refreshed');
         } catch (e) {
             console.error('Refresh failed:', e);
-            btn.innerText = '> ERROR';
-        } finally {
-            setTimeout(() => {
-                btn.disabled = false;
-                btn.innerText = '> REFRESH';
-            }, 1500);
+            alert('Refresh error');
         }
     }
 
@@ -1062,10 +1095,46 @@
 
         const newURL = window.location.origin + window.location.pathname + '?' + params.toString();
         navigator.clipboard.writeText(newURL);
-        const btn = event.target;
-        btn.innerText = '> LINK COPIED';
-        setTimeout(() => btn.innerText = '> COPY LINK', 1500);
+        alert('Link copied to clipboard');
     }
+
+    // ---------- DROPDOWN TOGGLE ----------
+    document.addEventListener('DOMContentLoaded', function() {
+        const menuToggle = document.getElementById('menuToggle');
+        const dropdown = document.getElementById('dropdownMenu');
+
+        menuToggle.addEventListener('click', function(e) {
+            e.stopPropagation();
+            dropdown.classList.toggle('show');
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            if (!menuToggle.contains(event.target) && !dropdown.contains(event.target)) {
+                dropdown.classList.remove('show');
+            }
+        });
+
+        // Prevent dropdown from closing when clicking inside it (handled by button actions)
+    });
+
+    // ---------- TYPING ANIMATION ----------
+    window.addEventListener('load', function() {
+        const typingSpan = document.getElementById('name-typing');
+        const fullText = finalName; // e.g., "> SUBJECT: RAIDEN"
+        let i = 0;
+        function typeNext() {
+            if (i < fullText.length) {
+                typingSpan.textContent += fullText.charAt(i);
+                i++;
+                setTimeout(typeNext, 50); // typing speed
+            } else {
+                // remove cursor after typing
+                document.querySelector('.typing-cursor').style.display = 'none';
+            }
+        }
+        typeNext();
+    });
 
     // ---------- SSE ----------
     function setupSSE() {
@@ -1074,7 +1143,6 @@
         eventSource.onmessage = function(event) {
             try {
                 const data = JSON.parse(event.data);
-                // Update sliders and radar
                 emotions.forEach((emo, i) => {
                     if (sliders[emo]) {
                         sliders[emo].value = data[emo];
