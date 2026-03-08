@@ -34,7 +34,6 @@
             touch-action: none;
         }
 
-        /* --- THE CRT MONITOR FRAME --- */
         .crt-monitor {
             background: #222; 
             border: 10px solid #2a2a2a;
@@ -60,7 +59,6 @@
             padding: 15px;
         }
 
-        /* Scanlines and Static Overlay */
         .screen::after {
             content: " ";
             position: absolute;
@@ -72,7 +70,6 @@
             z-index: 100;
         }
 
-        /* --- CORRUPTION EFFECTS --- */
         .corrupted-overlay {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -110,7 +107,6 @@
             100% { transform: translate(0,0); }
         }
 
-        /* --- LAYOUT --- */
         .main-container {
             display: flex;
             flex-direction: row;
@@ -133,20 +129,45 @@
             filter: drop-shadow(0 0 10px var(--glow-red));
         }
 
-        #save-btn {
+        .bond-selector {
+            margin: 10px 0;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            font-size: 12px;
+            z-index: 110;
+        }
+
+        .bond-selector select {
+            background: black;
+            color: var(--glow-red);
+            border: 1px solid var(--glow-red);
+            font-family: 'VHS';
+            padding: 5px;
+            width: 70%;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+            z-index: 110;
+        }
+
+        .terminal-btn {
             background: transparent;
             border: 1px solid var(--glow-red);
             color: var(--glow-red);
             font-family: 'VHS';
-            padding: 10px 20px;
-            margin-top: 15px;
+            padding: 8px 12px;
             cursor: pointer;
             text-transform: uppercase;
             font-size: 10px;
-            z-index: 110;
         }
 
-        #save-btn:hover { background: var(--glow-red); color: black; }
+        .terminal-btn:hover { background: var(--glow-red); color: black; }
+        .terminal-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
         .stats-panel { flex: 1; display: flex; flex-direction: column; justify-content: center; }
         h3 { margin: 5px 0; font-size: 12px; text-transform: uppercase; color: var(--text-gray); }
@@ -187,7 +208,18 @@
             <div class="main-container">
                 <div id="wheel-area">
                     <canvas id="radarChart"></canvas>
-                    <button id="save-btn" onclick="saveCalibration()">💾 Save Calibration</button>
+
+                    <!-- Bond selector (hidden initially) -->
+                    <div class="bond-selector" id="bondSelector" style="display: none;">
+                        <select id="bondSelect" onchange="loadBond()">
+                            <option value="">-- Select Bond --</option>
+                        </select>
+                    </div>
+
+                    <div class="button-group">
+                        <button class="terminal-btn" onclick="syncToBot()" id="syncBtn">🔄 Sync to Bot</button>
+                        <button class="terminal-btn" onclick="copyShareLink()">🔗 Copy Link</button>
+                    </div>
                 </div>
 
                 <div class="stats-panel">
@@ -217,12 +249,18 @@
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-dragdata@2.2.3/dist/chartjs-plugin-dragdata.min.js"></script>
 
     <script>
+        // ---------- CONFIG ----------
+        // !!! CHANGE THESE TWO VALUES !!!
+        const API_BASE = "https://your-actual-railway-app.railway.app"; // Replace with your Railway URL
+        const SYNC_SECRET = "mySuperSecret123"; // Must match the SYNC_SECRET in Railway environment variables
+
         const params = new URLSearchParams(window.location.search);
-        
-        // 1. ROT DETECTION & GLITCH LOGIC
+        const userId = params.get('userId');
+        const charName = params.get('charName') || params.get('name');
         const rot = parseInt(params.get('rot')) || 0;
         const isCorrupted = rot >= 80;
 
+        // Glitch effect on text
         function glitchText(text) {
             if (!isCorrupted) return text;
             return text.replace(/e/gi, "3").replace(/a/gi, "4").replace(/o/gi, "0").replace(/i/gi, "1").replace(/s/gi, "5");
@@ -234,24 +272,30 @@
             document.getElementById('version-text').innerText = "v5.2_UN5T4BL3";
         }
 
-        // 2. IDENTITY
         const rawName = params.get('name') || "SUBJECT_NULL";
         document.getElementById('char-name').innerText = glitchText(`> SUBJECT: ${rawName.toUpperCase()}`);
 
-        // 3. STATS
+        // Stats bars
         document.getElementById('grit-bar').style.width = (params.get('grit') || 100) + "%";
         document.getElementById('rot-bar').style.width = rot + "%";
         document.getElementById('weird-bar').style.width = (params.get('weird') || 0) + "%";
 
-        // 4. RADAR
-        const getEmoData = (prefix) => [
-            params.get(prefix + 'joy') || 10, params.get(prefix + 'trust') || 10,
-            params.get(prefix + 'fear') || 10, params.get(prefix + 'surp') || 10,
-            params.get(prefix + 'grief') || 10, params.get(prefix + 'disg') || 10,
-            params.get(prefix + 'rage') || 10, params.get(prefix + 'anti') || 10
-        ];
+        // Helper to get emotion data from params (with prefix)
+        function getEmoData(prefix) {
+            return [
+                parseInt(params.get(prefix + 'joy')) || 10,
+                parseInt(params.get(prefix + 'trust')) || 10,
+                parseInt(params.get(prefix + 'fear')) || 10,
+                parseInt(params.get(prefix + 'surp')) || 10,
+                parseInt(params.get(prefix + 'grief')) || 10,
+                parseInt(params.get(prefix + 'disg')) || 10,
+                parseInt(params.get(prefix + 'rage')) || 10,
+                parseInt(params.get(prefix + 'anti')) || 10
+            ];
+        }
 
-        const datasets = [{
+        // Initial datasets
+        let datasets = [{
             label: 'LOCAL',
             data: getEmoData(''),
             backgroundColor: isCorrupted ? 'rgba(255, 255, 255, 0.1)' : 'rgba(255, 26, 26, 0.3)',
@@ -270,6 +314,10 @@
                 pointBackgroundColor: '#14ff14',
                 dragData: false
             });
+            document.getElementById('bondSelector').style.display = 'none';
+        } else {
+            document.getElementById('bondSelector').style.display = 'flex';
+            fetchBonds();
         }
 
         const ctx = document.getElementById('radarChart').getContext('2d');
@@ -303,13 +351,138 @@
             }
         });
 
-        function saveCalibration() {
+        // ---------- BOND FETCHING ----------
+        async function fetchBonds() {
+            if (!userId || !charName) return;
+            try {
+                const url = `${API_BASE}/api/relationships?userId=${encodeURIComponent(userId)}&charName=${encodeURIComponent(charName)}&secret=${encodeURIComponent(SYNC_SECRET)}`;
+                const response = await fetch(url);
+                const bonds = await response.json();
+                const select = document.getElementById('bondSelect');
+                select.innerHTML = '<option value="">-- Select Bond --</option>';
+                bonds.forEach(bond => {
+                    const option = document.createElement('option');
+                    option.value = bond.userId;
+                    option.textContent = bond.characterName;
+                    option.dataset.joy = bond.emotions.joy;
+                    option.dataset.trust = bond.emotions.trust;
+                    option.dataset.fear = bond.emotions.fear;
+                    option.dataset.surp = bond.emotions.surp;
+                    option.dataset.grief = bond.emotions.grief;
+                    option.dataset.disg = bond.emotions.disg;
+                    option.dataset.rage = bond.emotions.rage;
+                    option.dataset.anti = bond.emotions.anti;
+                    select.appendChild(option);
+                });
+            } catch (e) {
+                console.error('Failed to fetch bonds', e);
+            }
+        }
+
+        function loadBond() {
+            const select = document.getElementById('bondSelect');
+            const option = select.selectedOptions[0];
+            if (!option.value) {
+                if (radarChart.data.datasets.length > 1) {
+                    radarChart.data.datasets.pop();
+                    radarChart.update();
+                }
+                return;
+            }
+            const targetData = [
+                parseInt(option.dataset.joy) || 10,
+                parseInt(option.dataset.trust) || 10,
+                parseInt(option.dataset.fear) || 10,
+                parseInt(option.dataset.surp) || 10,
+                parseInt(option.dataset.grief) || 10,
+                parseInt(option.dataset.disg) || 10,
+                parseInt(option.dataset.rage) || 10,
+                parseInt(option.dataset.anti) || 10
+            ];
+            if (radarChart.data.datasets.length > 1) {
+                radarChart.data.datasets[1].data = targetData;
+                radarChart.data.datasets[1].label = option.textContent;
+            } else {
+                radarChart.data.datasets.push({
+                    label: option.textContent,
+                    data: targetData,
+                    backgroundColor: 'rgba(20, 255, 20, 0.2)',
+                    borderColor: '#14ff14',
+                    pointBackgroundColor: '#14ff14',
+                    dragData: false
+                });
+            }
+            radarChart.update();
+        }
+
+        // ---------- SYNC TO BOT ----------
+        async function syncToBot() {
+            const btn = document.getElementById('syncBtn');
+            btn.disabled = true;
+            btn.innerText = 'SYNCING...';
+
+            const currentData = radarChart.data.datasets[0].data;
+            const labels = ['joy','trust','fear','surp','grief','disg','rage','anti'];
+            const emotions = {};
+            labels.forEach((l, i) => emotions[l] = currentData[i]);
+
+            const payload = {
+                userId: userId,
+                characterName: charName,
+                emotions: emotions,
+                secret: SYNC_SECRET
+            };
+
+            try {
+                const response = await fetch(`${API_BASE}/api/sync`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const result = await response.json();
+                if (result.success) {
+                    btn.innerText = '✓ SYNCED!';
+                } else {
+                    btn.innerText = '❌ FAILED';
+                    console.error(result.error);
+                }
+            } catch (e) {
+                btn.innerText = '❌ ERROR';
+                console.error(e);
+            } finally {
+                setTimeout(() => {
+                    btn.disabled = false;
+                    btn.innerText = '🔄 Sync to Bot';
+                }, 2000);
+            }
+        }
+
+        // ---------- COPY SHARE LINK ----------
+        function copyShareLink() {
             const currentData = radarChart.data.datasets[0].data;
             const labels = ['joy','trust','fear','surp','grief','disg','rage','anti'];
             labels.forEach((l, i) => params.set(l, currentData[i]));
+
+            if (radarChart.data.datasets.length > 1) {
+                const targetData = radarChart.data.datasets[1].data;
+                const targetLabel = radarChart.data.datasets[1].label;
+                params.set('target_oc', targetLabel);
+                labels.forEach((l, i) => params.set('t_' + l, targetData[i]));
+                const select = document.getElementById('bondSelect');
+                if (select.selectedOptions[0] && select.selectedOptions[0].value) {
+                    params.set('target_user', select.selectedOptions[0].value);
+                }
+            } else {
+                params.delete('target_oc');
+                params.delete('target_user');
+                labels.forEach(l => params.delete('t_' + l));
+            }
+
             const newURL = window.location.origin + window.location.pathname + '?' + params.toString();
             navigator.clipboard.writeText(newURL);
-            document.getElementById('save-btn').innerText = "CALIBRATION_COPIED";
+            const btn = event.target;
+            btn.innerText = '✓ LINK COPIED!';
+            setTimeout(() => btn.innerText = '🔗 Copy Link', 1500);
         }
     </script>
 </body>
