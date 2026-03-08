@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>PHANTOM_TERMINAL_V5.2_CORRUPTION</title>
     <style>
-        /* --- MILITARY TERMINAL THEME --- */
+        /* --- MILITARY TERMINAL THEME (same as before, with additions for lore) --- */
         :root {
             --crt-green: #14ff14;
             --glow-red: #ff1a1a;
@@ -132,7 +132,6 @@
             flex-grow: 1;
         }
 
-        /* Top row: radar + stats (flex row on desktop) */
         .top-row {
             display: flex;
             flex-direction: row;
@@ -261,7 +260,51 @@
             text-transform: uppercase;
         }
 
-        /* ========== MOBILE OPTIMIZATIONS ========== */
+        /* Lore view and edit styles */
+        .lore-panel {
+            width: 100%;
+            margin-top: 20px;
+        }
+        .lore-field {
+            margin-bottom: 15px;
+        }
+        .lore-label {
+            font-size: 0.8rem;
+            color: var(--text-gray);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 3px;
+        }
+        .lore-value {
+            font-size: 1rem;
+            color: var(--glow-red);
+            background: rgba(0,0,0,0.3);
+            padding: 8px;
+            border: 1px solid var(--dim-red);
+            word-wrap: break-word;
+        }
+        .lore-input {
+            width: 100%;
+            background: black;
+            color: var(--glow-red);
+            border: 2px solid var(--mid-red);
+            font-family: 'VHS', monospace;
+            padding: 12px;
+            font-size: 0.9rem;
+            border-radius: 0;
+            box-sizing: border-box;
+        }
+        textarea.lore-input {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        /* Hide/show panels */
+        .hidden-panel {
+            display: none !important;
+        }
+
+        /* Mobile adjustments */
         @media (max-width: 600px) {
             .top-row {
                 flex-direction: column;
@@ -272,7 +315,7 @@
                 margin-bottom: 10px;
             }
             #radarChart {
-                max-width: 100%;   /* allow chart to use full width */
+                max-width: 100%;
                 height: auto;
             }
             .stats-panel {
@@ -282,25 +325,25 @@
                 margin-bottom: 15px;
             }
             h3 {
-                font-size: 1rem;   /* larger labels */
+                font-size: 1rem;
             }
             .bar-bg {
-                height: 24px;       /* taller bars for easier viewing */
+                height: 24px;
             }
             .bond-selector select {
-                width: 100%;        /* full width dropdown */
+                width: 100%;
                 padding: 16px 10px;
                 font-size: 1rem;
             }
             .button-group {
-                flex-direction: column;  /* stack buttons vertically */
+                flex-direction: column;
                 gap: 10px;
                 margin-top: 15px;
             }
             .terminal-btn {
-                width: 100%;         /* full width buttons */
+                width: 100%;
                 min-width: unset;
-                padding: 18px 12px;  /* even larger tap target */
+                padding: 18px 12px;
                 font-size: 1rem;
             }
             .footer {
@@ -319,12 +362,12 @@
         <div class="corrupted-overlay"></div>
         <h2 id="char-name">> INITIALIZING...</h2>
 
-        <div class="main-container">
+        <!-- MAIN VIEW (Radar + Stats) -->
+        <div id="mainView" class="main-container">
             <div class="top-row">
                 <div id="wheel-area">
                     <canvas id="radarChart"></canvas>
                 </div>
-
                 <div class="stats-panel">
                     <div class="stat-group">
                         <h3>> WEIRD_INDEX</h3>
@@ -351,6 +394,49 @@
                 <button class="terminal-btn" onclick="syncToBot()" id="syncBtn">> SYNC TO BOT</button>
                 <button class="terminal-btn" onclick="refreshData()" id="refreshBtn">> REFRESH</button>
                 <button class="terminal-btn" onclick="copyShareLink()">> COPY LINK</button>
+                <button class="terminal-btn" onclick="showLoreView()">> SUBJECT FILE</button>
+                <button class="terminal-btn" onclick="showEditLore()">> EDIT LORE</button>
+            </div>
+        </div>
+
+        <!-- LORE VIEW (Read‑only) -->
+        <div id="loreView" class="main-container hidden-panel">
+            <h2 style="margin-bottom:15px;">> SUBJECT FILE</h2>
+            <div class="lore-panel">
+                <div class="lore-field"><div class="lore-label">NAME</div><div id="lore-name" class="lore-value">—</div></div>
+                <div class="lore-field"><div class="lore-label">AGE</div><div id="lore-age" class="lore-value">—</div></div>
+                <div class="lore-field"><div class="lore-label">GENDER</div><div id="lore-gender" class="lore-value">—</div></div>
+                <div class="lore-field"><div class="lore-label">APPEARANCE</div><div id="lore-appearance" class="lore-value">—</div></div>
+                <div class="lore-field"><div class="lore-label">PERSONALITY</div><div id="lore-personality" class="lore-value">—</div></div>
+                <div class="lore-field"><div class="lore-label">BACKSTORY</div><div id="lore-backstory" class="lore-value">—</div></div>
+                <div class="lore-field"><div class="lore-label">ABILITIES</div><div id="lore-abilities" class="lore-value">—</div></div>
+                <div class="lore-field"><div class="lore-label">WEAKNESSES</div><div id="lore-weaknesses" class="lore-value">—</div></div>
+                <div class="lore-field"><div class="lore-label">FACTION</div><div id="lore-faction" class="lore-value">—</div></div>
+                <div class="lore-field"><div class="lore-label">GOALS</div><div id="lore-goals" class="lore-value">—</div></div>
+            </div>
+            <div class="button-group">
+                <button class="terminal-btn" onclick="showMainView()">> RETURN</button>
+            </div>
+        </div>
+
+        <!-- EDIT LORE VIEW (Form) -->
+        <div id="editLoreView" class="main-container hidden-panel">
+            <h2 style="margin-bottom:15px;">> EDIT SUBJECT FILE</h2>
+            <div class="lore-panel">
+                <div class="lore-field"><div class="lore-label">NAME</div><input type="text" id="edit-name" class="lore-input" placeholder="NAME"></div>
+                <div class="lore-field"><div class="lore-label">AGE</div><input type="text" id="edit-age" class="lore-input" placeholder="AGE"></div>
+                <div class="lore-field"><div class="lore-label">GENDER</div><input type="text" id="edit-gender" class="lore-input" placeholder="GENDER"></div>
+                <div class="lore-field"><div class="lore-label">APPEARANCE</div><textarea id="edit-appearance" class="lore-input" placeholder="APPEARANCE"></textarea></div>
+                <div class="lore-field"><div class="lore-label">PERSONALITY</div><textarea id="edit-personality" class="lore-input" placeholder="PERSONALITY"></textarea></div>
+                <div class="lore-field"><div class="lore-label">BACKSTORY</div><textarea id="edit-backstory" class="lore-input" placeholder="BACKSTORY"></textarea></div>
+                <div class="lore-field"><div class="lore-label">ABILITIES</div><textarea id="edit-abilities" class="lore-input" placeholder="ABILITIES"></textarea></div>
+                <div class="lore-field"><div class="lore-label">WEAKNESSES</div><textarea id="edit-weaknesses" class="lore-input" placeholder="WEAKNESSES"></textarea></div>
+                <div class="lore-field"><div class="lore-label">FACTION</div><input type="text" id="edit-faction" class="lore-input" placeholder="FACTION"></div>
+                <div class="lore-field"><div class="lore-label">GOALS</div><textarea id="edit-goals" class="lore-input" placeholder="GOALS"></textarea></div>
+            </div>
+            <div class="button-group">
+                <button class="terminal-btn" onclick="saveLore()">> SAVE LORE</button>
+                <button class="terminal-btn" onclick="showMainView()">> CANCEL</button>
             </div>
         </div>
 
@@ -374,6 +460,9 @@
     const rot = parseInt(params.get('rot')) || 0;
     const isCorrupted = rot >= 80;
 
+    // Current lore data (empty initially)
+    let currentLore = {};
+
     function glitchText(text) {
         if (!isCorrupted) return text;
         return text.replace(/e/gi, "3").replace(/a/gi, "4").replace(/o/gi, "0").replace(/i/gi, "1").replace(/s/gi, "5");
@@ -396,7 +485,6 @@
     // ---------- COLOR SATURATION BASED ON VALUE ----------
     function getLocalColor(value) {
         if (isCorrupted) return '#fff';
-        // Dark red (low) to bright red (high)
         const intensity = value / 100;
         const r = Math.floor(139 + (255 - 139) * intensity);
         const g = Math.floor(0 + (26 - 0) * intensity);
@@ -484,8 +572,8 @@
                         font: { family: 'VHS', size: 10 }
                     },
                     ticks: { display: false },
-                    suggestedMin: 0,
-                    suggestedMax: 100
+                    min: 0,        // <-- FIX: force outer ring to represent 100
+                    max: 100
                 }
             },
             elements: {
@@ -497,7 +585,105 @@
         }
     });
 
-    // ---------- BOND FETCHING ----------
+    // ---------- UI PANEL TOGGLING ----------
+    function showMainView() {
+        document.getElementById('mainView').classList.remove('hidden-panel');
+        document.getElementById('loreView').classList.add('hidden-panel');
+        document.getElementById('editLoreView').classList.add('hidden-panel');
+    }
+
+    function showLoreView() {
+        document.getElementById('mainView').classList.add('hidden-panel');
+        document.getElementById('loreView').classList.remove('hidden-panel');
+        document.getElementById('editLoreView').classList.add('hidden-panel');
+        loadLoreToView(); // refresh displayed lore
+    }
+
+    function showEditLore() {
+        document.getElementById('mainView').classList.add('hidden-panel');
+        document.getElementById('loreView').classList.add('hidden-panel');
+        document.getElementById('editLoreView').classList.remove('hidden-panel');
+        loadLoreToForm(); // populate form with current lore
+    }
+
+    // ---------- LORE FETCHING ----------
+    async function loadLoreToView() {
+        if (!userId || !charName) return;
+        try {
+            const url = `${API_BASE}/api/lore?userId=${encodeURIComponent(userId)}&charName=${encodeURIComponent(charName)}&secret=${encodeURIComponent(SYNC_SECRET)}`;
+            const response = await fetch(url);
+            if (!response.ok) throw new Error('Failed to fetch lore');
+            currentLore = await response.json();
+            // Update view fields
+            document.getElementById('lore-name').innerText = currentLore.name || '—';
+            document.getElementById('lore-age').innerText = currentLore.age || '—';
+            document.getElementById('lore-gender').innerText = currentLore.gender || '—';
+            document.getElementById('lore-appearance').innerText = currentLore.appearance || '—';
+            document.getElementById('lore-personality').innerText = currentLore.personality || '—';
+            document.getElementById('lore-backstory').innerText = currentLore.backstory || '—';
+            document.getElementById('lore-abilities').innerText = currentLore.abilities || '—';
+            document.getElementById('lore-weaknesses').innerText = currentLore.weaknesses || '—';
+            document.getElementById('lore-faction').innerText = currentLore.faction || '—';
+            document.getElementById('lore-goals').innerText = currentLore.goals || '—';
+        } catch (e) {
+            console.error('Failed to load lore', e);
+        }
+    }
+
+    function loadLoreToForm() {
+        // Populate edit form with currentLore (or empty)
+        document.getElementById('edit-name').value = currentLore.name || '';
+        document.getElementById('edit-age').value = currentLore.age || '';
+        document.getElementById('edit-gender').value = currentLore.gender || '';
+        document.getElementById('edit-appearance').value = currentLore.appearance || '';
+        document.getElementById('edit-personality').value = currentLore.personality || '';
+        document.getElementById('edit-backstory').value = currentLore.backstory || '';
+        document.getElementById('edit-abilities').value = currentLore.abilities || '';
+        document.getElementById('edit-weaknesses').value = currentLore.weaknesses || '';
+        document.getElementById('edit-faction').value = currentLore.faction || '';
+        document.getElementById('edit-goals').value = currentLore.goals || '';
+    }
+
+    async function saveLore() {
+        const lore = {
+            name: document.getElementById('edit-name').value,
+            age: document.getElementById('edit-age').value,
+            gender: document.getElementById('edit-gender').value,
+            appearance: document.getElementById('edit-appearance').value,
+            personality: document.getElementById('edit-personality').value,
+            backstory: document.getElementById('edit-backstory').value,
+            abilities: document.getElementById('edit-abilities').value,
+            weaknesses: document.getElementById('edit-weaknesses').value,
+            faction: document.getElementById('edit-faction').value,
+            goals: document.getElementById('edit-goals').value
+        };
+
+        try {
+            const response = await fetch(`${API_BASE}/api/lore`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    userId,
+                    characterName: charName,
+                    lore,
+                    secret: SYNC_SECRET
+                })
+            });
+            const result = await response.json();
+            if (result.success) {
+                currentLore = lore; // update local copy
+                showMainView(); // optionally return to main view
+                // could also show a success message
+            } else {
+                alert('Failed to save lore');
+            }
+        } catch (e) {
+            console.error('Save lore error', e);
+            alert('Connection error');
+        }
+    }
+
+    // ---------- BOND FETCHING (unchanged) ----------
     async function fetchBonds() {
         if (!userId || !charName) return;
         try {
@@ -567,7 +753,7 @@
         radarChart.update();
     }
 
-    // ---------- SYNC TO BOT ----------
+    // ---------- SYNC, REFRESH, COPY LINK (unchanged) ----------
     async function syncToBot() {
         const btn = document.getElementById('syncBtn');
         btn.disabled = true;
@@ -609,7 +795,6 @@
         }
     }
 
-    // ---------- REFRESH DATA FROM BOT ----------
     async function refreshData() {
         const btn = document.getElementById('refreshBtn');
         btn.disabled = true;
@@ -630,14 +815,12 @@
             }
             const data = await response.json();
 
-            // Update radar chart's first dataset (local)
             radarChart.data.datasets[0].data = [
                 data.joy, data.trust, data.fear, data.surp,
                 data.grief, data.disg, data.rage, data.anti
             ];
             radarChart.update();
 
-            // Update stat bars
             document.getElementById('grit-bar').style.width = data.grit + "%";
             document.getElementById('rot-bar').style.width = data.rot + "%";
             document.getElementById('weird-bar').style.width = data.weird + "%";
@@ -654,7 +837,6 @@
         }
     }
 
-    // ---------- COPY SHARE LINK ----------
     function copyShareLink() {
         const currentValues = radarChart.data.datasets[0].data;
         const labels = ['joy','trust','fear','surp','grief','disg','rage','anti'];
@@ -681,6 +863,33 @@
         btn.innerText = '> LINK COPIED';
         setTimeout(() => btn.innerText = '> COPY LINK', 1500);
     }
+
+    // ---------- SSE (unchanged) ----------
+    function setupSSE() {
+        if (!userId || !charName) return;
+        const eventSource = new EventSource(`${API_BASE}/api/events?userId=${encodeURIComponent(userId)}&charName=${encodeURIComponent(charName)}&secret=${encodeURIComponent(SYNC_SECRET)}`);
+        eventSource.onmessage = function(event) {
+            try {
+                const data = JSON.parse(event.data);
+                radarChart.data.datasets[0].data = [
+                    data.joy, data.trust, data.fear, data.surp,
+                    data.grief, data.disg, data.rage, data.anti
+                ];
+                radarChart.update();
+                document.getElementById('grit-bar').style.width = data.grit + "%";
+                document.getElementById('rot-bar').style.width = data.rot + "%";
+                document.getElementById('weird-bar').style.width = data.weird + "%";
+            } catch (e) {
+                console.error('SSE parse error', e);
+            }
+        };
+        eventSource.onerror = function() {
+            eventSource.close();
+            setTimeout(setupSSE, 3000);
+        };
+    }
+
+    setupSSE();
 </script>
 </body>
 </html>
