@@ -3,16 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DEEP_BUNKER_TERMINAL_V4.2</title>
+    <title>PHANTOM_TERMINAL_V5.2_CORRUPTION</title>
     <style>
         /* --- CORE MILITARY THEME --- */
         :root {
-            --crt-green: rgba(20, 255, 20, 0.1); 
+            --crt-green: #14ff14; 
             --glow-red: #ff1a1a;
             --mid-red: #8B0000;
             --dim-red: #440000;
             --bg-black: #050000;
             --text-gray: #aaaaaa;
+            --corruption-offset: 0px;
         }
 
         @font-face {
@@ -29,36 +30,37 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            overflow-x: hidden; /* Prevent horizontal scroll on mobile */
+            overflow: hidden;
+            touch-action: none;
         }
 
         /* --- THE CRT MONITOR FRAME --- */
         .crt-monitor {
             background: #222; 
-            border: 10px solid #2a2a2a; /* Slightly thinner for mobile */
+            border: 10px solid #2a2a2a;
             border-radius: 20px;
             padding: 5px;
             position: relative;
             box-shadow: 0 0 50px rgba(0,0,0,0.8) inset, 0 10px 20px rgba(0,0,0,0.5);
             display: flex;
-            width: 95%; /* Responsive width */
+            width: 95%;
             max-width: 850px;
+            transition: all 0.1s;
         }
 
-        /* The actual screen area */
         .screen {
             background-color: var(--bg-black);
             width: 100%;
             height: 100%;
             border-radius: 10px;
             position: relative;
-            overflow-y: auto; /* Allow scrolling if content overflows */
+            overflow: hidden;
             display: flex;
             flex-direction: column;
             padding: 15px;
         }
 
-        /* --- SCANLINES & CURVATURE --- */
+        /* Scanlines and Static Overlay */
         .screen::after {
             content: " ";
             position: absolute;
@@ -67,22 +69,62 @@
                         linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
             background-size: 100% 2px, 3px 100%;
             pointer-events: none;
-            z-index: 10;
+            z-index: 100;
         }
 
-        /* --- LAYOUT & COMPONENTS --- */
+        /* --- CORRUPTION EFFECTS --- */
+        .corrupted-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: repeating-linear-gradient(0deg, transparent 0px, transparent 1px, rgba(255,255,255,0.05) 2px);
+            opacity: 0;
+            pointer-events: none;
+            z-index: 90;
+        }
+
+        .rot-critical .corrupted-overlay {
+            opacity: 1;
+            animation: noise 0.2s infinite;
+        }
+
+        .rot-critical .crt-monitor {
+            animation: shake 0.5s infinite;
+            border-color: #440000;
+        }
+
+        .rot-critical .bar-fill {
+            filter: hue-rotate(320deg) brightness(1.5);
+        }
+
+        @keyframes noise {
+            0% { transform: translate(0,0); }
+            10% { transform: translate(-5px,-5px); }
+            20% { transform: translate(5px,5px); }
+            100% { transform: translate(0,0); }
+        }
+
+        @keyframes shake {
+            0% { transform: translate(0,0); }
+            25% { transform: translate(1px, -1px); }
+            50% { transform: translate(-1px, 1px); }
+            100% { transform: translate(0,0); }
+        }
+
+        /* --- LAYOUT --- */
         .main-container {
             display: flex;
-            flex-direction: row; /* Desktop side-by-side */
+            flex-direction: row;
             gap: 20px;
             flex-grow: 1;
+            animation: flicker 0.15s infinite;
         }
 
         #wheel-area {
-            flex: 0 0 45%;
+            flex: 0 0 50%;
             display: flex;
             flex-direction: column;
             align-items: center;
+            position: relative;
         }
 
         #radarChart {
@@ -91,82 +133,25 @@
             filter: drop-shadow(0 0 10px var(--glow-red));
         }
 
-        /* --- MOBILE RESPONSIVE TWEAKS --- */
-        @media (max-width: 600px) {
-            .main-container {
-                flex-direction: column; /* Stack vertically on mobile */
-                align-items: center;
-            }
-            #wheel-area {
-                flex: 0 0 auto;
-                width: 80%;
-            }
-            .stats-panel {
-                width: 100%;
-            }
-            h2 { font-size: 14px; }
+        #save-btn {
+            background: transparent;
+            border: 1px solid var(--glow-red);
+            color: var(--glow-red);
+            font-family: 'VHS';
+            padding: 10px 20px;
+            margin-top: 15px;
+            cursor: pointer;
+            text-transform: uppercase;
+            font-size: 10px;
+            z-index: 110;
         }
 
-        /* --- ANIMATIONS & INTERACTION --- */
-        @keyframes flicker {
-            0% { opacity: 0.95; }
-            5% { opacity: 0.98; }
-            100% { opacity: 1; }
-        }
+        #save-btn:hover { background: var(--glow-red); color: black; }
 
-        .main-container { animation: flicker 0.15s infinite; }
-
-        @keyframes glitch {
-            0% { transform: translate(0); }
-            20% { transform: translate(-2px, 2px); filter: hue-rotate(90deg); }
-            40% { transform: translate(2px, -2px); }
-            60% { transform: translate(-2px, -2px); opacity: 0.8; }
-            100% { transform: translate(0); }
-        }
-
-        .glitching { animation: glitch 0.3s ease-in-out; }
-
-        /* --- STATS PANEL --- */
-        .stats-panel {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-
-        h3 { 
-            margin: 5px 0; font-size: 12px; 
-            text-transform: uppercase; letter-spacing: 1px;
-            color: var(--text-gray); 
-            text-shadow: 0 0 5px var(--mid-red);
-            padding: 10px 0; /* Larger touch target for mobile */
-        }
-
-        h3:active { /* Mobile touch feedback */
-            color: #ffffff;
-            text-shadow: 0 0 10px var(--glow-red);
-        }
-
-        .bar-bg {
-            background: #000000;
-            height: 14px;
-            width: 100%;
-            border: 1px solid var(--dim-red);
-            margin-bottom: 10px;
-        }
-
-        @keyframes breathing {
-            0% { box-shadow: 0 0 5px var(--glow-red); }
-            50% { box-shadow: 0 0 15px var(--glow-red); }
-            100% { box-shadow: 0 0 5px var(--glow-red); }
-        }
-
-        .bar-fill {
-            height: 100%;
-            background: var(--glow-red);
-            animation: breathing 4s infinite ease-in-out;
-            transition: width 0.5s ease;
-        }
+        .stats-panel { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+        h3 { margin: 5px 0; font-size: 12px; text-transform: uppercase; color: var(--text-gray); }
+        .bar-bg { background: #000; height: 14px; width: 100%; border: 1px solid var(--dim-red); margin-bottom: 10px; }
+        .bar-fill { height: 100%; background: var(--glow-red); box-shadow: 0 0 10px var(--glow-red); transition: width 0.5s ease; }
 
         .footer {
             margin-top: 20px;
@@ -177,94 +162,155 @@
             font-size: 8px;
             color: var(--dim-red);
         }
+
+        @media (max-width: 600px) {
+            .main-container { flex-direction: column; align-items: center; }
+            #wheel-area { flex: 0 0 auto; width: 90%; }
+        }
+
+        @keyframes flicker { 0% { opacity: 0.98; } 100% { opacity: 1; } }
+        .glitching { animation: glitch 0.3s ease-in-out; }
+        @keyframes glitch {
+            0% { transform: translate(0); }
+            20% { transform: translate(-4px, 2px); filter: hue-rotate(90deg); }
+            100% { transform: translate(0); }
+        }
     </style>
 </head>
 <body>
 
-    <div class="crt-monitor">
-        <div class="screen">
-            <h2 id="char-name">> Subject: LOADING...</h2>
+    <div class="crt-monitor" id="monitor-frame">
+        <div class="screen" id="screen-body">
+            <div class="corrupted-overlay"></div>
+            <h2 id="char-name">> INITIALIZING...</h2>
+            
             <div class="main-container">
                 <div id="wheel-area">
                     <canvas id="radarChart"></canvas>
+                    <button id="save-btn" onclick="saveCalibration()">💾 Save Calibration</button>
                 </div>
 
                 <div class="stats-panel">
                     <div class="stat-group">
-                        <h3 onclick="triggerGlitch()">WEIRD_INDEX</h3>
-                        <div class="bar-bg"><div id="weird-bar" class="bar-fill" style="width: 0%"></div></div>
+                        <h3>WEIRD_INDEX</h3>
+                        <div class="bar-bg"><div id="weird-bar" class="bar-fill"></div></div>
                     </div>
-                    
                     <div class="stat-group">
-                        <h3 onclick="triggerGlitch()">GRIT_STAMINA</h3>
-                        <div class="bar-bg"><div id="grit-bar" class="bar-fill" style="width: 0%"></div></div>
+                        <h3>GRIT_STAMINA</h3>
+                        <div class="bar-bg"><div id="grit-bar" class="bar-fill"></div></div>
                     </div>
-                    
                     <div class="stat-group">
-                        <h3 onclick="triggerGlitch()">ROT_DECAY</h3>
-                        <div class="bar-bg"><div id="rot-bar" class="bar-fill" style="width: 0%"></div></div>
+                        <h3>ROT_DECAY</h3>
+                        <div class="bar-bg"><div id="rot-bar" class="bar-fill"></div></div>
                     </div>
                 </div>
             </div>
 
             <div class="footer">
-                <div>[STATUS: ACTIVE]</div>
-                <div>SIGNAL: WEAK // v4.2</div>
+                <div id="status-text">[ STATUS: ONLINE ]</div>
+                <div id="version-text">v5.2_STABLE</div>
             </div>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-dragdata@2.2.3/dist/chartjs-plugin-dragdata.min.js"></script>
+
     <script>
         const params = new URLSearchParams(window.location.search);
-        const charName = params.get('name') || "UNKNOWN_SUBJECT";
-        document.getElementById('char-name').innerText = "> Subject: " + charName.toUpperCase();
         
-        const grit = params.get('grit') || 100;
-        const weird = params.get('weird') || 0;
-        const rot = params.get('rot') || 0;
+        // 1. ROT DETECTION & GLITCH LOGIC
+        const rot = parseInt(params.get('rot')) || 0;
+        const isCorrupted = rot >= 80;
 
-        document.getElementById('grit-bar').style.width = grit + "%";
-        document.getElementById('weird-bar').style.width = weird + "%";
+        function glitchText(text) {
+            if (!isCorrupted) return text;
+            return text.replace(/e/gi, "3").replace(/a/gi, "4").replace(/o/gi, "0").replace(/i/gi, "1").replace(/s/gi, "5");
+        }
+
+        if (isCorrupted) {
+            document.body.classList.add('rot-critical');
+            document.getElementById('status-text').innerText = "[ ST4TU5: C0RRUPT3D ]";
+            document.getElementById('version-text').innerText = "v5.2_UN5T4BL3";
+        }
+
+        // 2. IDENTITY
+        const rawName = params.get('name') || "SUBJECT_NULL";
+        document.getElementById('char-name').innerText = glitchText(`> SUBJECT: ${rawName.toUpperCase()}`);
+
+        // 3. STATS
+        document.getElementById('grit-bar').style.width = (params.get('grit') || 100) + "%";
         document.getElementById('rot-bar').style.width = rot + "%";
+        document.getElementById('weird-bar').style.width = (params.get('weird') || 0) + "%";
 
-        function triggerGlitch() {
-            const canvas = document.getElementById('radarChart');
-            canvas.classList.add('glitching');
-            setTimeout(() => canvas.classList.remove('glitching'), 300);
+        // 4. RADAR
+        const getEmoData = (prefix) => [
+            params.get(prefix + 'joy') || 10, params.get(prefix + 'trust') || 10,
+            params.get(prefix + 'fear') || 10, params.get(prefix + 'surp') || 10,
+            params.get(prefix + 'grief') || 10, params.get(prefix + 'disg') || 10,
+            params.get(prefix + 'rage') || 10, params.get(prefix + 'anti') || 10
+        ];
+
+        const datasets = [{
+            label: 'LOCAL',
+            data: getEmoData(''),
+            backgroundColor: isCorrupted ? 'rgba(255, 255, 255, 0.1)' : 'rgba(255, 26, 26, 0.3)',
+            borderColor: isCorrupted ? '#fff' : '#ff1a1a',
+            pointBackgroundColor: isCorrupted ? '#fff' : '#ff1a1a',
+            dragData: true
+        }];
+
+        const targetName = params.get('target_oc');
+        if (targetName) {
+            datasets.push({
+                label: 'TARGET',
+                data: getEmoData('t_'),
+                backgroundColor: 'rgba(20, 255, 20, 0.2)',
+                borderColor: '#14ff14',
+                pointBackgroundColor: '#14ff14',
+                dragData: false
+            });
         }
 
         const ctx = document.getElementById('radarChart').getContext('2d');
-        new Chart(ctx, {
+        const radarChart = new Chart(ctx, {
             type: 'radar',
             data: {
                 labels: ['JOY', 'TRUST', 'FEAR', 'SURP', 'GRIEF', 'DISG', 'RAGE', 'ANTI'],
-                datasets: [{
-                    data: [
-                        params.get('joy')||10, params.get('trust')||10, params.get('fear')||10, 
-                        params.get('surp')||10, params.get('grief')||10, params.get('disg')||10, 
-                        params.get('rage')||10, params.get('anti')||10
-                    ],
-                    backgroundColor: 'rgba(255, 26, 26, 0.2)',
-                    borderColor: '#ff1a1a',
-                    borderWidth: 2,
-                    pointBackgroundColor: '#ff1a1a'
-                }]
+                datasets: datasets
             },
             options: {
-                scales: {
-                    r: {
-                        angleLines: { color: '#440000' },
-                        grid: { color: '#440000' },
-                        pointLabels: { color: '#ff1a1a', font: { size: 8, family: 'VHS' } },
-                        ticks: { display: false },
-                        suggestedMin: 0,
-                        suggestedMax: 100
+                plugins: {
+                    legend: { display: false },
+                    dragData: {
+                        round: 0,
+                        onDragStart: () => document.getElementById('radarChart').classList.add('glitching'),
+                        onDragEnd: () => document.getElementById('radarChart').classList.remove('glitching')
                     }
                 },
-                plugins: { legend: { display: false } }
+                scales: {
+                    r: {
+                        angleLines: { color: isCorrupted ? '#fff' : '#440000' },
+                        grid: { color: isCorrupted ? '#fff' : '#440000' },
+                        pointLabels: { 
+                            color: isCorrupted ? '#fff' : '#ff1a1a', 
+                            font: { family: 'VHS', size: 10 } 
+                        },
+                        ticks: { display: false },
+                        suggestedMin: 0, suggestedMax: 100
+                    }
+                }
             }
         });
+
+        function saveCalibration() {
+            const currentData = radarChart.data.datasets[0].data;
+            const labels = ['joy','trust','fear','surp','grief','disg','rage','anti'];
+            labels.forEach((l, i) => params.set(l, currentData[i]));
+            const newURL = window.location.origin + window.location.pathname + '?' + params.toString();
+            navigator.clipboard.writeText(newURL);
+            document.getElementById('save-btn').innerText = "CALIBRATION_COPIED";
+        }
     </script>
 </body>
 </html>
