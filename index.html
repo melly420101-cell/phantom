@@ -1234,31 +1234,57 @@
         // ready
     }
 
-    function playYouTube() {
-        if (!currentYoutubeUrl) {
-            alert('No YouTube link set for this character.');
-            return;
-        }
-        const videoId = extractVideoId(currentYoutubeUrl);
-        if (!videoId) {
-            alert('Invalid YouTube URL stored.');
-            return;
-        }
-        if (!ytPlayer) {
-            ytPlayer = new YT.Player('ytPlayer', {
-                height: '0',
-                width: '0',
-                videoId: videoId,
-                playerVars: { autoplay: 1, controls: 0, modestbranding: 1, rel: 0 },
-                events: {
-                    onReady: (event) => event.target.playVideo(),
-                    onError: (event) => alert('YouTube error: ' + event.data)
-                }
-            });
-        } else {
-            ytPlayer.loadVideoById(videoId);
-        }
+    // Updated playYouTube function for iOS compatibility
+function playYouTube() {
+    if (!currentYoutubeUrl) {
+        alert('No YouTube link set for this character.');
+        return;
     }
+    const videoId = extractVideoId(currentYoutubeUrl);
+    if (!videoId) {
+        alert('Invalid YouTube URL stored.');
+        return;
+    }
+
+    const playerDiv = document.getElementById('ytPlayer');
+    
+    // Temporarily make the player visible (1x1 pixel) so iOS recognises it
+    playerDiv.style.display = 'block';
+    playerDiv.style.width = '1px';
+    playerDiv.style.height = '1px';
+    playerDiv.style.opacity = '0.01'; // nearly invisible
+
+    if (!ytPlayer) {
+        // Create player for the first time
+        ytPlayer = new YT.Player('ytPlayer', {
+            height: '1',   // minimal size
+            width: '1',
+            videoId: videoId,
+            playerVars: { autoplay: 1, controls: 0, modestbranding: 1, rel: 0 },
+            events: {
+                onReady: (event) => {
+                    event.target.playVideo();
+                    // Hide again after a short delay (playback started)
+                    setTimeout(() => {
+                        playerDiv.style.width = '0';
+                        playerDiv.style.height = '0';
+                        playerDiv.style.opacity = '0';
+                    }, 500);
+                },
+                onError: (event) => alert('YouTube error: ' + event.data)
+            }
+        });
+    } else {
+        // Player already exists – load new video and play
+        ytPlayer.loadVideoById(videoId);
+        // Hide after a short delay
+        setTimeout(() => {
+            playerDiv.style.width = '0';
+            playerDiv.style.height = '0';
+            playerDiv.style.opacity = '0';
+        }, 500);
+    }
+}
 
     function stopYouTube() {
         if (ytPlayer) {
