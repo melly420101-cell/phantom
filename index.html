@@ -223,7 +223,87 @@
             box-shadow: 0 0 10px rgba(255,26,26,0.3);
         }
 
-        /* ----- NEW LAYOUT ----- */
+        /* ----- NEW QUOTE SECTION ----- */
+        .quote-section {
+            border: 1px solid var(--dim-red);
+            padding: 10px;
+            margin: 10px 0;
+            background: rgba(0,0,0,0.5);
+        }
+        .quote-display {
+            font-style: italic;
+            color: var(--glow-red);
+            text-shadow: 0 0 5px currentColor;
+            word-wrap: break-word;
+        }
+        .quote-edit {
+            display: flex;
+            gap: 10px;
+            margin-top: 5px;
+        }
+        .quote-input {
+            flex: 1;
+            background: black;
+            color: var(--glow-red);
+            border: 1px solid var(--mid-red);
+            font-family: 'VHS', monospace;
+            padding: 8px;
+        }
+
+        /* ----- YOUTUBE PLAYER ----- */
+        .youtube-player {
+            border: 1px solid var(--dim-red);
+            padding: 10px;
+            margin: 10px 0;
+            background: rgba(0,0,0,0.5);
+        }
+        .yt-input-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
+        }
+        .yt-input {
+            flex: 2;
+            min-width: 200px;
+            background: black;
+            color: var(--glow-red);
+            border: 1px solid var(--mid-red);
+            font-family: 'VHS', monospace;
+            padding: 8px;
+        }
+        .yt-btn {
+            background: transparent;
+            border: 1px solid var(--glow-red);
+            color: var(--glow-red);
+            font-family: 'VHS', monospace;
+            padding: 8px 15px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .yt-btn:hover {
+            background: var(--glow-red);
+            color: black;
+        }
+        .yt-btn.stop {
+            border-color: var(--text-gray);
+            color: var(--text-gray);
+        }
+        .yt-btn.stop:hover {
+            background: var(--text-gray);
+            color: black;
+        }
+        /* YouTube edit controls hidden by default */
+        .yt-edit {
+            display: none;
+            margin-top: 10px;
+        }
+        .yt-edit.show {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
         .action-header {
             display: flex;
             flex-direction: row;
@@ -326,6 +406,42 @@
         .dropdown-item:hover {
             background: var(--glow-red);
             color: black;
+        }
+
+        /* Password protection */
+        .password-prompt {
+            display: flex;
+            gap: 10px;
+            margin: 10px 0;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .password-input {
+            background: black;
+            color: var(--glow-red);
+            border: 1px solid var(--mid-red);
+            font-family: 'VHS', monospace;
+            padding: 10px;
+            flex: 1;
+            min-width: 150px;
+        }
+        .unlock-btn {
+            background: transparent;
+            border: 1px solid var(--glow-red);
+            color: var(--glow-red);
+            font-family: 'VHS', monospace;
+            padding: 10px 15px;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: 0.2s;
+        }
+        .unlock-btn:hover {
+            background: var(--glow-red);
+            color: black;
+        }
+        .edit-locked {
+            opacity: 0.5;
+            pointer-events: none;
         }
 
         /* Collapsible Local Emotions Panel */
@@ -637,6 +753,30 @@
         <div class="corrupted-overlay"></div>
         <h2 id="char-name">> <span id="name-typing"></span><span class="typing-cursor"></span></h2>
 
+        <!-- Quote Section -->
+        <div class="quote-section" id="quoteSection">
+            <div id="quoteDisplay" class="quote-display"></div>
+            <div id="quoteEdit" class="quote-edit" style="display: none;">
+                <input type="text" id="quoteInput" class="quote-input" placeholder="Enter a quote...">
+                <button class="yt-btn" onclick="saveQuote()">Save</button>
+                <button class="yt-btn stop" onclick="cancelQuoteEdit()">Cancel</button>
+            </div>
+        </div>
+
+        <!-- YouTube Player -->
+        <div class="youtube-player">
+            <div class="yt-input-group">
+                <button class="yt-btn" onclick="playYouTube()">Play</button>
+                <button class="yt-btn stop" onclick="stopYouTube()">Stop</button>
+            </div>
+            <!-- YouTube URL edit (hidden until unlocked) -->
+            <div class="yt-edit" id="ytEdit">
+                <input type="text" id="ytUrl" class="yt-input" placeholder="YouTube link (for everyone)">
+                <button class="yt-btn" onclick="saveYouTubeUrl()">Save</button>
+            </div>
+            <div id="ytPlayer" style="display: none;"></div>
+        </div>
+
         <!-- MAIN VIEW -->
         <div id="mainView" class="main-container">
             <div class="top-row">
@@ -665,6 +805,12 @@
                 </select>
             </div>
 
+            <!-- Password protection prompt -->
+            <div id="passwordPrompt" class="password-prompt" style="display: none;">
+                <input type="password" id="editPassword" class="password-input" placeholder="Enter edit password">
+                <button class="unlock-btn" onclick="unlockEdit()">UNLOCK</button>
+            </div>
+
             <!-- Action header with SUBJECT FILE, JOURNAL LOG and menu dropdown -->
             <div class="action-header">
                 <button class="subject-file-btn" onclick="showLoreView()">> SUBJECT FILE</button>
@@ -674,7 +820,8 @@
                     <div class="dropdown-menu" id="dropdownMenu">
                         <button class="dropdown-item" onclick="refreshData()">> REFRESH</button>
                         <button class="dropdown-item" onclick="copyShareLink()">> COPY LINK</button>
-                        <button class="dropdown-item" onclick="showEditLore()">> EDIT LORE</button>
+                        <!-- Added ID to EDIT LORE button for password control -->
+                        <button class="dropdown-item" onclick="showEditLore()" id="editLoreBtn">> EDIT LORE</button>
                     </div>
                 </div>
             </div>
@@ -686,7 +833,7 @@
                     <span class="collapse-indicator" id="collapseIndicator">▼</span>
                 </div>
                 <div class="collapse-content" id="collapseContent">
-                    <div class="sliders-panel">
+                    <div class="sliders-panel" id="slidersPanel">
                         <div class="slider-row" id="slider-joy">
                             <span class="slider-label">JOY</span>
                             <div class="slider-container">
@@ -814,6 +961,7 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://www.youtube.com/iframe_api"></script>
 
 <script>
     // ---------- CONFIG ----------
@@ -826,10 +974,18 @@
     const rot = parseInt(params.get('rot')) || 0;
     const isCorrupted = rot >= 80;
 
-    // Data storage
     let currentLore = {};
     let journalEntries = [];
     let journalIndex = 0;
+    let hasPassword = false;
+    let editPassword = null;
+    let editLocked = true;
+    let currentQuote = "";
+    let currentYoutubeUrl = "";
+
+    // YouTube player
+    let ytPlayer;
+    let playerReady = false;
 
     // Sliders
     const emotions = ['joy','trust','fear','surp','grief','disg','rage','anti'];
@@ -850,12 +1006,10 @@
     const rawName = params.get('name') || "SUBJECT_NULL";
     const finalName = glitchText(`> SUBJECT: ${rawName.toUpperCase()}`);
 
-    // Stats bars
     document.getElementById('grit-bar').style.width = (params.get('grit') || 100) + "%";
     document.getElementById('rot-bar').style.width = rot + "%";
     document.getElementById('weird-bar').style.width = (params.get('weird') || 0) + "%";
 
-    // ---------- COLOR SATURATION ----------
     function getLocalColor(value) {
         if (isCorrupted) return '#fff';
         const intensity = value / 100;
@@ -874,7 +1028,6 @@
         return `rgb(${r}, ${g}, ${b})`;
     }
 
-    // ---------- SLIDER SETUP ----------
     function getSliderValues() {
         return emotions.map(emo => parseInt(sliders[emo].value) || 10);
     }
@@ -902,7 +1055,6 @@
         }
     });
 
-    // ---------- RADAR DATA ----------
     function getEmoData(prefix) {
         return [
             parseInt(params.get(prefix + 'joy')) || 10,
@@ -961,35 +1113,192 @@
             datasets: datasets
         },
         options: {
-            plugins: {
-                legend: { display: false }
-            },
+            plugins: { legend: { display: false } },
             scales: {
                 r: {
                     angleLines: { color: isCorrupted ? '#fff' : '#440000' },
                     grid: { color: isCorrupted ? '#fff' : '#440000' },
-                    pointLabels: {
-                        color: isCorrupted ? '#fff' : '#ff1a1a',
-                        font: { family: 'VHS', size: 10 }
-                    },
-                    ticks: {
-                        display: false,
-                        stepSize: 20,
-                        callback: function(value) { return value; }
-                    },
-                    min: 0,
-                    max: 100,
-                    beginAtZero: true
+                    pointLabels: { color: isCorrupted ? '#fff' : '#ff1a1a', font: { family: 'VHS', size: 10 } },
+                    ticks: { display: false, stepSize: 20 },
+                    min: 0, max: 100, beginAtZero: true
                 }
             },
-            elements: {
-                point: {
-                    radius: 6,
-                    hoverRadius: 8
-                }
-            }
+            elements: { point: { radius: 6, hoverRadius: 8 } }
         }
     });
+
+    // ---------- PASSWORD PROTECTION ----------
+    async function checkPasswordStatus() {
+        if (!userId || !charName) return;
+        try {
+            const url = `${API_BASE}/api/character?userId=${encodeURIComponent(userId)}&charName=${encodeURIComponent(charName)}&secret=${encodeURIComponent(SYNC_SECRET)}`;
+            const response = await fetch(url);
+            if (!response.ok) throw new Error('Failed to fetch character');
+            const data = await response.json();
+            hasPassword = data.hasPassword || false;
+            currentQuote = data.quote || "";
+            currentYoutubeUrl = data.youtubeUrl || "";
+            updateQuoteDisplay();
+            if (hasPassword) {
+                document.getElementById('passwordPrompt').style.display = 'flex';
+                editLocked = true;
+                document.getElementById('slidersPanel').classList.add('edit-locked');
+                document.getElementById('syncBtn').classList.add('edit-locked');
+                document.getElementById('syncBtn').disabled = true;
+                // Hide the Edit Lore button if password protected
+                document.getElementById('editLoreBtn').style.display = 'none';
+            } else {
+                document.getElementById('passwordPrompt').style.display = 'none';
+                editLocked = false;
+                document.getElementById('slidersPanel').classList.remove('edit-locked');
+                document.getElementById('syncBtn').classList.remove('edit-locked');
+                document.getElementById('syncBtn').disabled = false;
+                document.getElementById('quoteDisplay').onclick = () => startQuoteEdit();
+                document.getElementById('ytEdit').classList.add('show');
+                // Show the Edit Lore button (in case it was hidden)
+                document.getElementById('editLoreBtn').style.display = 'block';
+            }
+        } catch (e) {
+            console.error('Failed to check password status', e);
+        }
+    }
+
+    window.unlockEdit = function() {
+        const entered = document.getElementById('editPassword').value;
+        if (!entered) { alert('Please enter a password'); return; }
+        editPassword = entered;
+        document.getElementById('passwordPrompt').style.display = 'none';
+        document.getElementById('slidersPanel').classList.remove('edit-locked');
+        document.getElementById('syncBtn').classList.remove('edit-locked');
+        document.getElementById('syncBtn').disabled = false;
+        editLocked = false;
+        document.getElementById('quoteDisplay').onclick = () => startQuoteEdit();
+        document.getElementById('ytEdit').classList.add('show');
+        // Show the Edit Lore button after successful unlock
+        document.getElementById('editLoreBtn').style.display = 'block';
+    };
+
+    // ---------- QUOTE ----------
+    function updateQuoteDisplay() {
+        const displayDiv = document.getElementById('quoteDisplay');
+        if (currentQuote) {
+            displayDiv.innerText = `"${currentQuote}"`;
+        } else {
+            displayDiv.innerText = '> No quote set.';
+        }
+    }
+
+    function startQuoteEdit() {
+        if (editLocked) return;
+        document.getElementById('quoteDisplay').style.display = 'none';
+        document.getElementById('quoteEdit').style.display = 'flex';
+        document.getElementById('quoteInput').value = currentQuote;
+    }
+
+    function cancelQuoteEdit() {
+        document.getElementById('quoteEdit').style.display = 'none';
+        document.getElementById('quoteDisplay').style.display = 'block';
+    }
+
+    async function saveQuote() {
+        const newQuote = document.getElementById('quoteInput').value;
+        if (!userId || !charName) { alert('Missing character info'); return; }
+        try {
+            const response = await fetch(`${API_BASE}/api/quote`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    userId,
+                    characterName: charName,
+                    quote: newQuote,
+                    secret: SYNC_SECRET,
+                    password: editPassword || undefined
+                })
+            });
+            const result = await response.json();
+            if (result.success) {
+                currentQuote = newQuote;
+                updateQuoteDisplay();
+                cancelQuoteEdit();
+            } else {
+                alert('Failed to save quote: ' + (result.error || 'Unknown error'));
+            }
+        } catch (e) {
+            console.error('Save quote error', e);
+            alert('Connection error');
+        }
+    }
+
+    // ---------- YOUTUBE ----------
+    function onYouTubeIframeAPIReady() {
+        // ready
+    }
+
+    function playYouTube() {
+        if (!currentYoutubeUrl) {
+            alert('No YouTube link set for this character.');
+            return;
+        }
+        const videoId = extractVideoId(currentYoutubeUrl);
+        if (!videoId) {
+            alert('Invalid YouTube URL stored.');
+            return;
+        }
+        if (!ytPlayer) {
+            ytPlayer = new YT.Player('ytPlayer', {
+                height: '0',
+                width: '0',
+                videoId: videoId,
+                playerVars: { autoplay: 1, controls: 0, modestbranding: 1, rel: 0 },
+                events: {
+                    onReady: (event) => event.target.playVideo(),
+                    onError: (event) => alert('YouTube error: ' + event.data)
+                }
+            });
+        } else {
+            ytPlayer.loadVideoById(videoId);
+        }
+    }
+
+    function stopYouTube() {
+        if (ytPlayer) {
+            ytPlayer.stopVideo();
+        }
+    }
+
+    function extractVideoId(url) {
+        const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+        const match = url.match(regExp);
+        return (match && match[2].length === 11) ? match[2] : null;
+    }
+
+    async function saveYouTubeUrl() {
+        const newUrl = document.getElementById('ytUrl').value;
+        if (!userId || !charName) { alert('Missing character info'); return; }
+        try {
+            const response = await fetch(`${API_BASE}/api/youtube`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    userId,
+                    characterName: charName,
+                    youtubeUrl: newUrl,
+                    secret: SYNC_SECRET,
+                    password: editPassword || undefined
+                })
+            });
+            const result = await response.json();
+            if (result.success) {
+                currentYoutubeUrl = newUrl;
+                alert('YouTube URL updated.');
+            } else {
+                alert('Failed to save YouTube URL: ' + (result.error || 'Unknown error'));
+            }
+        } catch (e) {
+            console.error('Save YouTube error', e);
+            alert('Connection error');
+        }
+    }
 
     // ---------- UI PANEL TOGGLING ----------
     function showMainView() {
@@ -1008,6 +1317,11 @@
     }
 
     function showEditLore() {
+        // Prevent entering edit lore if password protected and not unlocked
+        if (hasPassword && editLocked) {
+            alert('This character is password protected. Please unlock it first using the password prompt above.');
+            return;
+        }
         document.getElementById('mainView').classList.add('hidden-panel');
         document.getElementById('loreView').classList.add('hidden-panel');
         document.getElementById('editLoreView').classList.remove('hidden-panel');
@@ -1070,7 +1384,6 @@
         nextBtn.disabled = journalIndex === journalEntries.length - 1;
 
         const entry = journalEntries[journalIndex];
-        // Format timestamp nicely (optional)
         const date = new Date(entry.timestamp);
         const formattedDate = date.toLocaleString();
         entryDiv.innerText = `[${formattedDate}]\n${entry.entry}`;
@@ -1078,17 +1391,11 @@
     }
 
     function journalPrev() {
-        if (journalIndex > 0) {
-            journalIndex--;
-            updateJournalDisplay();
-        }
+        if (journalIndex > 0) { journalIndex--; updateJournalDisplay(); }
     }
 
     function journalNext() {
-        if (journalIndex < journalEntries.length - 1) {
-            journalIndex++;
-            updateJournalDisplay();
-        }
+        if (journalIndex < journalEntries.length - 1) { journalIndex++; updateJournalDisplay(); }
     }
 
     function loadLoreToForm() {
@@ -1105,6 +1412,12 @@
     }
 
     async function saveLore() {
+        // Prevent saving if password protected and not unlocked
+        if (hasPassword && editLocked) {
+            alert('You must unlock the character before saving lore.');
+            return;
+        }
+
         const lore = {
             name: document.getElementById('edit-name').value,
             age: document.getElementById('edit-age').value,
@@ -1118,23 +1431,35 @@
             goals: document.getElementById('edit-goals').value
         };
 
+        const payload = {
+            userId,
+            characterName: charName,
+            lore,
+            secret: SYNC_SECRET
+        };
+
+        // If the character has a password, include it
+        if (hasPassword) {
+            if (!editPassword) {
+                alert('No password available. Please unlock again.');
+                return;
+            }
+            payload.password = editPassword;
+        }
+
         try {
             const response = await fetch(`${API_BASE}/api/lore`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    userId,
-                    characterName: charName,
-                    lore,
-                    secret: SYNC_SECRET
-                })
+                body: JSON.stringify(payload)
             });
             const result = await response.json();
             if (result.success) {
                 currentLore = lore;
                 showMainView();
             } else {
-                alert('Failed to save lore');
+                alert('Failed to save lore: ' + (result.error || 'Unknown error'));
+                // If the error is 'Invalid edit password', you may want to lock again
             }
         } catch (e) {
             console.error('Save lore error', e);
@@ -1165,9 +1490,7 @@
                 option.dataset.anti = bond.emotions.anti;
                 select.appendChild(option);
             });
-        } catch (e) {
-            console.error('Failed to fetch bonds', e);
-        }
+        } catch (e) { console.error('Failed to fetch bonds', e); }
     }
 
     function loadBond() {
@@ -1214,6 +1537,7 @@
 
     // ---------- SYNC (LOAD DATA) ----------
     async function syncToBot() {
+        if (editLocked) { alert('This character is password protected. Please unlock first.'); return; }
         const btn = document.getElementById('syncBtn');
         btn.disabled = true;
         btn.innerText = '> LOADING...';
@@ -1223,11 +1547,9 @@
         emotions.forEach((emo, i) => emotionsObj[emo] = currentValues[i]);
 
         const payload = {
-            userId: userId,
-            characterName: charName,
-            emotions: emotionsObj,
-            secret: SYNC_SECRET
+            userId, characterName: charName, emotions: emotionsObj, secret: SYNC_SECRET
         };
+        if (hasPassword) payload.password = editPassword;
 
         try {
             const response = await fetch(`${API_BASE}/api/sync`, {
@@ -1236,8 +1558,13 @@
                 body: JSON.stringify(payload)
             });
             const result = await response.json();
-            if (result.success) {
-                btn.innerText = '> LOAD COMPLETE';
+            if (result.success) { btn.innerText = '> LOAD COMPLETE'; } 
+            else if (result.error === 'Invalid edit password') {
+                btn.innerText = '> WRONG PASSWORD';
+                editLocked = true;
+                document.getElementById('slidersPanel').classList.add('edit-locked');
+                document.getElementById('syncBtn').classList.add('edit-locked');
+                document.getElementById('passwordPrompt').style.display = 'flex';
             } else {
                 btn.innerText = '> LOAD FAILED';
                 console.error(result.error);
@@ -1255,10 +1582,7 @@
 
     // ---------- REFRESH ----------
     async function refreshData() {
-        if (!userId || !charName) {
-            alert('Missing user or character info');
-            return;
-        }
+        if (!userId || !charName) { alert('Missing user or character info'); return; }
         try {
             const url = `${API_BASE}/api/character?userId=${encodeURIComponent(userId)}&charName=${encodeURIComponent(charName)}&secret=${encodeURIComponent(SYNC_SECRET)}`;
             const response = await fetch(url);
@@ -1281,11 +1605,30 @@
             document.getElementById('rot-bar').style.width = data.rot + "%";
             document.getElementById('weird-bar').style.width = data.weird + "%";
 
+            hasPassword = data.hasPassword || false;
+            currentQuote = data.quote || "";
+            currentYoutubeUrl = data.youtubeUrl || "";
+            updateQuoteDisplay();
+            if (hasPassword && editLocked) {
+                document.getElementById('passwordPrompt').style.display = 'flex';
+                document.getElementById('slidersPanel').classList.add('edit-locked');
+                document.getElementById('syncBtn').classList.add('edit-locked');
+                document.getElementById('syncBtn').disabled = true;
+                // Hide Edit Lore button if password protected
+                document.getElementById('editLoreBtn').style.display = 'none';
+            } else if (!hasPassword) {
+                document.getElementById('passwordPrompt').style.display = 'none';
+                document.getElementById('slidersPanel').classList.remove('edit-locked');
+                document.getElementById('syncBtn').classList.remove('edit-locked');
+                document.getElementById('syncBtn').disabled = false;
+                editLocked = false;
+                document.getElementById('quoteDisplay').onclick = () => startQuoteEdit();
+                document.getElementById('ytEdit').classList.add('show');
+                // Show Edit Lore button
+                document.getElementById('editLoreBtn').style.display = 'block';
+            }
             alert('Data refreshed');
-        } catch (e) {
-            console.error('Refresh failed:', e);
-            alert('Refresh error');
-        }
+        } catch (e) { console.error('Refresh failed:', e); alert('Refresh error'); }
     }
 
     // ---------- COPY LINK ----------
@@ -1318,12 +1661,10 @@
     document.addEventListener('DOMContentLoaded', function() {
         const menuToggle = document.getElementById('menuToggle');
         const dropdown = document.getElementById('dropdownMenu');
-
         menuToggle.addEventListener('click', function(e) {
             e.stopPropagation();
             dropdown.classList.toggle('show');
         });
-
         document.addEventListener('click', function(event) {
             if (!menuToggle.contains(event.target) && !dropdown.contains(event.target)) {
                 dropdown.classList.remove('show');
@@ -1336,13 +1677,10 @@
         const header = document.getElementById('collapseHeader');
         const content = document.getElementById('collapseContent');
         const indicator = document.getElementById('collapseIndicator');
-
         header.addEventListener('click', function() {
             content.classList.toggle('expanded');
             indicator.textContent = content.classList.contains('expanded') ? '▼' : '►';
         });
-
-        // Start expanded
         content.classList.add('expanded');
         indicator.textContent = '▼';
     });
@@ -1362,6 +1700,7 @@
             }
         }
         typeNext();
+        checkPasswordStatus();
     });
 
     // ---------- SSE ----------
@@ -1385,16 +1724,13 @@
                 document.getElementById('grit-bar').style.width = data.grit + "%";
                 document.getElementById('rot-bar').style.width = data.rot + "%";
                 document.getElementById('weird-bar').style.width = data.weird + "%";
-            } catch (e) {
-                console.error('SSE parse error', e);
-            }
+            } catch (e) { console.error('SSE parse error', e); }
         };
         eventSource.onerror = function() {
             eventSource.close();
             setTimeout(setupSSE, 3000);
         };
     }
-
     setupSSE();
 </script>
 </body>
