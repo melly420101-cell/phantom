@@ -470,7 +470,8 @@
             letter-spacing: 1px;
         }
 
-        .lore-panel {
+        /* Lore and Journal styles */
+        .lore-panel, .journal-panel {
             width: 100%;
             margin-top: 20px;
         }
@@ -509,6 +510,54 @@
         textarea.lore-input {
             min-height: 80px;
             resize: vertical;
+        }
+
+        /* Journal specific */
+        .journal-entry {
+            font-size: 1rem;
+            color: var(--glow-red);
+            background: rgba(0,0,0,0.5);
+            padding: 15px;
+            border: 1px solid var(--mid-red);
+            box-shadow: 0 0 8px rgba(255,26,26,0.2);
+            min-height: 150px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            margin-bottom: 20px;
+        }
+        .journal-nav {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+        }
+        .journal-nav-btn {
+            min-width: 60px;
+            padding: 10px 15px;
+            font-size: 1.2rem;
+            background: transparent;
+            border: 1px solid var(--glow-red);
+            color: var(--glow-red);
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 0 10px rgba(255,26,26,0.3);
+        }
+        .journal-nav-btn:hover {
+            background: var(--glow-red);
+            color: black;
+            box-shadow: 0 0 20px var(--glow-red);
+        }
+        .journal-nav-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+            border-color: var(--dim-red);
+            box-shadow: none;
+        }
+        #journal-day {
+            font-size: 1rem;
+            color: var(--text-gray);
+            text-transform: uppercase;
+            letter-spacing: 2px;
         }
 
         .hidden-panel {
@@ -616,9 +665,10 @@
                 </select>
             </div>
 
-            <!-- Action header with SUBJECT FILE button and menu dropdown -->
+            <!-- Action header with SUBJECT FILE, JOURNAL LOG and menu dropdown -->
             <div class="action-header">
                 <button class="subject-file-btn" onclick="showLoreView()">> SUBJECT FILE</button>
+                <button class="subject-file-btn" onclick="showJournalView()">> JOURNAL LOG</button>
                 <div class="menu-container" id="menuContainer">
                     <button class="menu-btn" id="menuToggle">≡</button>
                     <div class="dropdown-menu" id="dropdownMenu">
@@ -719,6 +769,22 @@
             </div>
         </div>
 
+        <!-- JOURNAL VIEW -->
+        <div id="journalView" class="main-container hidden-panel">
+            <h2 style="margin-bottom:15px;">> JOURNAL LOG</h2>
+            <div class="journal-panel">
+                <div class="journal-entry" id="journal-entry-text">No journal entries.</div>
+                <div class="journal-nav">
+                    <button class="journal-nav-btn" onclick="journalPrev()" id="journal-prev">◀</button>
+                    <span id="journal-day">DAY 0 / 0</span>
+                    <button class="journal-nav-btn" onclick="journalNext()" id="journal-next">▶</button>
+                </div>
+            </div>
+            <div class="button-group">
+                <button class="terminal-btn" onclick="showMainView()">> RETURN</button>
+            </div>
+        </div>
+
         <!-- EDIT LORE VIEW (Form) -->
         <div id="editLoreView" class="main-container hidden-panel">
             <h2 style="margin-bottom:15px;">> EDIT SUBJECT FILE</h2>
@@ -760,8 +826,10 @@
     const rot = parseInt(params.get('rot')) || 0;
     const isCorrupted = rot >= 80;
 
-    // Current lore data
+    // Data storage
     let currentLore = {};
+    let journalEntries = [];
+    let journalIndex = 0;
 
     // Sliders
     const emotions = ['joy','trust','fear','surp','grief','disg','rage','anti'];
@@ -928,42 +996,98 @@
         document.getElementById('mainView').classList.remove('hidden-panel');
         document.getElementById('loreView').classList.add('hidden-panel');
         document.getElementById('editLoreView').classList.add('hidden-panel');
+        document.getElementById('journalView').classList.add('hidden-panel');
     }
 
     function showLoreView() {
         document.getElementById('mainView').classList.add('hidden-panel');
         document.getElementById('loreView').classList.remove('hidden-panel');
         document.getElementById('editLoreView').classList.add('hidden-panel');
-        loadLoreToView();
+        document.getElementById('journalView').classList.add('hidden-panel');
+        loadCharacterData().then(() => updateLoreDisplay());
     }
 
     function showEditLore() {
         document.getElementById('mainView').classList.add('hidden-panel');
         document.getElementById('loreView').classList.add('hidden-panel');
         document.getElementById('editLoreView').classList.remove('hidden-panel');
+        document.getElementById('journalView').classList.add('hidden-panel');
         loadLoreToForm();
     }
 
-    // ---------- LORE ----------
-    async function loadLoreToView() {
+    function showJournalView() {
+        document.getElementById('mainView').classList.add('hidden-panel');
+        document.getElementById('loreView').classList.add('hidden-panel');
+        document.getElementById('editLoreView').classList.add('hidden-panel');
+        document.getElementById('journalView').classList.remove('hidden-panel');
+        loadCharacterData().then(() => updateJournalDisplay());
+    }
+
+    // ---------- DATA LOADING ----------
+    async function loadCharacterData() {
         if (!userId || !charName) return;
         try {
             const url = `${API_BASE}/api/lore?userId=${encodeURIComponent(userId)}&charName=${encodeURIComponent(charName)}&secret=${encodeURIComponent(SYNC_SECRET)}`;
             const response = await fetch(url);
             if (!response.ok) throw new Error('Failed to fetch lore');
-            currentLore = await response.json();
-            document.getElementById('lore-name').innerText = currentLore.name || '—';
-            document.getElementById('lore-age').innerText = currentLore.age || '—';
-            document.getElementById('lore-gender').innerText = currentLore.gender || '—';
-            document.getElementById('lore-appearance').innerText = currentLore.appearance || '—';
-            document.getElementById('lore-personality').innerText = currentLore.personality || '—';
-            document.getElementById('lore-backstory').innerText = currentLore.backstory || '—';
-            document.getElementById('lore-abilities').innerText = currentLore.abilities || '—';
-            document.getElementById('lore-weaknesses').innerText = currentLore.weaknesses || '—';
-            document.getElementById('lore-faction').innerText = currentLore.faction || '—';
-            document.getElementById('lore-goals').innerText = currentLore.goals || '—';
+            const data = await response.json();
+            currentLore = data.lore || {};
+            journalEntries = data.journal || [];
+            journalIndex = 0;
         } catch (e) {
-            console.error('Failed to load lore', e);
+            console.error('Failed to load character data', e);
+        }
+    }
+
+    function updateLoreDisplay() {
+        document.getElementById('lore-name').innerText = currentLore.name || '—';
+        document.getElementById('lore-age').innerText = currentLore.age || '—';
+        document.getElementById('lore-gender').innerText = currentLore.gender || '—';
+        document.getElementById('lore-appearance').innerText = currentLore.appearance || '—';
+        document.getElementById('lore-personality').innerText = currentLore.personality || '—';
+        document.getElementById('lore-backstory').innerText = currentLore.backstory || '—';
+        document.getElementById('lore-abilities').innerText = currentLore.abilities || '—';
+        document.getElementById('lore-weaknesses').innerText = currentLore.weaknesses || '—';
+        document.getElementById('lore-faction').innerText = currentLore.faction || '—';
+        document.getElementById('lore-goals').innerText = currentLore.goals || '—';
+    }
+
+    function updateJournalDisplay() {
+        const entryDiv = document.getElementById('journal-entry-text');
+        const daySpan = document.getElementById('journal-day');
+        const prevBtn = document.getElementById('journal-prev');
+        const nextBtn = document.getElementById('journal-next');
+
+        if (!journalEntries || journalEntries.length === 0) {
+            entryDiv.innerText = 'No journal entries.';
+            daySpan.innerText = 'DAY 0 / 0';
+            prevBtn.disabled = true;
+            nextBtn.disabled = true;
+            return;
+        }
+
+        prevBtn.disabled = journalIndex === 0;
+        nextBtn.disabled = journalIndex === journalEntries.length - 1;
+
+        const entry = journalEntries[journalIndex];
+        // Format timestamp nicely (optional)
+        const date = new Date(entry.timestamp);
+        const formattedDate = date.toLocaleString();
+        entryDiv.innerText = `[${formattedDate}]\n${entry.entry}`;
+        daySpan.innerText = `DAY ${journalIndex + 1} / ${journalEntries.length}`;
+    }
+
+    function journalPrev() {
+        if (journalIndex > 0) {
+            journalIndex--;
+            updateJournalDisplay();
+        }
+    }
+
+    function journalNext() {
+        if (journalIndex < journalEntries.length - 1) {
+            journalIndex++;
+            updateJournalDisplay();
         }
     }
 
@@ -1218,7 +1342,7 @@
             indicator.textContent = content.classList.contains('expanded') ? '▼' : '►';
         });
 
-        // Start expanded (optional)
+        // Start expanded
         content.classList.add('expanded');
         indicator.textContent = '▼';
     });
