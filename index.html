@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -13,805 +14,837 @@
             --bg-black: #000000;
             --text-gray: #aaaaaa;
             --screen-flicker: 0.15s infinite;
+            --glow-magenta: #ff00ff;
         }
 
-        /* Ensure full-screen covers everything */
-        html, body {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
-        }
+```
+    /* Ensure full-screen covers everything */
+    html, body {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+    }
 
-        @font-face {
-            font-family: 'VHS';
-            src: url('https://fonts.cdnfonts.com/s/16060/VCR_OSD_MONO_1.001.woff') format('woff');
-        }
+    @font-face {
+        font-family: 'VHS';
+        src: url('https://fonts.cdnfonts.com/s/16060/VCR_OSD_MONO_1.001.woff') format('woff');
+    }
 
-        body {
-            background-color: #111;
-            color: var(--glow-red);
-            font-family: 'VHS', 'Courier New', monospace;
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            overflow-x: hidden;
-            touch-action: pan-y;
-            font-size: 16px;
-        }
+    body {
+        background-color: #111;
+        color: var(--glow-red);
+        font-family: 'VHS', 'Courier New', monospace;
+        margin: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        overflow-x: hidden;
+        touch-action: pan-y;
+        font-size: 16px;
+    }
 
-        .crt-monitor {
-            background: #0a0a0a;
-            border: 5px solid #1a1a1a;
-            border-radius: 15px;
-            padding: 5px;
-            position: relative;
-            box-shadow: 0 0 30px rgba(255,26,26,0.2) inset, 0 0 20px rgba(255,26,26,0.3);
-            display: flex;
-            width: 95%;
-            max-width: 900px;
-            max-height: 95vh;
-            transition: all 0.1s;
-        }
+    .crt-monitor {
+        background: #0a0a0a;
+        border: 5px solid #1a1a1a;
+        border-radius: 15px;
+        padding: 5px;
+        position: relative;
+        box-shadow: 0 0 30px rgba(255,26,26,0.2) inset, 0 0 20px rgba(255,26,26,0.3);
+        display: flex;
+        width: 95%;
+        max-width: 900px;
+        max-height: 95vh;
+        transition: all 0.1s;
+    }
 
-        .screen {
-            background-color: var(--bg-black);
-            width: 100%;
-            height: 100%;
-            border-radius: 8px;
-            position: relative;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            padding: 15px;
-            animation: flicker var(--screen-flicker);
-            box-shadow: 0 0 15px rgba(255,26,26,0.2) inset;
-        }
+    .screen {
+        background-color: var(--bg-black);
+        width: 100%;
+        height: 100%;
+        border-radius: 8px;
+        position: relative;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        padding: 15px;
+        animation: flicker var(--screen-flicker);
+        box-shadow: 0 0 15px rgba(255,26,26,0.2) inset;
+    }
 
-        .screen::after {
-            content: " ";
-            position: absolute;
-            top: 0; left: 0; bottom: 0; right: 0;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(255, 26, 26, 0.03) 50%),
-                        linear-gradient(90deg, rgba(255, 26, 26, 0.02), rgba(0, 0, 0, 0), rgba(255, 26, 26, 0.02));
-            background-size: 100% 4px, 3px 100%;
-            pointer-events: none;
-            z-index: 100;
-        }
+    .screen::after {
+        content: " ";
+        position: absolute;
+        top: 0; left: 0; bottom: 0; right: 0;
+        background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(255, 26, 26, 0.03) 50%),
+                    linear-gradient(90deg, rgba(255, 26, 26, 0.02), rgba(0, 0, 0, 0), rgba(255, 26, 26, 0.02));
+        background-size: 100% 4px, 3px 100%;
+        pointer-events: none;
+        z-index: 100;
+    }
 
-        .corrupted-overlay {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: repeating-linear-gradient(0deg, transparent 0px, transparent 1px, rgba(255,26,26,0.05) 2px);
-            opacity: 0;
-            pointer-events: none;
-            z-index: 90;
-        }
+    .corrupted-overlay {
+        position: absolute;
+        top: 0; left: 0; width: 100%; height: 100%;
+        background: repeating-linear-gradient(0deg, transparent 0px, transparent 1px, rgba(255,26,26,0.05) 2px);
+        opacity: 0;
+        pointer-events: none;
+        z-index: 90;
+    }
 
-        .rot-critical .corrupted-overlay {
-            opacity: 1;
-            animation: noise 0.2s infinite;
-        }
+    .rot-critical .corrupted-overlay {
+        opacity: 1;
+        animation: noise 0.2s infinite;
+    }
 
-        .rot-critical .crt-monitor {
-            animation: shake 0.5s infinite;
-            border-color: #440000;
-        }
+    .rot-critical .crt-monitor {
+        animation: shake 0.5s infinite;
+        border-color: #440000;
+    }
 
-        .rot-critical .bar-fill {
-            filter: hue-rotate(0deg) brightness(1.5);
-        }
+    .rot-critical .bar-fill {
+        filter: hue-rotate(0deg) brightness(1.5);
+    }
 
-        @keyframes noise {
-            0% { transform: translate(0,0); }
-            10% { transform: translate(-5px,-5px); }
-            20% { transform: translate(5px,5px); }
-            100% { transform: translate(0,0); }
-        }
+    @keyframes noise {
+        0% { transform: translate(0,0); }
+        10% { transform: translate(-5px,-5px); }
+        20% { transform: translate(5px,5px); }
+        100% { transform: translate(0,0); }
+    }
 
-        @keyframes shake {
-            0% { transform: translate(0,0); }
-            25% { transform: translate(1px, -1px); }
-            50% { transform: translate(-1px, 1px); }
-            100% { transform: translate(0,0); }
-        }
+    @keyframes shake {
+        0% { transform: translate(0,0); }
+        25% { transform: translate(1px, -1px); }
+        50% { transform: translate(-1px, 1px); }
+        100% { transform: translate(0,0); }
+    }
 
-        @keyframes flicker {
-            0% { opacity: 0.98; }
-            100% { opacity: 1; }
-        }
+    @keyframes flicker {
+        0% { opacity: 0.98; }
+        100% { opacity: 1; }
+    }
 
-        .glitching {
-            animation: glitch 0.3s ease-in-out;
-        }
+    .glitching {
+        animation: glitch 0.3s ease-in-out;
+    }
 
-        @keyframes glitch {
-            0% { transform: translate(0); }
-            20% { transform: translate(-4px, 2px); filter: hue-rotate(30deg); }
-            100% { transform: translate(0); }
-        }
+    @keyframes glitch {
+        0% { transform: translate(0); }
+        20% { transform: translate(-4px, 2px); filter: hue-rotate(30deg); }
+        100% { transform: translate(0); }
+    }
 
-        @keyframes breathe {
-            0% { box-shadow: 0 0 5px var(--glow-red), 0 0 10px var(--glow-red); }
-            50% { box-shadow: 0 0 15px var(--glow-red), 0 0 25px var(--glow-red); }
-            100% { box-shadow: 0 0 5px var(--glow-red), 0 0 10px var(--glow-red); }
-        }
+    @keyframes breathe {
+        0% { box-shadow: 0 0 5px var(--glow-red), 0 0 10px var(--glow-red); }
+        50% { box-shadow: 0 0 15px var(--glow-red), 0 0 25px var(--glow-red); }
+        100% { box-shadow: 0 0 5px var(--glow-red), 0 0 10px var(--glow-red); }
+    }
 
-        .main-container {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            flex-grow: 1;
-        }
+    .main-container {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        flex-grow: 1;
+    }
 
-        .top-row {
-            display: flex;
-            flex-direction: row;
-            gap: 20px;
-            flex-wrap: wrap;
-        }
+    .top-row {
+        display: flex;
+        flex-direction: row;
+        gap: 20px;
+        flex-wrap: wrap;
+    }
 
-        #wheel-area {
-            flex: 1 1 250px;
-            min-width: 200px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
+    #wheel-area {
+        flex: 1 1 250px;
+        min-width: 200px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
 
-        #radarChart {
-            width: 100% !important;
-            height: auto !important;
-            max-width: 280px;
-            filter: drop-shadow(0 0 8px var(--glow-red));
-            animation: breathe 3s infinite ease-in-out;
-        }
+    #radarChart {
+        width: 100% !important;
+        height: auto !important;
+        max-width: 280px;
+        filter: drop-shadow(0 0 8px var(--glow-red));
+        animation: breathe 3s infinite ease-in-out;
+    }
 
-        .stats-panel {
-            flex: 1 1 200px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
+    .stats-panel {
+        flex: 1 1 200px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
 
-        .stat-group {
-            margin-bottom: 10px;
-        }
+    .stat-group {
+        margin-bottom: 10px;
+    }
 
-        h3 {
-            margin: 5px 0;
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            color: var(--text-gray);
-            letter-spacing: 1px;
-            text-shadow: 0 0 5px rgba(255,26,26,0.5);
-        }
+    h3 {
+        margin: 5px 0;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        color: var(--text-gray);
+        letter-spacing: 1px;
+        text-shadow: 0 0 5px rgba(255,26,26,0.5);
+    }
 
-        .bar-bg {
-            background: #000;
-            height: 16px;
-            width: 100%;
-            border: 1px solid var(--mid-red);
-            box-shadow: 0 0 8px rgba(255,26,26,0.3);
-        }
+    .bar-bg {
+        background: #000;
+        height: 16px;
+        width: 100%;
+        border: 1px solid var(--mid-red);
+        box-shadow: 0 0 8px rgba(255,26,26,0.3);
+    }
 
-        .bar-fill {
-            height: 100%;
-            background: var(--glow-red);
-            box-shadow: 0 0 10px var(--glow-red);
-            transition: width 0.2s ease;
-            animation: breathe 3s infinite ease-in-out;
-        }
+    .bar-fill {
+        height: 100%;
+        background: var(--glow-red);
+        box-shadow: 0 0 10px var(--glow-red);
+        transition: width 0.2s ease;
+        animation: breathe 3s infinite ease-in-out;
+    }
 
-        /* Bond selector */
-        .bond-selector {
-            margin: 15px 0 10px;
-            width: 100%;
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            font-size: 0.8rem;
-            z-index: 110;
-        }
+    /* Bond selector */
+    .bond-selector {
+        margin: 15px 0 10px;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        font-size: 0.8rem;
+        z-index: 110;
+        flex-wrap: wrap;
+    }
 
-        .bond-selector select {
-            background: black;
-            color: var(--glow-red);
-            border: 1px solid var(--mid-red);
-            font-family: 'VHS', monospace;
-            padding: 12px 8px;
-            width: 80%;
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            border-radius: 0;
-            -webkit-appearance: none;
-            appearance: none;
-            box-shadow: 0 0 10px rgba(255,26,26,0.3);
-        }
+    .bond-selector select {
+        background: black;
+        color: var(--glow-red);
+        border: 1px solid var(--mid-red);
+        font-family: 'VHS', monospace;
+        padding: 12px 8px;
+        width: 80%;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        border-radius: 0;
+        -webkit-appearance: none;
+        appearance: none;
+        box-shadow: 0 0 10px rgba(255,26,26,0.3);
+    }
 
-        /* ----- NEW QUOTE SECTION ----- */
-        .quote-section {
-            border: 1px solid var(--dim-red);
-            padding: 10px;
-            margin: 10px 0;
-            background: rgba(0,0,0,0.5);
-        }
-        .quote-display {
-            font-style: italic;
-            color: var(--glow-red);
-            text-shadow: 0 0 5px currentColor;
-            word-wrap: break-word;
-        }
-        .quote-edit {
-            display: flex;
-            gap: 10px;
-            margin-top: 5px;
-        }
-        .quote-input {
-            flex: 1;
-            background: black;
-            color: var(--glow-red);
-            border: 1px solid var(--mid-red);
-            font-family: 'VHS', monospace;
-            padding: 8px;
-        }
+    /* ----- NEW QUOTE SECTION ----- */
+    .quote-section {
+        border: 1px solid var(--dim-red);
+        padding: 10px;
+        margin: 10px 0;
+        background: rgba(0,0,0,0.5);
+    }
+    .quote-display {
+        font-style: italic;
+        color: var(--glow-red);
+        text-shadow: 0 0 5px currentColor;
+        word-wrap: break-word;
+    }
+    .quote-edit {
+        display: flex;
+        gap: 10px;
+        margin-top: 5px;
+    }
+    .quote-input {
+        flex: 1;
+        background: black;
+        color: var(--glow-red);
+        border: 1px solid var(--mid-red);
+        font-family: 'VHS', monospace;
+        padding: 8px;
+    }
 
-        /* ----- YOUTUBE PLAYER ----- */
-        .youtube-player {
-            border: 1px solid var(--dim-red);
-            padding: 10px;
-            margin: 10px 0;
-            background: rgba(0,0,0,0.5);
-        }
-        .yt-input-group {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            margin-bottom: 10px;
-        }
-        .yt-input {
-            flex: 2;
-            min-width: 200px;
-            background: black;
-            color: var(--glow-red);
-            border: 1px solid var(--mid-red);
-            font-family: 'VHS', monospace;
-            padding: 8px;
-        }
-        .yt-btn {
-            background: transparent;
-            border: 1px solid var(--glow-red);
-            color: var(--glow-red);
-            font-family: 'VHS', monospace;
-            padding: 8px 15px;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-        .yt-btn:hover {
-            background: var(--glow-red);
-            color: black;
-        }
-        .yt-btn.stop {
-            border-color: var(--text-gray);
-            color: var(--text-gray);
-        }
-        .yt-btn.stop:hover {
-            background: var(--text-gray);
-            color: black;
-        }
-        .yt-edit {
-            display: none;
-            margin-top: 10px;
-        }
-        .yt-edit.show {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
+    /* ----- YOUTUBE PLAYER ----- */
+    .youtube-player {
+        border: 1px solid var(--dim-red);
+        padding: 10px;
+        margin: 10px 0;
+        background: rgba(0,0,0,0.5);
+    }
+    .yt-input-group {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-bottom: 10px;
+    }
+    .yt-input {
+        flex: 2;
+        min-width: 200px;
+        background: black;
+        color: var(--glow-red);
+        border: 1px solid var(--mid-red);
+        font-family: 'VHS', monospace;
+        padding: 8px;
+    }
+    .yt-btn {
+        background: transparent;
+        border: 1px solid var(--glow-red);
+        color: var(--glow-red);
+        font-family: 'VHS', monospace;
+        padding: 8px 15px;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+    .yt-btn:hover {
+        background: var(--glow-red);
+        color: black;
+    }
+    .yt-btn.stop {
+        border-color: var(--text-gray);
+        color: var(--text-gray);
+    }
+    .yt-btn.stop:hover {
+        background: var(--text-gray);
+        color: black;
+    }
+    .yt-edit {
+        display: none;
+        margin-top: 10px;
+    }
+    .yt-edit.show {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
 
+    .action-header {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 10px;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .subject-file-btn {
+        background: transparent;
+        border: 1px solid var(--glow-red);
+        color: var(--glow-red);
+        font-family: 'VHS', monospace;
+        padding: 12px 20px;
+        cursor: pointer;
+        text-transform: uppercase;
+        font-size: 1rem;
+        letter-spacing: 2px;
+        transition: 0.2s;
+        border-radius: 0;
+        box-shadow: 0 0 15px rgba(255,26,26,0.4);
+        text-shadow: 0 0 8px currentColor;
+        animation: breathe 3s infinite ease-in-out;
+        flex: 1;
+        min-width: 160px;
+    }
+
+    .subject-file-btn:hover,
+    .subject-file-btn:active {
+        background: var(--glow-red);
+        color: black;
+        box-shadow: 0 0 30px var(--glow-red);
+    }
+
+    .menu-container {
+        position: relative;
+        display: inline-block;
+    }
+
+    .menu-btn {
+        background: transparent;
+        border: 1px solid var(--glow-red);
+        color: var(--glow-red);
+        font-family: 'VHS', monospace;
+        padding: 12px 20px;
+        cursor: pointer;
+        text-transform: uppercase;
+        font-size: 1.2rem;
+        line-height: 1;
+        transition: 0.2s;
+        border-radius: 0;
+        box-shadow: 0 0 10px rgba(255,26,26,0.3);
+        text-shadow: 0 0 5px currentColor;
+    }
+
+    .menu-btn:hover {
+        background: var(--glow-red);
+        color: black;
+        box-shadow: 0 0 20px var(--glow-red);
+    }
+
+    .dropdown-menu {
+        position: absolute;
+        top: 110%;
+        right: 0;
+        background: #0a0a0a;
+        border: 1px solid var(--mid-red);
+        box-shadow: 0 0 20px rgba(255,26,26,0.3);
+        display: none;
+        flex-direction: column;
+        min-width: 180px;
+        z-index: 200;
+    }
+
+    .dropdown-menu.show {
+        display: flex;
+    }
+
+    .dropdown-item {
+        background: transparent;
+        border: none;
+        border-bottom: 1px solid var(--dim-red);
+        color: var(--glow-red);
+        font-family: 'VHS', monospace;
+        padding: 14px 16px;
+        cursor: pointer;
+        text-transform: uppercase;
+        font-size: 0.9rem;
+        letter-spacing: 1px;
+        text-align: left;
+        transition: 0.1s;
+    }
+
+    .dropdown-item:last-child {
+        border-bottom: none;
+    }
+
+    .dropdown-item:hover {
+        background: var(--glow-red);
+        color: black;
+    }
+
+    /* Password protection */
+    .password-prompt {
+        display: flex;
+        gap: 10px;
+        margin: 10px 0;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+    .password-input {
+        background: black;
+        color: var(--glow-red);
+        border: 1px solid var(--mid-red);
+        font-family: 'VHS', monospace;
+        padding: 10px;
+        flex: 1;
+        min-width: 150px;
+    }
+    .unlock-btn {
+        background: transparent;
+        border: 1px solid var(--glow-red);
+        color: var(--glow-red);
+        font-family: 'VHS', monospace;
+        padding: 10px 15px;
+        cursor: pointer;
+        text-transform: uppercase;
+        transition: 0.2s;
+    }
+    .unlock-btn:hover {
+        background: var(--glow-red);
+        color: black;
+    }
+    .edit-locked {
+        opacity: 0.5;
+        pointer-events: none;
+    }
+
+    /* Collapsible Local Emotions Panel */
+    .collapse-panel {
+        border: 1px solid var(--dim-red);
+        margin: 10px 0;
+        background: rgba(0,0,0,0.5);
+    }
+
+    .collapse-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 16px;
+        cursor: pointer;
+        background: rgba(139,0,0,0.2);
+        border-bottom: 1px solid var(--dim-red);
+        user-select: none;
+    }
+
+    .collapse-header h3 {
+        margin: 0;
+        font-size: 1rem;
+        color: var(--glow-red);
+        text-shadow: 0 0 5px currentColor;
+    }
+
+    .collapse-indicator {
+        font-size: 1.2rem;
+        color: var(--glow-red);
+        transition: transform 0.2s;
+    }
+
+    .collapse-content {
+        padding: 15px;
+        display: none;
+    }
+
+    .collapse-content.expanded {
+        display: block;
+    }
+
+    /* Sliders inside collapsible */
+    .sliders-panel {
+        width: 100%;
+    }
+
+    .slider-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 15px;
+    }
+
+    .slider-label {
+        width: 70px;
+        text-transform: uppercase;
+        font-size: 0.8rem;
+        color: var(--glow-red);
+        text-shadow: 0 0 5px currentColor;
+    }
+
+    .slider-container {
+        flex: 1;
+        position: relative;
+        height: 30px;
+        display: flex;
+        align-items: center;
+    }
+
+    input[type=range] {
+        -webkit-appearance: none;
+        width: 100%;
+        height: 6px;
+        background: black;
+        border: 1px solid var(--mid-red);
+        outline: none;
+        box-shadow: 0 0 8px rgba(255,26,26,0.3);
+    }
+
+    input[type=range]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        width: 20px;
+        height: 20px;
+        background: var(--glow-red);
+        border: 1px solid white;
+        cursor: pointer;
+        box-shadow: 0 0 15px var(--glow-red);
+    }
+
+    input[type=range]::-moz-range-thumb {
+        width: 20px;
+        height: 20px;
+        background: var(--glow-red);
+        border: 1px solid white;
+        cursor: pointer;
+        box-shadow: 0 0 15px var(--glow-red);
+    }
+
+    .slider-value {
+        width: 45px;
+        text-align: right;
+        font-size: 0.9rem;
+        color: var(--glow-red);
+        text-shadow: 0 0 5px currentColor;
+    }
+
+    .load-data-btn {
+        background: transparent;
+        border: 1px solid var(--glow-red);
+        color: var(--glow-red);
+        font-family: 'VHS', monospace;
+        padding: 14px 18px;
+        cursor: pointer;
+        text-transform: uppercase;
+        font-size: 1rem;
+        letter-spacing: 2px;
+        width: 100%;
+        margin-top: 15px;
+        transition: 0.2s;
+        border-radius: 0;
+        box-shadow: 0 0 15px rgba(255,26,26,0.4);
+        text-shadow: 0 0 8px currentColor;
+    }
+
+    .load-data-btn:hover,
+    .load-data-btn:active {
+        background: var(--glow-red);
+        color: black;
+        box-shadow: 0 0 30px var(--glow-red);
+    }
+
+    .footer {
+        margin-top: 20px;
+        border-top: 1px solid var(--dim-red);
+        padding-top: 8px;
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.7rem;
+        color: var(--dim-red);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    /* Lore and Journal styles */
+    .lore-panel, .journal-panel {
+        width: 100%;
+        margin-top: 20px;
+    }
+    .lore-field {
+        margin-bottom: 15px;
+    }
+    .lore-label {
+        font-size: 0.8rem;
+        color: var(--text-gray);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 3px;
+        text-shadow: 0 0 5px rgba(255,26,26,0.3);
+    }
+    .lore-value {
+        font-size: 1rem;
+        color: var(--glow-red);
+        background: rgba(0,0,0,0.5);
+        padding: 8px;
+        border: 1px solid var(--mid-red);
+        word-wrap: break-word;
+        box-shadow: 0 0 8px rgba(255,26,26,0.2);
+    }
+    .lore-input {
+        width: 100%;
+        background: black;
+        color: var(--glow-red);
+        border: 1px solid var(--mid-red);
+        font-family: 'VHS', monospace;
+        padding: 12px;
+        font-size: 0.9rem;
+        border-radius: 0;
+        box-sizing: border-box;
+        box-shadow: 0 0 8px rgba(255,26,26,0.2);
+    }
+    textarea.lore-input {
+        min-height: 80px;
+        resize: vertical;
+    }
+
+    /* Journal specific */
+    .journal-entry {
+        font-size: 1rem;
+        color: var(--glow-red);
+        background: rgba(0,0,0,0.5);
+        padding: 15px;
+        border: 1px solid var(--mid-red);
+        box-shadow: 0 0 8px rgba(255,26,26,0.2);
+        min-height: 150px;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+        margin-bottom: 20px;
+    }
+    .journal-nav {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 20px;
+    }
+    .journal-nav-btn {
+        min-width: 60px;
+        padding: 10px 15px;
+        font-size: 1.2rem;
+        background: transparent;
+        border: 1px solid var(--glow-red);
+        color: var(--glow-red);
+        cursor: pointer;
+        transition: 0.2s;
+        box-shadow: 0 0 10px rgba(255,26,26,0.3);
+    }
+    .journal-nav-btn:hover {
+        background: var(--glow-red);
+        color: black;
+        box-shadow: 0 0 20px var(--glow-red);
+    }
+    .journal-nav-btn:disabled {
+        opacity: 0.3;
+        cursor: not-allowed;
+        border-color: var(--dim-red);
+        box-shadow: none;
+    }
+    #journal-day {
+        font-size: 1rem;
+        color: var(--text-gray);
+        text-transform: uppercase;
+        letter-spacing: 2px;
+    }
+
+    .hidden-panel {
+        display: none !important;
+    }
+
+    .button-group {
+        display: flex;
+        gap: 12px;
+        margin-top: 20px;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .terminal-btn {
+        background: transparent;
+        border: 1px solid var(--glow-red);
+        color: var(--glow-red);
+        font-family: 'VHS', monospace;
+        padding: 14px 18px;
+        cursor: pointer;
+        text-transform: uppercase;
+        font-size: 0.8rem;
+        letter-spacing: 1px;
+        transition: 0.2s;
+        border-radius: 0;
+        box-shadow: 0 0 10px rgba(255,26,26,0.3);
+        text-shadow: 0 0 5px currentColor;
+    }
+
+    .terminal-btn:hover,
+    .terminal-btn:active {
+        background: var(--glow-red);
+        color: black;
+        box-shadow: 0 0 20px var(--glow-red);
+    }
+
+    /* Typing cursor */
+    .typing-cursor::after {
+        content: "▋";
+        animation: blink 1s infinite;
+        margin-left: 2px;
+    }
+    @keyframes blink {
+        0%, 50% { opacity: 1; }
+        51%, 100% { opacity: 0; }
+    }
+
+    /* Mobile adjustments */
+    @media (max-width: 600px) {
         .action-header {
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 10px;
-            flex-wrap: wrap;
-            gap: 10px;
+            flex-direction: column;
+            align-items: stretch;
         }
-
         .subject-file-btn {
-            background: transparent;
-            border: 1px solid var(--glow-red);
-            color: var(--glow-red);
-            font-family: 'VHS', monospace;
-            padding: 12px 20px;
-            cursor: pointer;
-            text-transform: uppercase;
-            font-size: 1rem;
-            letter-spacing: 2px;
-            transition: 0.2s;
-            border-radius: 0;
-            box-shadow: 0 0 15px rgba(255,26,26,0.4);
-            text-shadow: 0 0 8px currentColor;
-            animation: breathe 3s infinite ease-in-out;
-            flex: 1;
-            min-width: 160px;
+            width: 100%;
         }
-
-        .subject-file-btn:hover,
-        .subject-file-btn:active {
-            background: var(--glow-red);
-            color: black;
-            box-shadow: 0 0 30px var(--glow-red);
-        }
-
         .menu-container {
-            position: relative;
-            display: inline-block;
+            width: 100%;
         }
-
         .menu-btn {
-            background: transparent;
-            border: 1px solid var(--glow-red);
-            color: var(--glow-red);
-            font-family: 'VHS', monospace;
-            padding: 12px 20px;
-            cursor: pointer;
-            text-transform: uppercase;
-            font-size: 1.2rem;
-            line-height: 1;
-            transition: 0.2s;
-            border-radius: 0;
-            box-shadow: 0 0 10px rgba(255,26,26,0.3);
-            text-shadow: 0 0 5px currentColor;
+            width: 100%;
+            text-align: center;
         }
-
-        .menu-btn:hover {
-            background: var(--glow-red);
-            color: black;
-            box-shadow: 0 0 20px var(--glow-red);
-        }
-
         .dropdown-menu {
-            position: absolute;
-            top: 110%;
-            right: 0;
-            background: #0a0a0a;
-            border: 1px solid var(--mid-red);
-            box-shadow: 0 0 20px rgba(255,26,26,0.3);
-            display: none;
-            flex-direction: column;
-            min-width: 180px;
-            z-index: 200;
-        }
-
-        .dropdown-menu.show {
-            display: flex;
-        }
-
-        .dropdown-item {
-            background: transparent;
-            border: none;
-            border-bottom: 1px solid var(--dim-red);
-            color: var(--glow-red);
-            font-family: 'VHS', monospace;
-            padding: 14px 16px;
-            cursor: pointer;
-            text-transform: uppercase;
-            font-size: 0.9rem;
-            letter-spacing: 1px;
-            text-align: left;
-            transition: 0.1s;
-        }
-
-        .dropdown-item:last-child {
-            border-bottom: none;
-        }
-
-        .dropdown-item:hover {
-            background: var(--glow-red);
-            color: black;
-        }
-
-        /* Password protection */
-        .password-prompt {
-            display: flex;
-            gap: 10px;
-            margin: 10px 0;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-        .password-input {
-            background: black;
-            color: var(--glow-red);
-            border: 1px solid var(--mid-red);
-            font-family: 'VHS', monospace;
-            padding: 10px;
-            flex: 1;
-            min-width: 150px;
-        }
-        .unlock-btn {
-            background: transparent;
-            border: 1px solid var(--glow-red);
-            color: var(--glow-red);
-            font-family: 'VHS', monospace;
-            padding: 10px 15px;
-            cursor: pointer;
-            text-transform: uppercase;
-            transition: 0.2s;
-        }
-        .unlock-btn:hover {
-            background: var(--glow-red);
-            color: black;
-        }
-        .edit-locked {
-            opacity: 0.5;
-            pointer-events: none;
-        }
-
-        /* Collapsible Local Emotions Panel */
-        .collapse-panel {
-            border: 1px solid var(--dim-red);
-            margin: 10px 0;
-            background: rgba(0,0,0,0.5);
-        }
-
-        .collapse-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 12px 16px;
-            cursor: pointer;
-            background: rgba(139,0,0,0.2);
-            border-bottom: 1px solid var(--dim-red);
-            user-select: none;
-        }
-
-        .collapse-header h3 {
-            margin: 0;
-            font-size: 1rem;
-            color: var(--glow-red);
-            text-shadow: 0 0 5px currentColor;
-        }
-
-        .collapse-indicator {
-            font-size: 1.2rem;
-            color: var(--glow-red);
-            transition: transform 0.2s;
-        }
-
-        .collapse-content {
-            padding: 15px;
-            display: none;
-        }
-
-        .collapse-content.expanded {
-            display: block;
-        }
-
-        /* Sliders inside collapsible */
-        .sliders-panel {
             width: 100%;
-        }
-
-        .slider-row {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-
-        .slider-label {
-            width: 70px;
-            text-transform: uppercase;
-            font-size: 0.8rem;
-            color: var(--glow-red);
-            text-shadow: 0 0 5px currentColor;
-        }
-
-        .slider-container {
-            flex: 1;
-            position: relative;
-            height: 30px;
-            display: flex;
-            align-items: center;
-        }
-
-        input[type=range] {
-            -webkit-appearance: none;
-            width: 100%;
-            height: 6px;
-            background: black;
-            border: 1px solid var(--mid-red);
-            outline: none;
-            box-shadow: 0 0 8px rgba(255,26,26,0.3);
-        }
-
-        input[type=range]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 20px;
-            height: 20px;
-            background: var(--glow-red);
-            border: 1px solid white;
-            cursor: pointer;
-            box-shadow: 0 0 15px var(--glow-red);
-        }
-
-        input[type=range]::-moz-range-thumb {
-            width: 20px;
-            height: 20px;
-            background: var(--glow-red);
-            border: 1px solid white;
-            cursor: pointer;
-            box-shadow: 0 0 15px var(--glow-red);
-        }
-
-        .slider-value {
-            width: 45px;
-            text-align: right;
-            font-size: 0.9rem;
-            color: var(--glow-red);
-            text-shadow: 0 0 5px currentColor;
-        }
-
-        .load-data-btn {
-            background: transparent;
-            border: 1px solid var(--glow-red);
-            color: var(--glow-red);
-            font-family: 'VHS', monospace;
-            padding: 14px 18px;
-            cursor: pointer;
-            text-transform: uppercase;
-            font-size: 1rem;
-            letter-spacing: 2px;
-            width: 100%;
-            margin-top: 15px;
-            transition: 0.2s;
-            border-radius: 0;
-            box-shadow: 0 0 15px rgba(255,26,26,0.4);
-            text-shadow: 0 0 8px currentColor;
-        }
-
-        .load-data-btn:hover,
-        .load-data-btn:active {
-            background: var(--glow-red);
-            color: black;
-            box-shadow: 0 0 30px var(--glow-red);
-        }
-
-        .footer {
-            margin-top: 20px;
-            border-top: 1px solid var(--dim-red);
-            padding-top: 8px;
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.7rem;
-            color: var(--dim-red);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        /* Lore and Journal styles */
-        .lore-panel, .journal-panel {
-            width: 100%;
-            margin-top: 20px;
-        }
-        .lore-field {
-            margin-bottom: 15px;
-        }
-        .lore-label {
-            font-size: 0.8rem;
-            color: var(--text-gray);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 3px;
-            text-shadow: 0 0 5px rgba(255,26,26,0.3);
-        }
-        .lore-value {
-            font-size: 1rem;
-            color: var(--glow-red);
-            background: rgba(0,0,0,0.5);
-            padding: 8px;
-            border: 1px solid var(--mid-red);
-            word-wrap: break-word;
-            box-shadow: 0 0 8px rgba(255,26,26,0.2);
-        }
-        .lore-input {
-            width: 100%;
-            background: black;
-            color: var(--glow-red);
-            border: 1px solid var(--mid-red);
-            font-family: 'VHS', monospace;
-            padding: 12px;
-            font-size: 0.9rem;
-            border-radius: 0;
-            box-sizing: border-box;
-            box-shadow: 0 0 8px rgba(255,26,26,0.2);
-        }
-        textarea.lore-input {
-            min-height: 80px;
-            resize: vertical;
-        }
-
-        /* Journal specific */
-        .journal-entry {
-            font-size: 1rem;
-            color: var(--glow-red);
-            background: rgba(0,0,0,0.5);
-            padding: 15px;
-            border: 1px solid var(--mid-red);
-            box-shadow: 0 0 8px rgba(255,26,26,0.2);
-            min-height: 150px;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-            margin-bottom: 20px;
-        }
-        .journal-nav {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 20px;
-        }
-        .journal-nav-btn {
-            min-width: 60px;
-            padding: 10px 15px;
-            font-size: 1.2rem;
-            background: transparent;
-            border: 1px solid var(--glow-red);
-            color: var(--glow-red);
-            cursor: pointer;
-            transition: 0.2s;
-            box-shadow: 0 0 10px rgba(255,26,26,0.3);
-        }
-        .journal-nav-btn:hover {
-            background: var(--glow-red);
-            color: black;
-            box-shadow: 0 0 20px var(--glow-red);
-        }
-        .journal-nav-btn:disabled {
-            opacity: 0.3;
-            cursor: not-allowed;
-            border-color: var(--dim-red);
-            box-shadow: none;
-        }
-        #journal-day {
-            font-size: 1rem;
-            color: var(--text-gray);
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-
-        .hidden-panel {
-            display: none !important;
-        }
-
-        .button-group {
-            display: flex;
-            gap: 12px;
-            margin-top: 20px;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-
-        .terminal-btn {
-            background: transparent;
-            border: 1px solid var(--glow-red);
-            color: var(--glow-red);
-            font-family: 'VHS', monospace;
-            padding: 14px 18px;
-            cursor: pointer;
-            text-transform: uppercase;
-            font-size: 0.8rem;
-            letter-spacing: 1px;
-            transition: 0.2s;
-            border-radius: 0;
-            box-shadow: 0 0 10px rgba(255,26,26,0.3);
-            text-shadow: 0 0 5px currentColor;
-        }
-
-        .terminal-btn:hover,
-        .terminal-btn:active {
-            background: var(--glow-red);
-            color: black;
-            box-shadow: 0 0 20px var(--glow-red);
-        }
-
-        /* Typing cursor */
-        .typing-cursor::after {
-            content: "▋";
-            animation: blink 1s infinite;
-            margin-left: 2px;
-        }
-        @keyframes blink {
-            0%, 50% { opacity: 1; }
-            51%, 100% { opacity: 0; }
-        }
-
-        /* Mobile adjustments */
-        @media (max-width: 600px) {
-            .action-header {
-                flex-direction: column;
-                align-items: stretch;
-            }
-            .subject-file-btn {
-                width: 100%;
-            }
-            .menu-container {
-                width: 100%;
-            }
-            .menu-btn {
-                width: 100%;
-                text-align: center;
-            }
-            .dropdown-menu {
-                width: 100%;
-                right: auto;
-                left: 0;
-            }
-        }
-  /* --- MILITARY BOOT SEQUENCE --- */
-        #boot-screen {
-            position: fixed;
-            top: 0;
+            right: auto;
             left: 0;
-            width: 100vw;
-            height: 100vh;
-            background-color: #050505;
-            z-index: 9999999; /* Highest possible */
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-end;
-            padding: 40px;
-            box-sizing: border-box;
-            color: var(--glow-red);
-            font-family: 'VHS', monospace;
-            font-size: 1.1rem;
-            text-shadow: 0 0 8px var(--glow-red);
-            transition: opacity 0.3s ease, filter 0.3s ease;
-            pointer-events: none;
         }
-        
-        .boot-line {
-            margin-bottom: 8px;
-            animation: text-flicker 0.05s steps(2) infinite;
-        }
+    }
+```
 
-        .boot-fade-out {
-            opacity: 0;
-            filter: contrast(2) brightness(2) blur(4px) hue-rotate(20deg);
-            transform: scale(1.02);
-        }
+/* — MILITARY BOOT SEQUENCE — */
+#boot-screen {
+position: fixed;
+top: 0;
+left: 0;
+width: 100vw;
+height: 100vh;
+background-color: #050505;
+z-index: 9999999; /* Highest possible */
+display: flex;
+flex-direction: column;
+justify-content: flex-end;
+padding: 40px;
+box-sizing: border-box;
+color: var(–glow-red);
+font-family: ‘VHS’, monospace;
+font-size: 1.1rem;
+text-shadow: 0 0 8px var(–glow-red);
+transition: opacity 0.3s ease, filter 0.3s ease;
+pointer-events: none;
+}
 
-        @keyframes text-flicker {
-            0% { opacity: 0.9; }
-            50% { opacity: 1; }
-            100% { opacity: 0.8; }
-        }
+```
+    .boot-line {
+        margin-bottom: 8px;
+        animation: text-flicker 0.05s steps(2) infinite;
+    }
 
-        /* --- FULLSCREEN FLOWER OVERLAY --- */
-        body.fullscreen-mode #wheel-area {
-            position: fixed !important;
-            top: 0 !important;
-            left: 0 !important;
-            width: 100vw !important;
-            height: 100vh !important;
-            max-width: none !important;
-            background: rgba(10, 10, 10, 0.98) !important;
-            z-index: 99999 !important;
-            display: flex !important;
-            justify-content: center !important;
-            align-items: center !important;
-            margin: 0 !important;
-            padding: 0 !important;
-        }
+    .boot-fade-out {
+        opacity: 0;
+        filter: contrast(2) brightness(2) blur(4px) hue-rotate(20deg);
+        transform: scale(1.02);
+    }
 
-        body.fullscreen-mode #radarChart {
-            max-width: none !important;
-            filter: drop-shadow(0 0 15px var(--glow-red)) !important;
-        }
-    </style>
+    @keyframes text-flicker {
+        0% { opacity: 0.9; }
+        50% { opacity: 1; }
+        100% { opacity: 0.8; }
+    }
+
+    /* --- FULLSCREEN FLOWER OVERLAY --- */
+    body.fullscreen-mode #wheel-area {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 100vw !important;
+        height: 100vh !important;
+        max-width: none !important;
+        background: rgba(10, 10, 10, 0.98) !important;
+        z-index: 99999 !important;
+        display: flex !important;
+        justify-content: center !important;
+        align-items: center !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    body.fullscreen-mode #radarChart {
+        max-width: none !important;
+        filter: drop-shadow(0 0 15px var(--glow-red)) !important;
+    }
+
+    /* --- LEGEND for flower overlays --- */
+    .flower-legend {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        justify-content: center;
+        margin-top: 8px;
+        font-size: 0.65rem;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+    }
+    .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        opacity: 0.8;
+    }
+    .legend-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        flex-shrink: 0;
+    }
+</style>
+```
+
 </head>
 <body>
   <div id="boot-screen">
@@ -824,251 +857,271 @@
         <div class="corrupted-overlay"></div>
         <h2 id="char-name">> <span id="name-typing"></span><span class="typing-cursor"></span></h2>
 
-        <div class="quote-section" id="quoteSection">
-            <div id="quoteDisplay" class="quote-display"></div>
-            <div id="quoteEdit" class="quote-edit" style="display: none;">
-                <input type="text" id="quoteInput" class="quote-input" placeholder="Enter a quote...">
-                <button class="yt-btn" onclick="saveQuote()">Save</button>
-                <button class="yt-btn stop" onclick="cancelQuoteEdit()">Cancel</button>
-            </div>
-        </div>
-
-        <div class="youtube-player">
-            <div class="yt-input-group">
-                <button class="yt-btn" onclick="playYouTube()">Play</button>
-                <button class="yt-btn stop" onclick="stopYouTube()">Stop</button>
-            </div>
-            <div class="yt-edit" id="ytEdit">
-                <input type="text" id="ytUrl" class="yt-input" placeholder="YouTube link (for everyone)">
-                <button class="yt-btn" onclick="saveYouTubeUrl()">Save</button>
-            </div>
-            <div id="ytPlayer" style="display: none;"></div>
-        </div>
-
-        <div id="mainView" class="main-container">
-            <div class="top-row">
-                <div id="wheel-area">
-                    <canvas id="radarChart"></canvas>
-                </div>
-                <div class="stats-panel">
-                    <div class="stat-group">
-                        <h3>> WEIRD_INDEX</h3>
-                        <div class="bar-bg"><div id="weird-bar" class="bar-fill"></div></div>
-                    </div>
-                    <div class="stat-group">
-                        <h3>> GRIT_STAMINA</h3>
-                        <div class="bar-bg"><div id="grit-bar" class="bar-fill"></div></div>
-                    </div>
-                    <div class="stat-group">
-                        <h3>> ROT_DECAY</h3>
-                        <div class="bar-bg"><div id="rot-bar" class="bar-fill"></div></div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="bond-selector" id="bondSelector" style="display: none; align-items: center;">
-                <select id="bondSelect" onchange="loadBond()">
-                    <option value="">-- SELECT BOND --</option>
-                </select>
-                <button id="toggleBondBtn" class="terminal-btn" style="display: none; padding: 12px; font-size: 0.8rem; margin-left: 10px;" onclick="toggleBondMode()">> VIEW BOND</button>
-            </div>
-
-            <div id="passwordPrompt" class="password-prompt" style="display: none;">
-                <input type="password" id="editPassword" class="password-input" placeholder="Enter edit password">
-                <button class="unlock-btn" onclick="unlockEdit()">UNLOCK</button>
-            </div>
-
-            <div class="action-header">
-                <button class="subject-file-btn" onclick="showLoreView()">> SUBJECT FILE</button>
-                <button class="subject-file-btn" onclick="showJournalView()">> JOURNAL LOG</button>
-                <div class="menu-container" id="menuContainer">
-                    <button class="menu-btn" id="menuToggle">≡</button>
-                    <div class="dropdown-menu" id="dropdownMenu">
-                        <button class="dropdown-item" onclick="refreshData()">> REFRESH</button>
-                        <button class="dropdown-item" onclick="copyShareLink()">> COPY LINK</button>
-                        <button class="dropdown-item" onclick="showEditLore()" id="editLoreBtn">> EDIT LORE</button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="collapse-panel" id="localEmotionsPanel">
-                <div class="collapse-header" id="collapseHeader">
-                    <h3>> LOCAL EMOTIONS</h3>
-                    <span class="collapse-indicator" id="collapseIndicator">▼</span>
-                </div>
-                <div class="collapse-content" id="collapseContent">
-                    <div class="sliders-panel" id="slidersPanel">
-                        <div class="slider-row" id="slider-joy">
-                            <span class="slider-label">JOY</span>
-                            <div style="flex: 1; display: flex; flex-direction: column; justify-content: center;">
-                                <div style="display: flex; justify-content: space-between; font-size: 0.55rem; color: var(--text-gray); margin-bottom: 5px; opacity: 0.8; letter-spacing: 0.5px;">
-                                    <span>SERENITY</span><span>JOY</span><span>ECSTASY</span>
-                                </div>
-                                <div class="slider-container" style="height: auto;">
-                                    <input type="range" min="0" max="100" value="10" class="emotion-slider" id="joy-slider">
-                                </div>
-                            </div>
-                            <span class="slider-value" id="joy-value">10</span>
-                        </div>
-                        
-                        <div class="slider-row" id="slider-trust">
-                            <span class="slider-label">TRUST</span>
-                            <div style="flex: 1; display: flex; flex-direction: column; justify-content: center;">
-                                <div style="display: flex; justify-content: space-between; font-size: 0.55rem; color: var(--text-gray); margin-bottom: 5px; opacity: 0.8; letter-spacing: 0.5px;">
-                                    <span>ACCEPTANCE</span><span>TRUST</span><span>ADMIRATION</span>
-                                </div>
-                                <div class="slider-container" style="height: auto;">
-                                    <input type="range" min="0" max="100" value="10" class="emotion-slider" id="trust-slider">
-                                </div>
-                            </div>
-                            <span class="slider-value" id="trust-value">10</span>
-                        </div>
-
-                        <div class="slider-row" id="slider-fear">
-                            <span class="slider-label">FEAR</span>
-                            <div style="flex: 1; display: flex; flex-direction: column; justify-content: center;">
-                                <div style="display: flex; justify-content: space-between; font-size: 0.55rem; color: var(--text-gray); margin-bottom: 5px; opacity: 0.8; letter-spacing: 0.5px;">
-                                    <span>APPREHENSION</span><span>FEAR</span><span>TERROR</span>
-                                </div>
-                                <div class="slider-container" style="height: auto;">
-                                    <input type="range" min="0" max="100" value="10" class="emotion-slider" id="fear-slider">
-                                </div>
-                            </div>
-                            <span class="slider-value" id="fear-value">10</span>
-                        </div>
-
-                        <div class="slider-row" id="slider-surp">
-                            <span class="slider-label">SURP</span>
-                            <div style="flex: 1; display: flex; flex-direction: column; justify-content: center;">
-                                <div style="display: flex; justify-content: space-between; font-size: 0.55rem; color: var(--text-gray); margin-bottom: 5px; opacity: 0.8; letter-spacing: 0.5px;">
-                                    <span>DISTRACTION</span><span>SURPRISE</span><span>AMAZEMENT</span>
-                                </div>
-                                <div class="slider-container" style="height: auto;">
-                                    <input type="range" min="0" max="100" value="10" class="emotion-slider" id="surp-slider">
-                                </div>
-                            </div>
-                            <span class="slider-value" id="surp-value">10</span>
-                        </div>
-
-                        <div class="slider-row" id="slider-grief">
-                            <span class="slider-label">GRIEF</span>
-                            <div style="flex: 1; display: flex; flex-direction: column; justify-content: center;">
-                                <div style="display: flex; justify-content: space-between; font-size: 0.55rem; color: var(--text-gray); margin-bottom: 5px; opacity: 0.8; letter-spacing: 0.5px;">
-                                    <span>PENSIVENESS</span><span>SADNESS</span><span>GRIEF</span>
-                                </div>
-                                <div class="slider-container" style="height: auto;">
-                                    <input type="range" min="0" max="100" value="10" class="emotion-slider" id="grief-slider">
-                                </div>
-                            </div>
-                            <span class="slider-value" id="grief-value">10</span>
-                        </div>
-
-                        <div class="slider-row" id="slider-disg">
-                            <span class="slider-label">DISG</span>
-                            <div style="flex: 1; display: flex; flex-direction: column; justify-content: center;">
-                                <div style="display: flex; justify-content: space-between; font-size: 0.55rem; color: var(--text-gray); margin-bottom: 5px; opacity: 0.8; letter-spacing: 0.5px;">
-                                    <span>BOREDOM</span><span>DISGUST</span><span>LOATHING</span>
-                                </div>
-                                <div class="slider-container" style="height: auto;">
-                                    <input type="range" min="0" max="100" value="10" class="emotion-slider" id="disg-slider">
-                                </div>
-                            </div>
-                            <span class="slider-value" id="disg-value">10</span>
-                        </div>
-
-                        <div class="slider-row" id="slider-rage">
-                            <span class="slider-label">RAGE</span>
-                            <div style="flex: 1; display: flex; flex-direction: column; justify-content: center;">
-                                <div style="display: flex; justify-content: space-between; font-size: 0.55rem; color: var(--text-gray); margin-bottom: 5px; opacity: 0.8; letter-spacing: 0.5px;">
-                                    <span>ANNOYANCE</span><span>ANGER</span><span>RAGE</span>
-                                </div>
-                                <div class="slider-container" style="height: auto;">
-                                    <input type="range" min="0" max="100" value="10" class="emotion-slider" id="rage-slider">
-                                </div>
-                            </div>
-                            <span class="slider-value" id="rage-value">10</span>
-                        </div>
-
-                        <div class="slider-row" id="slider-anti">
-                            <span class="slider-label">ANTI</span>
-                            <div style="flex: 1; display: flex; flex-direction: column; justify-content: center;">
-                                <div style="display: flex; justify-content: space-between; font-size: 0.55rem; color: var(--text-gray); margin-bottom: 5px; opacity: 0.8; letter-spacing: 0.5px;">
-                                    <span>INTEREST</span><span>ANTICIPATION</span><span>VIGILANCE</span>
-                                </div>
-                                <div class="slider-container" style="height: auto;">
-                                    <input type="range" min="0" max="100" value="10" class="emotion-slider" id="anti-slider">
-                                </div>
-                            </div>
-                            <span class="slider-value" id="anti-value">10</span>
-                        </div>
-                    </div>
-                    <button class="load-data-btn" onclick="syncToBot()" id="syncBtn">> LOAD DATA</button>
-                </div>
-            </div>
-        </div>
-
-        <div id="loreView" class="main-container hidden-panel">
-            <h2 style="margin-bottom:15px;">> SUBJECT FILE</h2>
-            <div class="lore-panel">
-                <div class="lore-field"><div class="lore-label">NAME</div><div id="lore-name" class="lore-value">—</div></div>
-                <div class="lore-field"><div class="lore-label">AGE</div><div id="lore-age" class="lore-value">—</div></div>
-                <div class="lore-field"><div class="lore-label">GENDER</div><div id="lore-gender" class="lore-value">—</div></div>
-                <div class="lore-field"><div class="lore-label">APPEARANCE</div><div id="lore-appearance" class="lore-value">—</div></div>
-                <div class="lore-field"><div class="lore-label">PERSONALITY</div><div id="lore-personality" class="lore-value">—</div></div>
-                <div class="lore-field"><div class="lore-label">BACKSTORY</div><div id="lore-backstory" class="lore-value">—</div></div>
-                <div class="lore-field"><div class="lore-label">ABILITIES</div><div id="lore-abilities" class="lore-value">—</div></div>
-                <div class="lore-field"><div class="lore-label">WEAKNESSES</div><div id="lore-weaknesses" class="lore-value">—</div></div>
-                <div class="lore-field"><div class="lore-label">FACTION</div><div id="lore-faction" class="lore-value">—</div></div>
-                <div class="lore-field"><div class="lore-label">GOALS</div><div id="lore-goals" class="lore-value">—</div></div>
-            </div>
-            <div class="button-group">
-                <button class="terminal-btn" onclick="showMainView()">> RETURN</button>
-            </div>
-        </div>
-
-        <div id="journalView" class="main-container hidden-panel">
-            <h2 style="margin-bottom:15px;">> JOURNAL LOG</h2>
-            <div class="journal-panel">
-                <div class="journal-entry" id="journal-entry-text">No journal entries.</div>
-                <div class="journal-nav">
-                    <button class="journal-nav-btn" onclick="journalPrev()" id="journal-prev">◀</button>
-                    <span id="journal-day">DAY 0 / 0</span>
-                    <button class="journal-nav-btn" onclick="journalNext()" id="journal-next">▶</button>
-                </div>
-            </div>
-            <div class="button-group">
-                <button class="terminal-btn" onclick="showMainView()">> RETURN</button>
-            </div>
-        </div>
-
-        <div id="editLoreView" class="main-container hidden-panel">
-            <h2 style="margin-bottom:15px;">> EDIT SUBJECT FILE</h2>
-            <div class="lore-panel">
-                <div class="lore-field"><div class="lore-label">NAME</div><input type="text" id="edit-name" class="lore-input" placeholder="NAME"></div>
-                <div class="lore-field"><div class="lore-label">AGE</div><input type="text" id="edit-age" class="lore-input" placeholder="AGE"></div>
-                <div class="lore-field"><div class="lore-label">GENDER</div><input type="text" id="edit-gender" class="lore-input" placeholder="GENDER"></div>
-                <div class="lore-field"><div class="lore-label">APPEARANCE</div><textarea id="edit-appearance" class="lore-input" placeholder="APPEARANCE"></textarea></div>
-                <div class="lore-field"><div class="lore-label">PERSONALITY</div><textarea id="edit-personality" class="lore-input" placeholder="PERSONALITY"></textarea></div>
-                <div class="lore-field"><div class="lore-label">BACKSTORY</div><textarea id="edit-backstory" class="lore-input" placeholder="BACKSTORY"></textarea></div>
-                <div class="lore-field"><div class="lore-label">ABILITIES</div><textarea id="edit-abilities" class="lore-input" placeholder="ABILITIES"></textarea></div>
-                <div class="lore-field"><div class="lore-label">WEAKNESSES</div><textarea id="edit-weaknesses" class="lore-input" placeholder="WEAKNESSES"></textarea></div>
-                <div class="lore-field"><div class="lore-label">FACTION</div><input type="text" id="edit-faction" class="lore-input" placeholder="FACTION"></div>
-                <div class="lore-field"><div class="lore-label">GOALS</div><textarea id="edit-goals" class="lore-input" placeholder="GOALS"></textarea></div>
-            </div>
-            <div class="button-group">
-                <button class="terminal-btn" onclick="saveLore()">> SAVE LORE</button>
-                <button class="terminal-btn" onclick="showMainView()">> CANCEL</button>
-            </div>
-        </div>
-
-        <div class="footer">
-            <div id="status-text">> STATUS: ONLINE</div>
-            <div id="version-text">> v5.2_STABLE</div>
+```
+    <div class="quote-section" id="quoteSection">
+        <div id="quoteDisplay" class="quote-display"></div>
+        <div id="quoteEdit" class="quote-edit" style="display: none;">
+            <input type="text" id="quoteInput" class="quote-input" placeholder="Enter a quote...">
+            <button class="yt-btn" onclick="saveQuote()">Save</button>
+            <button class="yt-btn stop" onclick="cancelQuoteEdit()">Cancel</button>
         </div>
     </div>
+
+    <div class="youtube-player">
+        <div class="yt-input-group">
+            <button class="yt-btn" onclick="playYouTube()">Play</button>
+            <button class="yt-btn stop" onclick="stopYouTube()">Stop</button>
+        </div>
+        <div class="yt-edit" id="ytEdit">
+            <input type="text" id="ytUrl" class="yt-input" placeholder="YouTube link (for everyone)">
+            <button class="yt-btn" onclick="saveYouTubeUrl()">Save</button>
+        </div>
+        <div id="ytPlayer" style="display: none;"></div>
+    </div>
+
+    <div id="mainView" class="main-container">
+        <div class="top-row">
+            <div id="wheel-area">
+                <canvas id="radarChart"></canvas>
+                <!-- Flower legend: shown when a bond is selected -->
+                <div class="flower-legend" id="flowerLegend" style="display:none;">
+                    <div class="legend-item">
+                        <div class="legend-dot" style="background:#ff1a1a; box-shadow: 0 0 6px #ff1a1a;"></div>
+                        <span style="color:#ff1a1a;">YOU</span>
+                    </div>
+                    <div class="legend-item" id="legendGreen">
+                        <div class="legend-dot" style="background:#14ff14; box-shadow: 0 0 6px #14ff14;"></div>
+                        <span style="color:#14ff14;" id="legendGreenLabel">THEIR BASE</span>
+                    </div>
+                    <div class="legend-item" id="legendMagenta" style="display:none;">
+                        <div class="legend-dot" style="background:#ff00ff; box-shadow: 0 0 6px #ff00ff;"></div>
+                        <span style="color:#ff00ff;">YOUR BOND</span>
+                    </div>
+                </div>
+            </div>
+            <div class="stats-panel">
+                <div class="stat-group">
+                    <h3>> WEIRD_INDEX</h3>
+                    <div class="bar-bg"><div id="weird-bar" class="bar-fill"></div></div>
+                </div>
+                <div class="stat-group">
+                    <h3>> GRIT_STAMINA</h3>
+                    <div class="bar-bg"><div id="grit-bar" class="bar-fill"></div></div>
+                </div>
+                <div class="stat-group">
+                    <h3>> ROT_DECAY</h3>
+                    <div class="bar-bg"><div id="rot-bar" class="bar-fill"></div></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bond-selector" id="bondSelector" style="display: none; align-items: center;">
+            <select id="bondSelect" onchange="loadBond()">
+                <option value="">-- SELECT BOND --</option>
+            </select>
+            <button id="toggleBondBtn" class="terminal-btn" style="display: none; padding: 12px; font-size: 0.8rem; margin-left: 10px;" onclick="toggleBondMode()">> VIEW BOND</button>
+            <button id="mutualBtn" class="terminal-btn" style="display: none; padding: 12px; font-size: 0.8rem; margin-left: 10px; border-color: #ff00ff; color: #ff00ff; text-shadow: 0 0 8px #ff00ff; box-shadow: 0 0 10px rgba(255,0,255,0.3);" onclick="toggleMutualMode()">> MUTUAL BIO</button>
+        </div>
+
+        <div id="passwordPrompt" class="password-prompt" style="display: none;">
+            <input type="password" id="editPassword" class="password-input" placeholder="Enter edit password">
+            <button class="unlock-btn" onclick="unlockEdit()">UNLOCK</button>
+        </div>
+
+        <div class="action-header">
+            <button class="subject-file-btn" onclick="showLoreView()">> SUBJECT FILE</button>
+            <button class="subject-file-btn" onclick="showJournalView()">> JOURNAL LOG</button>
+            <div class="menu-container" id="menuContainer">
+                <button class="menu-btn" id="menuToggle">≡</button>
+                <div class="dropdown-menu" id="dropdownMenu">
+                    <button class="dropdown-item" onclick="refreshData()">> REFRESH</button>
+                    <button class="dropdown-item" onclick="copyShareLink()">> COPY LINK</button>
+                    <button class="dropdown-item" onclick="showEditLore()" id="editLoreBtn">> EDIT LORE</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="collapse-panel" id="localEmotionsPanel">
+            <div class="collapse-header" id="collapseHeader">
+                <h3>> LOCAL EMOTIONS</h3>
+                <span class="collapse-indicator" id="collapseIndicator">▼</span>
+            </div>
+            <div class="collapse-content" id="collapseContent">
+                <div class="sliders-panel" id="slidersPanel">
+                    <div class="slider-row" id="slider-joy">
+                        <span class="slider-label">JOY</span>
+                        <div style="flex: 1; display: flex; flex-direction: column; justify-content: center;">
+                            <div style="display: flex; justify-content: space-between; font-size: 0.55rem; color: var(--text-gray); margin-bottom: 5px; opacity: 0.8; letter-spacing: 0.5px;">
+                                <span>SERENITY</span><span>JOY</span><span>ECSTASY</span>
+                            </div>
+                            <div class="slider-container" style="height: auto;">
+                                <input type="range" min="0" max="100" value="10" class="emotion-slider" id="joy-slider">
+                            </div>
+                        </div>
+                        <span class="slider-value" id="joy-value">10</span>
+                    </div>
+                    
+                    <div class="slider-row" id="slider-trust">
+                        <span class="slider-label">TRUST</span>
+                        <div style="flex: 1; display: flex; flex-direction: column; justify-content: center;">
+                            <div style="display: flex; justify-content: space-between; font-size: 0.55rem; color: var(--text-gray); margin-bottom: 5px; opacity: 0.8; letter-spacing: 0.5px;">
+                                <span>ACCEPTANCE</span><span>TRUST</span><span>ADMIRATION</span>
+                            </div>
+                            <div class="slider-container" style="height: auto;">
+                                <input type="range" min="0" max="100" value="10" class="emotion-slider" id="trust-slider">
+                            </div>
+                        </div>
+                        <span class="slider-value" id="trust-value">10</span>
+                    </div>
+
+                    <div class="slider-row" id="slider-fear">
+                        <span class="slider-label">FEAR</span>
+                        <div style="flex: 1; display: flex; flex-direction: column; justify-content: center;">
+                            <div style="display: flex; justify-content: space-between; font-size: 0.55rem; color: var(--text-gray); margin-bottom: 5px; opacity: 0.8; letter-spacing: 0.5px;">
+                                <span>APPREHENSION</span><span>FEAR</span><span>TERROR</span>
+                            </div>
+                            <div class="slider-container" style="height: auto;">
+                                <input type="range" min="0" max="100" value="10" class="emotion-slider" id="fear-slider">
+                            </div>
+                        </div>
+                        <span class="slider-value" id="fear-value">10</span>
+                    </div>
+
+                    <div class="slider-row" id="slider-surp">
+                        <span class="slider-label">SURP</span>
+                        <div style="flex: 1; display: flex; flex-direction: column; justify-content: center;">
+                            <div style="display: flex; justify-content: space-between; font-size: 0.55rem; color: var(--text-gray); margin-bottom: 5px; opacity: 0.8; letter-spacing: 0.5px;">
+                                <span>DISTRACTION</span><span>SURPRISE</span><span>AMAZEMENT</span>
+                            </div>
+                            <div class="slider-container" style="height: auto;">
+                                <input type="range" min="0" max="100" value="10" class="emotion-slider" id="surp-slider">
+                            </div>
+                        </div>
+                        <span class="slider-value" id="surp-value">10</span>
+                    </div>
+
+                    <div class="slider-row" id="slider-grief">
+                        <span class="slider-label">GRIEF</span>
+                        <div style="flex: 1; display: flex; flex-direction: column; justify-content: center;">
+                            <div style="display: flex; justify-content: space-between; font-size: 0.55rem; color: var(--text-gray); margin-bottom: 5px; opacity: 0.8; letter-spacing: 0.5px;">
+                                <span>PENSIVENESS</span><span>SADNESS</span><span>GRIEF</span>
+                            </div>
+                            <div class="slider-container" style="height: auto;">
+                                <input type="range" min="0" max="100" value="10" class="emotion-slider" id="grief-slider">
+                            </div>
+                        </div>
+                        <span class="slider-value" id="grief-value">10</span>
+                    </div>
+
+                    <div class="slider-row" id="slider-disg">
+                        <span class="slider-label">DISG</span>
+                        <div style="flex: 1; display: flex; flex-direction: column; justify-content: center;">
+                            <div style="display: flex; justify-content: space-between; font-size: 0.55rem; color: var(--text-gray); margin-bottom: 5px; opacity: 0.8; letter-spacing: 0.5px;">
+                                <span>BOREDOM</span><span>DISGUST</span><span>LOATHING</span>
+                            </div>
+                            <div class="slider-container" style="height: auto;">
+                                <input type="range" min="0" max="100" value="10" class="emotion-slider" id="disg-slider">
+                            </div>
+                        </div>
+                        <span class="slider-value" id="disg-value">10</span>
+                    </div>
+
+                    <div class="slider-row" id="slider-rage">
+                        <span class="slider-label">RAGE</span>
+                        <div style="flex: 1; display: flex; flex-direction: column; justify-content: center;">
+                            <div style="display: flex; justify-content: space-between; font-size: 0.55rem; color: var(--text-gray); margin-bottom: 5px; opacity: 0.8; letter-spacing: 0.5px;">
+                                <span>ANNOYANCE</span><span>ANGER</span><span>RAGE</span>
+                            </div>
+                            <div class="slider-container" style="height: auto;">
+                                <input type="range" min="0" max="100" value="10" class="emotion-slider" id="rage-slider">
+                            </div>
+                        </div>
+                        <span class="slider-value" id="rage-value">10</span>
+                    </div>
+
+                    <div class="slider-row" id="slider-anti">
+                        <span class="slider-label">ANTI</span>
+                        <div style="flex: 1; display: flex; flex-direction: column; justify-content: center;">
+                            <div style="display: flex; justify-content: space-between; font-size: 0.55rem; color: var(--text-gray); margin-bottom: 5px; opacity: 0.8; letter-spacing: 0.5px;">
+                                <span>INTEREST</span><span>ANTICIPATION</span><span>VIGILANCE</span>
+                            </div>
+                            <div class="slider-container" style="height: auto;">
+                                <input type="range" min="0" max="100" value="10" class="emotion-slider" id="anti-slider">
+                            </div>
+                        </div>
+                        <span class="slider-value" id="anti-value">10</span>
+                    </div>
+                </div>
+                <button class="load-data-btn" onclick="syncToBot()" id="syncBtn">> LOAD DATA</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="loreView" class="main-container hidden-panel">
+        <h2 style="margin-bottom:15px;">> SUBJECT FILE</h2>
+        <div class="lore-panel">
+            <div class="lore-field"><div class="lore-label">NAME</div><div id="lore-name" class="lore-value">—</div></div>
+            <div class="lore-field"><div class="lore-label">AGE</div><div id="lore-age" class="lore-value">—</div></div>
+            <div class="lore-field"><div class="lore-label">GENDER</div><div id="lore-gender" class="lore-value">—</div></div>
+            <div class="lore-field"><div class="lore-label">APPEARANCE</div><div id="lore-appearance" class="lore-value">—</div></div>
+            <div class="lore-field"><div class="lore-label">PERSONALITY</div><div id="lore-personality" class="lore-value">—</div></div>
+            <div class="lore-field"><div class="lore-label">BACKSTORY</div><div id="lore-backstory" class="lore-value">—</div></div>
+            <div class="lore-field"><div class="lore-label">ABILITIES</div><div id="lore-abilities" class="lore-value">—</div></div>
+            <div class="lore-field"><div class="lore-label">WEAKNESSES</div><div id="lore-weaknesses" class="lore-value">—</div></div>
+            <div class="lore-field"><div class="lore-label">FACTION</div><div id="lore-faction" class="lore-value">—</div></div>
+            <div class="lore-field"><div class="lore-label">GOALS</div><div id="lore-goals" class="lore-value">—</div></div>
+        </div>
+        <div class="button-group">
+            <button class="terminal-btn" onclick="showMainView()">> RETURN</button>
+        </div>
+    </div>
+
+    <div id="journalView" class="main-container hidden-panel">
+        <h2 style="margin-bottom:15px;">> JOURNAL LOG</h2>
+        <div class="journal-panel">
+            <div class="journal-entry" id="journal-entry-text">No journal entries.</div>
+            <div class="journal-nav">
+                <button class="journal-nav-btn" onclick="journalPrev()" id="journal-prev">◀</button>
+                <span id="journal-day">DAY 0 / 0</span>
+                <button class="journal-nav-btn" onclick="journalNext()" id="journal-next">▶</button>
+            </div>
+        </div>
+        <div class="button-group">
+            <button class="terminal-btn" onclick="showMainView()">> RETURN</button>
+        </div>
+    </div>
+
+    <div id="editLoreView" class="main-container hidden-panel">
+        <h2 style="margin-bottom:15px;">> EDIT SUBJECT FILE</h2>
+        <div class="lore-panel">
+            <div class="lore-field"><div class="lore-label">NAME</div><input type="text" id="edit-name" class="lore-input" placeholder="NAME"></div>
+            <div class="lore-field"><div class="lore-label">AGE</div><input type="text" id="edit-age" class="lore-input" placeholder="AGE"></div>
+            <div class="lore-field"><div class="lore-label">GENDER</div><input type="text" id="edit-gender" class="lore-input" placeholder="GENDER"></div>
+            <div class="lore-field"><div class="lore-label">APPEARANCE</div><textarea id="edit-appearance" class="lore-input" placeholder="APPEARANCE"></textarea></div>
+            <div class="lore-field"><div class="lore-label">PERSONALITY</div><textarea id="edit-personality" class="lore-input" placeholder="PERSONALITY"></textarea></div>
+            <div class="lore-field"><div class="lore-label">BACKSTORY</div><textarea id="edit-backstory" class="lore-input" placeholder="BACKSTORY"></textarea></div>
+            <div class="lore-field"><div class="lore-label">ABILITIES</div><textarea id="edit-abilities" class="lore-input" placeholder="ABILITIES"></textarea></div>
+            <div class="lore-field"><div class="lore-label">WEAKNESSES</div><textarea id="edit-weaknesses" class="lore-input" placeholder="WEAKNESSES"></textarea></div>
+            <div class="lore-field"><div class="lore-label">FACTION</div><input type="text" id="edit-faction" class="lore-input" placeholder="FACTION"></div>
+            <div class="lore-field"><div class="lore-label">GOALS</div><textarea id="edit-goals" class="lore-input" placeholder="GOALS"></textarea></div>
+        </div>
+        <div class="button-group">
+            <button class="terminal-btn" onclick="saveLore()">> SAVE LORE</button>
+            <button class="terminal-btn" onclick="showMainView()">> CANCEL</button>
+        </div>
+    </div>
+
+    <div class="footer">
+        <div id="status-text">> STATUS: ONLINE</div>
+        <div id="version-text">> v5.2_STABLE</div>
+    </div>
+</div>
+```
+
 </div>
 
 <script src="https://www.youtube.com/iframe_api"></script>
+
 <script>
     // ---------- CONFIG ----------
     const API_BASE = "https://phantom-bot-production-fef1.up.railway.app";
@@ -1088,6 +1141,16 @@
     let editLocked = true;
     let currentQuote = "";
     let currentYoutubeUrl = "";
+
+    // --- MUTUAL BIOMETRICS state ---
+    // mutualBondValues  = this OC's bond-specific feelings toward the selected OC (magenta, default shown)
+    // mutualBaseValues  = this OC's base personality feelings (available via toggle)
+    // mutualOverlayValues = whichever is currently active
+    // All are fetched from the bond OC's relationship data — read-only unless you're that OC's owner
+    let mutualBaseValues = null;
+    let mutualBondValues = null;
+    let mutualOverlayValues = null;
+    let isShowingMutual = false;
 
     // YouTube player
     let ytPlayer;
@@ -1111,7 +1174,8 @@
 
     const rawName = params.get('name') || "SUBJECT_NULL";
     const finalName = glitchText(`> SUBJECT: ${rawName.toUpperCase()}`);
-  // --- TARGET OVERLAY & TOGGLE VARIABLES ---
+
+    // --- TARGET OVERLAY & TOGGLE VARIABLES ---
     let targetValues = null;
     let targetLabel = "";
     let bondDataCache = {}; 
@@ -1134,7 +1198,6 @@
         ];
         document.getElementById('bondSelector').style.display = 'none';
     } else {
-        // We defer changing the display to block/flex until the HTML is fully loaded 
         window.addEventListener('load', () => {
             const selector = document.getElementById('bondSelector');
             if(selector) selector.style.display = 'flex';
@@ -1168,7 +1231,7 @@
     const wheelArea = document.getElementById('wheel-area');
 
     let isFullScreen = false;
-    let bloomProgress = 1; // 1 means fully drawn
+    let bloomProgress = 1;
     let animationFrameId = null;
 
     const plutchikLabels = [
@@ -1183,7 +1246,7 @@
     ];
 
     function drawPetal(cx, cy, radius, angle, color, isFill, glow) {
-        if (radius <= 0) return; // safety catch
+        if (radius <= 0) return;
         ctx.beginPath();
         ctx.moveTo(cx, cy);
         
@@ -1202,12 +1265,11 @@
         ctx.quadraticCurveTo(cp2X, cp2Y, cx, cy);
 
         if (glow) {
-        // Change glow based on what color the line is
-        ctx.shadowColor = (color === '#00ffff' || color === '#14ff14') ? color : '#ff1a1a';
-        ctx.shadowBlur = isFullScreen ? 25 : 15;
-    } else {
-        ctx.shadowBlur = 0;
-    }
+            ctx.shadowColor = (color === '#00ffff' || color === '#14ff14' || color === '#ff00ff') ? color : '#ff1a1a';
+            ctx.shadowBlur = isFullScreen ? 25 : 15;
+        } else {
+            ctx.shadowBlur = 0;
+        }
 
         if (isFill) {
             ctx.fillStyle = color;
@@ -1221,7 +1283,6 @@
     }
 
     function renderFlower() {
-        // 1. Force the canvas to be visible and size it
         canvas.style.display = 'block'; 
         
         if (isFullScreen) {
@@ -1237,7 +1298,6 @@
         let cx = w / 2;
         let cy = h / 2;
         
-        // --- GLITCH JITTER ---
         if (isFullScreen && bloomProgress < 1) {
             const intensity = (1 - bloomProgress) * 15;
             cx += (Math.random() - 0.5) * intensity;
@@ -1255,7 +1315,6 @@
         const maxR = Math.min(w, h) / 2;
         let R = isFullScreen ? maxR * 0.6 : maxR * 0.7; 
 
-        // --- BLOOM EASING ---
         if (isFullScreen) {
             const eased = 1 - Math.pow(1 - bloomProgress, 4); 
             R *= eased;
@@ -1278,8 +1337,7 @@
             return slider ? parseInt(slider.value) || 10 : 10;
         });
 
-        
-          // Draw Primary Red Petals
+        // Draw Primary Red Petals (this OC's own emotions)
         for (let i = 0; i < 8; i++) {
             const angle = i * (Math.PI / 4) - (Math.PI / 2); 
             
@@ -1291,7 +1349,8 @@
             drawPetal(cx, cy, fillR, angle, `${baseColor} 0.5)`, true, true);
         }
 
-        // --- NEW: Draw Target Overlay (Green for Base, Cyan for Bond) ---
+        // --- Draw Target Overlay (Green for Base Personality, Cyan for Bond Feelings) ---
+        // These are the BOND OC's feelings toward this character — read from their data
         if (targetValues) {
             for (let i = 0; i < 8; i++) {
                 const angle = i * (Math.PI / 4) - (Math.PI / 2); 
@@ -1299,14 +1358,27 @@
                 const fillR = R * Math.max(0.05, val); 
                 
                 if (isShowingBondMode) {
-                    // Cyan for Relationship Bond
+                    // Cyan = bond OC's specific feelings toward this OC
                     drawPetal(cx, cy, fillR, angle, 'rgba(0, 255, 255, 0.2)', true, false); 
                     drawPetal(cx, cy, fillR, angle, '#00ffff', false, true); 
                 } else {
-                    // Green for Base Personality
+                    // Green = bond OC's base personality
                     drawPetal(cx, cy, fillR, angle, 'rgba(20, 255, 20, 0.2)', true, false); 
                     drawPetal(cx, cy, fillR, angle, '#14ff14', false, true); 
                 }
+            }
+        }
+
+        // --- MUTUAL BIOMETRICS Overlay ---
+        // Magenta = THIS OC's feelings toward the selected bond OC
+        // Fetched from the bond OC's relationship data (read-only; only editable by that OC's owner)
+        if (isShowingMutual && mutualOverlayValues) {
+            for (let i = 0; i < 8; i++) {
+                const angle = i * (Math.PI / 4) - (Math.PI / 2);
+                const val = mutualOverlayValues[i] / 100;
+                const fillR = R * Math.max(0.05, val);
+                drawPetal(cx, cy, fillR, angle, 'rgba(255, 0, 255, 0.18)', true, false);
+                drawPetal(cx, cy, fillR, angle, '#ff00ff', false, true);
             }
         }
 
@@ -1337,7 +1409,7 @@
                     ctx.fillStyle = isCorrupted ? '#fff' : '#ff1a1a'; 
                 }
             }
-            ctx.globalAlpha = 1; // Reset alpha
+            ctx.globalAlpha = 1;
         }
     }
 
@@ -1370,7 +1442,7 @@
         }
     });
 
-    // Wire up sliders dynamically to renderFlower
+    // Wire up sliders
     emotions.forEach(emo => {
         const slider = document.getElementById(`${emo}-slider`);
         const valueSpan = document.getElementById(`${emo}-value`);
@@ -1752,10 +1824,9 @@
             
             const select = document.getElementById('bondSelect');
             select.innerHTML = '<option value="">-- SELECT BOND --</option>';
-            bondDataCache = {}; // Reset cache
+            bondDataCache = {};
             
             bonds.forEach(bond => {
-                // Store the full complex object from the bot in memory
                 bondDataCache[bond.userId] = bond;
                 const option = document.createElement('option');
                 option.value = bond.userId;
@@ -1765,58 +1836,130 @@
         } catch (e) { console.error('Failed to fetch bonds', e); }
     }
 
-    function loadBond() {
+    // ---------- LOAD BOND (with Mutual Biometrics fetch) ----------
+    async function loadBond() {
         const select = document.getElementById('bondSelect');
         const toggleBtn = document.getElementById('toggleBondBtn');
+        const mutualBtn = document.getElementById('mutualBtn');
+        const legend = document.getElementById('flowerLegend');
+        const legendGreen = document.getElementById('legendGreen');
+        const legendMagenta = document.getElementById('legendMagenta');
         const selectedId = select.selectedOptions[0]?.value;
-        
+
+        // Reset mutual state on every bond change
+        mutualBaseValues = null;
+        mutualBondValues = null;
+        mutualOverlayValues = null;
+        isShowingMutual = false;
+        if (mutualBtn) { mutualBtn.style.display = 'none'; mutualBtn.innerText = '> MUTUAL BIO'; }
+        if (legendMagenta) legendMagenta.style.display = 'none';
+
         if (!selectedId) {
             targetValues = null;
             targetLabel = "";
+            isShowingBondMode = false;
             if (toggleBtn) toggleBtn.style.display = 'none';
+            if (legend) legend.style.display = 'none';
             renderFlower();
             return;
         }
-        
+
         const data = bondDataCache[selectedId];
         targetLabel = data.characterName;
-        
-        // Grab both arrays sent from the bot
+
+        // Their feelings toward this OC
         targetBaseValues = [
             data.baseEmotions.joy, data.baseEmotions.trust, data.baseEmotions.fear, data.baseEmotions.surp,
             data.baseEmotions.grief, data.baseEmotions.disg, data.baseEmotions.rage, data.baseEmotions.anti
         ];
-        
         targetBondValues = [
             data.bondEmotions.joy, data.bondEmotions.trust, data.bondEmotions.fear, data.bondEmotions.surp,
             data.bondEmotions.grief, data.bondEmotions.disg, data.bondEmotions.rage, data.bondEmotions.anti
         ];
 
-        // Default to Base Personality mode when a new character is picked
         isShowingBondMode = false;
         if (toggleBtn) {
             toggleBtn.innerText = '> VIEW BOND';
             toggleBtn.style.display = 'inline-block';
         }
-        
         targetValues = targetBaseValues;
+
+        // Show legend
+        if (legend) legend.style.display = 'flex';
+        if (legendGreen) document.getElementById('legendGreenLabel').innerText = `${targetLabel.toUpperCase()} BASE`;
+
+        // --- MUTUAL BIOMETRICS ---
+        // We look at the bond OC's own relationship list and find this character's entry
+        // This gives us how THIS character feels toward the bond OC
+        // It's sourced entirely from the bond OC's data — not editable from this page
+        try {
+            const bondUserId = selectedId;
+            const bondCharName = data.characterName;
+            const url = `${API_BASE}/api/relationships?userId=${encodeURIComponent(bondUserId)}&charName=${encodeURIComponent(bondCharName)}&secret=${encodeURIComponent(SYNC_SECRET)}`;
+            const response = await fetch(url);
+            if (response.ok) {
+                const reverseBonds = await response.json();
+                // Find our own character entry in their bond list
+                const ourEntry = reverseBonds.find(b => b.userId === userId);
+                if (ourEntry && ourEntry.bondEmotions && ourEntry.baseEmotions) {
+                    mutualBaseValues = [
+                        ourEntry.baseEmotions.joy, ourEntry.baseEmotions.trust, ourEntry.baseEmotions.fear, ourEntry.baseEmotions.surp,
+                        ourEntry.baseEmotions.grief, ourEntry.baseEmotions.disg, ourEntry.baseEmotions.rage, ourEntry.baseEmotions.anti
+                    ];
+                    mutualBondValues = [
+                        ourEntry.bondEmotions.joy, ourEntry.bondEmotions.trust, ourEntry.bondEmotions.fear, ourEntry.bondEmotions.surp,
+                        ourEntry.bondEmotions.grief, ourEntry.bondEmotions.disg, ourEntry.bondEmotions.rage, ourEntry.bondEmotions.anti
+                    ];
+                    // Default: show bond-specific feelings in magenta
+                    mutualOverlayValues = mutualBondValues;
+                    if (mutualBtn) mutualBtn.style.display = 'inline-block';
+                }
+            }
+        } catch(e) {
+            console.error('Mutual biometrics fetch failed', e);
+        }
+
         renderFlower();
     }
 
-    // --- NEW TOGGLE FUNCTION ---
+    // --- TOGGLE BOND MODE: Green (base personality) <-> Cyan (bond-specific feelings) ---
     window.toggleBondMode = function() {
         const toggleBtn = document.getElementById('toggleBondBtn');
+        const legendGreenLabel = document.getElementById('legendGreenLabel');
         isShowingBondMode = !isShowingBondMode;
-        
         if (isShowingBondMode) {
             toggleBtn.innerText = '> VIEW BASE';
-            targetValues = targetBondValues; // Switch green petals to Cyan Bond
+            targetValues = targetBondValues;
+            if (legendGreenLabel) legendGreenLabel.innerText = `${targetLabel.toUpperCase()} BOND`;
         } else {
             toggleBtn.innerText = '> VIEW BOND';
-            targetValues = targetBaseValues; // Switch Cyan petals back to Green Base
+            targetValues = targetBaseValues;
+            if (legendGreenLabel) legendGreenLabel.innerText = `${targetLabel.toUpperCase()} BASE`;
         }
-        
-        renderFlower(); // Redraw instantly
+        renderFlower();
+    };
+
+    // --- TOGGLE MUTUAL BIOMETRICS ---
+    // Magenta = this OC's feelings toward the bond OC
+    // Sourced from bond OC's data — view-only for anyone visiting this page
+    // Only editable by the bond OC's owner on THEIR page
+    // Inner toggle: bond-specific feelings (default) vs base personality feelings
+    window.toggleMutualMode = function() {
+        const mutualBtn = document.getElementById('mutualBtn');
+        const legendMagenta = document.getElementById('legendMagenta');
+        if (!mutualBaseValues && !mutualBondValues) return;
+
+        isShowingMutual = !isShowingMutual;
+        if (isShowingMutual) {
+            mutualOverlayValues = mutualBondValues || mutualBaseValues;
+            mutualBtn.innerText = '> HIDE MUTUAL';
+            if (legendMagenta) legendMagenta.style.display = 'flex';
+        } else {
+            mutualOverlayValues = mutualBondValues || mutualBaseValues;
+            mutualBtn.innerText = '> MUTUAL BIO';
+            if (legendMagenta) legendMagenta.style.display = 'none';
+        }
+        renderFlower();
     };
 
     // ---------- SYNC (LOAD DATA) ----------
@@ -1880,7 +2023,7 @@
                 }
             });
 
-            renderFlower(); // Update flower instead of old Chart.js
+            renderFlower();
 
             document.getElementById('grit-bar').style.width = data.grit + "%";
             document.getElementById('rot-bar').style.width = data.rot + "%";
@@ -1954,9 +2097,8 @@
         indicator.textContent = '▼';
     });
 
-    /// ---------- BOOT & TYPING ANIMATION ----------
+    // ---------- BOOT & TYPING ANIMATION ----------
     window.addEventListener('load', function() {
-        // 1. Setup the Boot Sequence lines
         const bootScreen = document.getElementById('boot-screen');
         const bootContainer = document.getElementById('boot-text-container');
         
@@ -1972,33 +2114,28 @@
         
         let bootIndex = 0;
 
-        // 2. Play the Boot Sequence
         function showNextBootLine() {
             if (bootIndex < bootLines.length) {
                 const line = document.createElement('div');
                 line.className = 'boot-line';
-                // Add some random hex codes to make it look like compiling data
                 const randomHex = Math.floor(Math.random()*16777215).toString(16).toUpperCase().padStart(6, '0');
                 line.innerText = `[0x${randomHex}] > ${bootLines[bootIndex]}`;
                 
                 bootContainer.appendChild(line);
                 bootIndex++;
                 
-                // Random delay between lines for a realistic loading feel (100ms - 400ms)
                 setTimeout(showNextBootLine, Math.random() * 300 + 100);
             } else {
-                // Boot complete: Glitch out the screen and reveal the terminal
                 setTimeout(() => {
                     bootScreen.classList.add('boot-fade-out');
                     setTimeout(() => {
                         bootScreen.style.display = 'none';
-                        startMainTerminal(); // Start the header typing once boot is done
-                    }, 300); // Wait for CSS transition
+                        startMainTerminal();
+                    }, 300);
                 }, 600);
             }
         }
 
-        // 3. Start the main terminal stuff after boot finishes
         function startMainTerminal() {
             const typingSpan = document.getElementById('name-typing');
             const fullText = finalName;
@@ -2015,11 +2152,9 @@
             typeNext();
         }
 
-        // Initialize background data while boot sequence plays
         checkPasswordStatus();
         setTimeout(() => { fetchBonds().then(renderFlower); }, 100); 
         
-        // Start the boot sequence!
         showNextBootLine();
     });
 
@@ -2037,7 +2172,7 @@
                     }
                 });
                 
-                renderFlower(); // Update flower instead of old Chart.js
+                renderFlower();
 
                 document.getElementById('grit-bar').style.width = data.grit + "%";
                 document.getElementById('rot-bar').style.width = data.rot + "%";
@@ -2051,5 +2186,6 @@
     }
     setupSSE();
 </script>
+
 </body>
 </html>
