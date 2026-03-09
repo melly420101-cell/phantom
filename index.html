@@ -1494,7 +1494,7 @@
     const entered = document.getElementById('editPassword').value;
     if (!entered) { alert('Please enter a password'); return; }
 
-    try {
+        try {
         const response = await fetch(`${API_BASE}/api/verify_password`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -1505,15 +1505,19 @@
                 secret: SYNC_SECRET
             })
         });
-        const result = await response.json();
+        const text = await response.text();
+        alert('Server response: ' + text);
+        const result = JSON.parse(text);
         if (!result.success) {
             alert('Wrong password.');
             return;
         }
     } catch(e) {
-    alert('Error: ' + e.message);
-    return;
-}
+        alert('Error: ' + e.message);
+        return;
+    }
+
+                
 
 
     editPassword = entered;
