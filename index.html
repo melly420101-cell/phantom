@@ -1492,9 +1492,9 @@
 
     window.unlockEdit = async function() {
     const entered = document.getElementById('editPassword').value;
-    if (!entered) { alert('Please enter a password'); return; }
+    if (!entered) { alert('INITIATIVE ERROR. NO PASSWORD ENTERED.'); return; }
 
-        try {
+    try {
         const response = await fetch(`${API_BASE}/api/verify_password`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -1505,17 +1505,28 @@
                 secret: SYNC_SECRET
             })
         });
-        const text = await response.text();
-        alert('Server response: ' + text);
-        const result = JSON.parse(text);
+        const result = await response.json();
         if (!result.success) {
-            alert('Wrong password.');
+            alert('INITIATIVE ERROR. WRONG PASSWORD.');
             return;
         }
     } catch(e) {
-        alert('Error: ' + e.message);
+        alert('INITIATIVE ERROR. CONNECTION FAILURE.');
         return;
     }
+
+    alert('INITIATIVE UNLOCKED. PASSWORD CORRECT.');
+    editPassword = entered;
+    document.getElementById('passwordPrompt').style.display = 'none';
+    document.getElementById('slidersPanel').classList.remove('edit-locked');
+    document.getElementById('syncBtn').classList.remove('edit-locked');
+    document.getElementById('syncBtn').disabled = false;
+    editLocked = false;
+    document.getElementById('quoteDisplay').onclick = () => startQuoteEdit();
+    document.getElementById('ytEdit').classList.add('show');
+    document.getElementById('editLoreBtn').style.display = 'block';
+};
+
 
                 
 
