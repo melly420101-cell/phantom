@@ -15,6 +15,14 @@
             --screen-flicker: 0.15s infinite;
         }
 
+        /* Ensure full-screen covers everything */
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+        }
+
         @font-face {
             font-family: 'VHS';
             src: url('https://fonts.cdnfonts.com/s/16060/VCR_OSD_MONO_1.001.woff') format('woff');
@@ -293,7 +301,6 @@
             background: var(--text-gray);
             color: black;
         }
-        /* YouTube edit controls hidden by default */
         .yt-edit {
             display: none;
             margin-top: 10px;
@@ -744,16 +751,79 @@
                 left: 0;
             }
         }
+  /* --- MILITARY BOOT SEQUENCE --- */
+        #boot-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: #050505;
+            z-index: 9999999; /* Highest possible */
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 40px;
+            box-sizing: border-box;
+            color: var(--glow-red);
+            font-family: 'VHS', monospace;
+            font-size: 1.1rem;
+            text-shadow: 0 0 8px var(--glow-red);
+            transition: opacity 0.3s ease, filter 0.3s ease;
+            pointer-events: none;
+        }
+        
+        .boot-line {
+            margin-bottom: 8px;
+            animation: text-flicker 0.05s steps(2) infinite;
+        }
+
+        .boot-fade-out {
+            opacity: 0;
+            filter: contrast(2) brightness(2) blur(4px) hue-rotate(20deg);
+            transform: scale(1.02);
+        }
+
+        @keyframes text-flicker {
+            0% { opacity: 0.9; }
+            50% { opacity: 1; }
+            100% { opacity: 0.8; }
+        }
+
+        /* --- FULLSCREEN FLOWER OVERLAY --- */
+        body.fullscreen-mode #wheel-area {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100vw !important;
+            height: 100vh !important;
+            max-width: none !important;
+            background: rgba(10, 10, 10, 0.98) !important;
+            z-index: 99999 !important;
+            display: flex !important;
+            justify-content: center !important;
+            align-items: center !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+        body.fullscreen-mode #radarChart {
+            max-width: none !important;
+            filter: drop-shadow(0 0 15px var(--glow-red)) !important;
+        }
     </style>
 </head>
 <body>
+  <div id="boot-screen">
+    <div id="boot-text-container"></div>
+    <div>> <span class="typing-cursor"></span></div>
+</div>
 
 <div class="crt-monitor" id="monitor-frame">
     <div class="screen" id="screen-body">
         <div class="corrupted-overlay"></div>
         <h2 id="char-name">> <span id="name-typing"></span><span class="typing-cursor"></span></h2>
 
-        <!-- Quote Section -->
         <div class="quote-section" id="quoteSection">
             <div id="quoteDisplay" class="quote-display"></div>
             <div id="quoteEdit" class="quote-edit" style="display: none;">
@@ -763,13 +833,11 @@
             </div>
         </div>
 
-        <!-- YouTube Player -->
         <div class="youtube-player">
             <div class="yt-input-group">
                 <button class="yt-btn" onclick="playYouTube()">Play</button>
                 <button class="yt-btn stop" onclick="stopYouTube()">Stop</button>
             </div>
-            <!-- YouTube URL edit (hidden until unlocked) -->
             <div class="yt-edit" id="ytEdit">
                 <input type="text" id="ytUrl" class="yt-input" placeholder="YouTube link (for everyone)">
                 <button class="yt-btn" onclick="saveYouTubeUrl()">Save</button>
@@ -777,7 +845,6 @@
             <div id="ytPlayer" style="display: none;"></div>
         </div>
 
-        <!-- MAIN VIEW -->
         <div id="mainView" class="main-container">
             <div class="top-row">
                 <div id="wheel-area">
@@ -799,19 +866,18 @@
                 </div>
             </div>
 
-            <div class="bond-selector" id="bondSelector" style="display: none;">
+            <div class="bond-selector" id="bondSelector" style="display: none; align-items: center;">
                 <select id="bondSelect" onchange="loadBond()">
                     <option value="">-- SELECT BOND --</option>
                 </select>
+                <button id="toggleBondBtn" class="terminal-btn" style="display: none; padding: 12px; font-size: 0.8rem; margin-left: 10px;" onclick="toggleBondMode()">> VIEW BOND</button>
             </div>
 
-            <!-- Password protection prompt -->
             <div id="passwordPrompt" class="password-prompt" style="display: none;">
                 <input type="password" id="editPassword" class="password-input" placeholder="Enter edit password">
                 <button class="unlock-btn" onclick="unlockEdit()">UNLOCK</button>
             </div>
 
-            <!-- Action header with SUBJECT FILE, JOURNAL LOG and menu dropdown -->
             <div class="action-header">
                 <button class="subject-file-btn" onclick="showLoreView()">> SUBJECT FILE</button>
                 <button class="subject-file-btn" onclick="showJournalView()">> JOURNAL LOG</button>
@@ -820,13 +886,11 @@
                     <div class="dropdown-menu" id="dropdownMenu">
                         <button class="dropdown-item" onclick="refreshData()">> REFRESH</button>
                         <button class="dropdown-item" onclick="copyShareLink()">> COPY LINK</button>
-                        <!-- Added ID to EDIT LORE button for password control -->
                         <button class="dropdown-item" onclick="showEditLore()" id="editLoreBtn">> EDIT LORE</button>
                     </div>
                 </div>
             </div>
 
-            <!-- Collapsible Local Emotions Panel -->
             <div class="collapse-panel" id="localEmotionsPanel">
                 <div class="collapse-header" id="collapseHeader">
                     <h3>> LOCAL EMOTIONS</h3>
@@ -836,57 +900,104 @@
                     <div class="sliders-panel" id="slidersPanel">
                         <div class="slider-row" id="slider-joy">
                             <span class="slider-label">JOY</span>
-                            <div class="slider-container">
-                                <input type="range" min="0" max="100" value="10" class="emotion-slider" id="joy-slider">
+                            <div style="flex: 1; display: flex; flex-direction: column; justify-content: center;">
+                                <div style="display: flex; justify-content: space-between; font-size: 0.55rem; color: var(--text-gray); margin-bottom: 5px; opacity: 0.8; letter-spacing: 0.5px;">
+                                    <span>SERENITY</span><span>JOY</span><span>ECSTASY</span>
+                                </div>
+                                <div class="slider-container" style="height: auto;">
+                                    <input type="range" min="0" max="100" value="10" class="emotion-slider" id="joy-slider">
+                                </div>
                             </div>
                             <span class="slider-value" id="joy-value">10</span>
                         </div>
+                        
                         <div class="slider-row" id="slider-trust">
                             <span class="slider-label">TRUST</span>
-                            <div class="slider-container">
-                                <input type="range" min="0" max="100" value="10" class="emotion-slider" id="trust-slider">
+                            <div style="flex: 1; display: flex; flex-direction: column; justify-content: center;">
+                                <div style="display: flex; justify-content: space-between; font-size: 0.55rem; color: var(--text-gray); margin-bottom: 5px; opacity: 0.8; letter-spacing: 0.5px;">
+                                    <span>ACCEPTANCE</span><span>TRUST</span><span>ADMIRATION</span>
+                                </div>
+                                <div class="slider-container" style="height: auto;">
+                                    <input type="range" min="0" max="100" value="10" class="emotion-slider" id="trust-slider">
+                                </div>
                             </div>
                             <span class="slider-value" id="trust-value">10</span>
                         </div>
+
                         <div class="slider-row" id="slider-fear">
                             <span class="slider-label">FEAR</span>
-                            <div class="slider-container">
-                                <input type="range" min="0" max="100" value="10" class="emotion-slider" id="fear-slider">
+                            <div style="flex: 1; display: flex; flex-direction: column; justify-content: center;">
+                                <div style="display: flex; justify-content: space-between; font-size: 0.55rem; color: var(--text-gray); margin-bottom: 5px; opacity: 0.8; letter-spacing: 0.5px;">
+                                    <span>APPREHENSION</span><span>FEAR</span><span>TERROR</span>
+                                </div>
+                                <div class="slider-container" style="height: auto;">
+                                    <input type="range" min="0" max="100" value="10" class="emotion-slider" id="fear-slider">
+                                </div>
                             </div>
                             <span class="slider-value" id="fear-value">10</span>
                         </div>
+
                         <div class="slider-row" id="slider-surp">
                             <span class="slider-label">SURP</span>
-                            <div class="slider-container">
-                                <input type="range" min="0" max="100" value="10" class="emotion-slider" id="surp-slider">
+                            <div style="flex: 1; display: flex; flex-direction: column; justify-content: center;">
+                                <div style="display: flex; justify-content: space-between; font-size: 0.55rem; color: var(--text-gray); margin-bottom: 5px; opacity: 0.8; letter-spacing: 0.5px;">
+                                    <span>DISTRACTION</span><span>SURPRISE</span><span>AMAZEMENT</span>
+                                </div>
+                                <div class="slider-container" style="height: auto;">
+                                    <input type="range" min="0" max="100" value="10" class="emotion-slider" id="surp-slider">
+                                </div>
                             </div>
                             <span class="slider-value" id="surp-value">10</span>
                         </div>
+
                         <div class="slider-row" id="slider-grief">
                             <span class="slider-label">GRIEF</span>
-                            <div class="slider-container">
-                                <input type="range" min="0" max="100" value="10" class="emotion-slider" id="grief-slider">
+                            <div style="flex: 1; display: flex; flex-direction: column; justify-content: center;">
+                                <div style="display: flex; justify-content: space-between; font-size: 0.55rem; color: var(--text-gray); margin-bottom: 5px; opacity: 0.8; letter-spacing: 0.5px;">
+                                    <span>PENSIVENESS</span><span>SADNESS</span><span>GRIEF</span>
+                                </div>
+                                <div class="slider-container" style="height: auto;">
+                                    <input type="range" min="0" max="100" value="10" class="emotion-slider" id="grief-slider">
+                                </div>
                             </div>
                             <span class="slider-value" id="grief-value">10</span>
                         </div>
+
                         <div class="slider-row" id="slider-disg">
                             <span class="slider-label">DISG</span>
-                            <div class="slider-container">
-                                <input type="range" min="0" max="100" value="10" class="emotion-slider" id="disg-slider">
+                            <div style="flex: 1; display: flex; flex-direction: column; justify-content: center;">
+                                <div style="display: flex; justify-content: space-between; font-size: 0.55rem; color: var(--text-gray); margin-bottom: 5px; opacity: 0.8; letter-spacing: 0.5px;">
+                                    <span>BOREDOM</span><span>DISGUST</span><span>LOATHING</span>
+                                </div>
+                                <div class="slider-container" style="height: auto;">
+                                    <input type="range" min="0" max="100" value="10" class="emotion-slider" id="disg-slider">
+                                </div>
                             </div>
                             <span class="slider-value" id="disg-value">10</span>
                         </div>
+
                         <div class="slider-row" id="slider-rage">
                             <span class="slider-label">RAGE</span>
-                            <div class="slider-container">
-                                <input type="range" min="0" max="100" value="10" class="emotion-slider" id="rage-slider">
+                            <div style="flex: 1; display: flex; flex-direction: column; justify-content: center;">
+                                <div style="display: flex; justify-content: space-between; font-size: 0.55rem; color: var(--text-gray); margin-bottom: 5px; opacity: 0.8; letter-spacing: 0.5px;">
+                                    <span>ANNOYANCE</span><span>ANGER</span><span>RAGE</span>
+                                </div>
+                                <div class="slider-container" style="height: auto;">
+                                    <input type="range" min="0" max="100" value="10" class="emotion-slider" id="rage-slider">
+                                </div>
                             </div>
                             <span class="slider-value" id="rage-value">10</span>
                         </div>
+
                         <div class="slider-row" id="slider-anti">
                             <span class="slider-label">ANTI</span>
-                            <div class="slider-container">
-                                <input type="range" min="0" max="100" value="10" class="emotion-slider" id="anti-slider">
+                            <div style="flex: 1; display: flex; flex-direction: column; justify-content: center;">
+                                <div style="display: flex; justify-content: space-between; font-size: 0.55rem; color: var(--text-gray); margin-bottom: 5px; opacity: 0.8; letter-spacing: 0.5px;">
+                                    <span>INTEREST</span><span>ANTICIPATION</span><span>VIGILANCE</span>
+                                </div>
+                                <div class="slider-container" style="height: auto;">
+                                    <input type="range" min="0" max="100" value="10" class="emotion-slider" id="anti-slider">
+                                </div>
                             </div>
                             <span class="slider-value" id="anti-value">10</span>
                         </div>
@@ -896,7 +1007,6 @@
             </div>
         </div>
 
-        <!-- LORE VIEW (Read‑only) -->
         <div id="loreView" class="main-container hidden-panel">
             <h2 style="margin-bottom:15px;">> SUBJECT FILE</h2>
             <div class="lore-panel">
@@ -916,7 +1026,6 @@
             </div>
         </div>
 
-        <!-- JOURNAL VIEW -->
         <div id="journalView" class="main-container hidden-panel">
             <h2 style="margin-bottom:15px;">> JOURNAL LOG</h2>
             <div class="journal-panel">
@@ -932,7 +1041,6 @@
             </div>
         </div>
 
-        <!-- EDIT LORE VIEW (Form) -->
         <div id="editLoreView" class="main-container hidden-panel">
             <h2 style="margin-bottom:15px;">> EDIT SUBJECT FILE</h2>
             <div class="lore-panel">
@@ -960,9 +1068,7 @@
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://www.youtube.com/iframe_api"></script>
-
 <script>
     // ---------- CONFIG ----------
     const API_BASE = "https://phantom-bot-production-fef1.up.railway.app";
@@ -1005,55 +1111,43 @@
 
     const rawName = params.get('name') || "SUBJECT_NULL";
     const finalName = glitchText(`> SUBJECT: ${rawName.toUpperCase()}`);
+  // --- TARGET OVERLAY & TOGGLE VARIABLES ---
+    let targetValues = null;
+    let targetLabel = "";
+    let bondDataCache = {}; 
+    let isShowingBondMode = false;
+    let targetBaseValues = null;
+    let targetBondValues = null;
+
+    const targetName = params.get('target_oc');
+    if (targetName) {
+        targetLabel = targetName;
+        targetValues = [
+            parseInt(params.get('t_joy')) || 10,
+            parseInt(params.get('t_trust')) || 10,
+            parseInt(params.get('t_fear')) || 10,
+            parseInt(params.get('t_surp')) || 10,
+            parseInt(params.get('t_grief')) || 10,
+            parseInt(params.get('t_disg')) || 10,
+            parseInt(params.get('t_rage')) || 10,
+            parseInt(params.get('t_anti')) || 10
+        ];
+        document.getElementById('bondSelector').style.display = 'none';
+    } else {
+        // We defer changing the display to block/flex until the HTML is fully loaded 
+        window.addEventListener('load', () => {
+            const selector = document.getElementById('bondSelector');
+            if(selector) selector.style.display = 'flex';
+        });
+    }
 
     document.getElementById('grit-bar').style.width = (params.get('grit') || 100) + "%";
     document.getElementById('rot-bar').style.width = rot + "%";
     document.getElementById('weird-bar').style.width = (params.get('weird') || 0) + "%";
 
-    function getLocalColor(value) {
-        if (isCorrupted) return '#fff';
-        const intensity = value / 100;
-        const r = 255;
-        const g = Math.floor(26 * intensity);
-        const b = Math.floor(26 * intensity);
-        return `rgb(${r}, ${g}, ${b})`;
-    }
-
-    function getTargetColor(value) {
-        if (isCorrupted) return '#fff';
-        const intensity = value / 100;
-        const r = Math.floor(20 * intensity);
-        const g = 255;
-        const b = Math.floor(20 * intensity);
-        return `rgb(${r}, ${g}, ${b})`;
-    }
-
     function getSliderValues() {
         return emotions.map(emo => parseInt(sliders[emo].value) || 10);
     }
-
-    function updateRadarFromSliders() {
-        if (radarChart && radarChart.data.datasets.length > 0) {
-            radarChart.data.datasets[0].data = getSliderValues();
-            radarChart.update();
-        }
-    }
-
-    emotions.forEach(emo => {
-        const slider = document.getElementById(`${emo}-slider`);
-        const valueSpan = document.getElementById(`${emo}-value`);
-        if (slider && valueSpan) {
-            sliders[emo] = slider;
-            valueSpans[emo] = valueSpan;
-            const initial = parseInt(params.get(emo)) || 10;
-            slider.value = initial;
-            valueSpan.innerText = initial;
-            slider.addEventListener('input', function() {
-                valueSpan.innerText = this.value;
-                updateRadarFromSliders();
-            });
-        }
-    });
 
     function getEmoData(prefix) {
         return [
@@ -1068,63 +1162,234 @@
         ];
     }
 
-    let datasets = [{
-        label: 'LOCAL',
-        data: getSliderValues(),
-        backgroundColor: isCorrupted ? 'rgba(255, 255, 255, 0.1)' : 'rgba(255, 26, 26, 0.3)',
-        borderColor: isCorrupted ? '#fff' : '#ff1a1a',
-        pointBackgroundColor: function(context) {
-            const value = context.dataset.data[context.dataIndex];
-            return getLocalColor(value);
-        },
-        pointBorderColor: '#fff',
-        pointRadius: 6,
-        pointHoverRadius: 8,
-        dragData: false
-    }];
+    // ---------- PLUTCHIK FLOWER WHEEL ----------
+    const canvas = document.getElementById('radarChart');
+    const ctx = canvas.getContext('2d');
+    const wheelArea = document.getElementById('wheel-area');
 
-    const targetName = params.get('target_oc');
-    if (targetName) {
-        datasets.push({
-            label: 'TARGET',
-            data: getEmoData('t_'),
-            backgroundColor: 'rgba(20, 255, 20, 0.2)',
-            borderColor: '#14ff14',
-            pointBackgroundColor: function(context) {
-                const value = context.dataset.data[context.dataIndex];
-                return getTargetColor(value);
-            },
-            pointBorderColor: '#fff',
-            pointRadius: 6,
-            pointHoverRadius: 8,
-            dragData: false
-        });
-        document.getElementById('bondSelector').style.display = 'none';
+    let isFullScreen = false;
+    let bloomProgress = 1; // 1 means fully drawn
+    let animationFrameId = null;
+
+    const plutchikLabels = [
+        { inner: 'SERENITY', middle: 'JOY', outer: 'ECSTASY' },
+        { inner: 'ACCEPTANCE', middle: 'TRUST', outer: 'ADMIRATION' },
+        { inner: 'APPREHENSION', middle: 'FEAR', outer: 'TERROR' },
+        { inner: 'DISTRACTION', middle: 'SURPRISE', outer: 'AMAZEMENT' },
+        { inner: 'PENSIVENESS', middle: 'SADNESS', outer: 'GRIEF' },
+        { inner: 'BOREDOM', middle: 'DISGUST', outer: 'LOATHING' },
+        { inner: 'ANNOYANCE', middle: 'ANGER', outer: 'RAGE' },
+        { inner: 'INTEREST', middle: 'ANTICIPATION', outer: 'VIGILANCE' }
+    ];
+
+    function drawPetal(cx, cy, radius, angle, color, isFill, glow) {
+        if (radius <= 0) return; // safety catch
+        ctx.beginPath();
+        ctx.moveTo(cx, cy);
+        
+        const cpDist = radius * 0.55;
+        const cpAngleOffset = 0.45;
+        
+        const tipX = cx + Math.cos(angle) * radius;
+        const tipY = cy + Math.sin(angle) * radius;
+        
+        const cp1X = cx + Math.cos(angle - cpAngleOffset) * cpDist;
+        const cp1Y = cy + Math.sin(angle - cpAngleOffset) * cpDist;
+        const cp2X = cx + Math.cos(angle + cpAngleOffset) * cpDist;
+        const cp2Y = cy + Math.sin(angle + cpAngleOffset) * cpDist;
+
+        ctx.quadraticCurveTo(cp1X, cp1Y, tipX, tipY);
+        ctx.quadraticCurveTo(cp2X, cp2Y, cx, cy);
+
+        if (glow) {
+        // Change glow based on what color the line is
+        ctx.shadowColor = (color === '#00ffff' || color === '#14ff14') ? color : '#ff1a1a';
+        ctx.shadowBlur = isFullScreen ? 25 : 15;
     } else {
-        document.getElementById('bondSelector').style.display = 'flex';
-        fetchBonds();
+        ctx.shadowBlur = 0;
     }
 
-    const ctx = document.getElementById('radarChart').getContext('2d');
-    const radarChart = new Chart(ctx, {
-        type: 'radar',
-        data: {
-            labels: ['JOY', 'TRUST', 'FEAR', 'SURP', 'GRIEF', 'DISG', 'RAGE', 'ANTI'],
-            datasets: datasets
-        },
-        options: {
-            plugins: { legend: { display: false } },
-            scales: {
-                r: {
-                    angleLines: { color: isCorrupted ? '#fff' : '#440000' },
-                    grid: { color: isCorrupted ? '#fff' : '#440000' },
-                    pointLabels: { color: isCorrupted ? '#fff' : '#ff1a1a', font: { family: 'VHS', size: 10 } },
-                    ticks: { display: false, stepSize: 20 },
-                    min: 0, max: 100, beginAtZero: true
-                }
-            },
-            elements: { point: { radius: 6, hoverRadius: 8 } }
+        if (isFill) {
+            ctx.fillStyle = color;
+            ctx.fill();
+        } else {
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 1;
+            ctx.stroke();
         }
+        ctx.shadowBlur = 0;
+    }
+
+    function renderFlower() {
+        // 1. Force the canvas to be visible and size it
+        canvas.style.display = 'block'; 
+        
+        if (isFullScreen) {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        } else {
+            canvas.width = 300;
+            canvas.height = 300;
+        }
+
+        const w = canvas.width;
+        const h = canvas.height;
+        let cx = w / 2;
+        let cy = h / 2;
+        
+        // --- GLITCH JITTER ---
+        if (isFullScreen && bloomProgress < 1) {
+            const intensity = (1 - bloomProgress) * 15;
+            cx += (Math.random() - 0.5) * intensity;
+            cy += (Math.random() - 0.5) * intensity;
+            
+            if (Math.random() > 0.7) {
+                ctx.filter = `hue-rotate(${Math.random() * 90}deg)`;
+            } else {
+                ctx.filter = 'none';
+            }
+        } else {
+            ctx.filter = 'none';
+        }
+
+        const maxR = Math.min(w, h) / 2;
+        let R = isFullScreen ? maxR * 0.6 : maxR * 0.7; 
+
+        // --- BLOOM EASING ---
+        if (isFullScreen) {
+            const eased = 1 - Math.pow(1 - bloomProgress, 4); 
+            R *= eased;
+        }
+
+        ctx.clearRect(0, 0, w, h);
+
+        // Draw dashed circles
+        ctx.strokeStyle = '#440000';
+        ctx.setLineDash([4, 4]);
+        [0.3, 0.6, 1.0].forEach(mult => {
+            ctx.beginPath();
+            ctx.arc(cx, cy, Math.max(0.1, R * mult), 0, Math.PI * 2);
+            ctx.stroke();
+        });
+        ctx.setLineDash([]);
+
+        const primaryValues = emotions.map(emo => {
+            const slider = document.getElementById(`${emo}-slider`);
+            return slider ? parseInt(slider.value) || 10 : 10;
+        });
+
+        
+          // Draw Primary Red Petals
+        for (let i = 0; i < 8; i++) {
+            const angle = i * (Math.PI / 4) - (Math.PI / 2); 
+            
+            drawPetal(cx, cy, R, angle, '#440000', false, false);
+
+            const val = primaryValues[i] / 100;
+            const fillR = R * Math.max(0.05, val); 
+            const baseColor = isCorrupted ? 'rgba(255, 255, 255,' : 'rgba(255, 26, 26,';
+            drawPetal(cx, cy, fillR, angle, `${baseColor} 0.5)`, true, true);
+        }
+
+        // --- NEW: Draw Target Overlay (Green for Base, Cyan for Bond) ---
+        if (targetValues) {
+            for (let i = 0; i < 8; i++) {
+                const angle = i * (Math.PI / 4) - (Math.PI / 2); 
+                const val = targetValues[i] / 100;
+                const fillR = R * Math.max(0.05, val); 
+                
+                if (isShowingBondMode) {
+                    // Cyan for Relationship Bond
+                    drawPetal(cx, cy, fillR, angle, 'rgba(0, 255, 255, 0.2)', true, false); 
+                    drawPetal(cx, cy, fillR, angle, '#00ffff', false, true); 
+                } else {
+                    // Green for Base Personality
+                    drawPetal(cx, cy, fillR, angle, 'rgba(20, 255, 20, 0.2)', true, false); 
+                    drawPetal(cx, cy, fillR, angle, '#14ff14', false, true); 
+                }
+            }
+        }
+
+        // Draw Labels
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillStyle = isCorrupted ? '#fff' : '#ff1a1a';
+
+        if (bloomProgress > 0.7 || !isFullScreen) {
+            ctx.globalAlpha = isFullScreen ? Math.min(1, (bloomProgress - 0.7) * 3.3) : 1; 
+
+            for (let i = 0; i < 8; i++) {
+                const angle = i * (Math.PI / 4) - (Math.PI / 2);
+                const labels = plutchikLabels[i];
+
+                const labelR = R * 1.15;
+                ctx.font = isFullScreen ? '14px VHS, monospace' : '10px VHS, monospace';
+                ctx.fillText(labels.outer, cx + Math.cos(angle) * labelR, cy + Math.sin(angle) * labelR);
+
+                if (isFullScreen) {
+                    ctx.fillStyle = isCorrupted ? 'rgba(255,255,255,0.8)' : 'rgba(255, 26, 26, 0.8)';
+                    ctx.fillText(labels.middle, cx + Math.cos(angle) * R * 0.65, cy + Math.sin(angle) * R * 0.65);
+                    
+                    ctx.fillStyle = isCorrupted ? 'rgba(255,255,255,0.5)' : 'rgba(255, 26, 26, 0.5)';
+                    ctx.font = '12px VHS, monospace';
+                    ctx.fillText(labels.inner, cx + Math.cos(angle) * R * 0.3, cy + Math.sin(angle) * R * 0.3);
+                    
+                    ctx.fillStyle = isCorrupted ? '#fff' : '#ff1a1a'; 
+                }
+            }
+            ctx.globalAlpha = 1; // Reset alpha
+        }
+    }
+
+    // Animation Loop
+    function animateBloom() {
+        if (bloomProgress < 1) {
+            bloomProgress += 0.05;
+            if (bloomProgress > 1) bloomProgress = 1;
+            renderFlower();
+            animationFrameId = requestAnimationFrame(animateBloom);
+        }
+    }
+
+    // Handle Tap
+    wheelArea.style.cursor = 'pointer';
+    wheelArea.addEventListener('click', (e) => {
+        e.stopPropagation();
+        isFullScreen = !isFullScreen;
+        
+        if (animationFrameId) cancelAnimationFrame(animationFrameId);
+        
+        if (isFullScreen) {
+            document.body.classList.add('fullscreen-mode');
+            bloomProgress = 0;
+            animateBloom();
+        } else {
+            document.body.classList.remove('fullscreen-mode');
+            bloomProgress = 1;
+            renderFlower();
+        }
+    });
+
+    // Wire up sliders dynamically to renderFlower
+    emotions.forEach(emo => {
+        const slider = document.getElementById(`${emo}-slider`);
+        const valueSpan = document.getElementById(`${emo}-value`);
+        if (slider && valueSpan) {
+            sliders[emo] = slider;
+            valueSpans[emo] = valueSpan;
+            const initial = parseInt(params.get(emo)) || 10;
+            slider.value = initial;
+            valueSpan.innerText = initial;
+            
+            slider.addEventListener('input', function() {
+                valueSpan.innerText = this.value;
+                if (!isFullScreen || bloomProgress === 1) renderFlower();
+            });
+        }
+    });
+
+    window.addEventListener('resize', () => {
+        if (isFullScreen) renderFlower();
     });
 
     // ---------- PASSWORD PROTECTION ----------
@@ -1145,7 +1410,6 @@
                 document.getElementById('slidersPanel').classList.add('edit-locked');
                 document.getElementById('syncBtn').classList.add('edit-locked');
                 document.getElementById('syncBtn').disabled = true;
-                // Hide the Edit Lore button if password protected
                 document.getElementById('editLoreBtn').style.display = 'none';
             } else {
                 document.getElementById('passwordPrompt').style.display = 'none';
@@ -1155,7 +1419,6 @@
                 document.getElementById('syncBtn').disabled = false;
                 document.getElementById('quoteDisplay').onclick = () => startQuoteEdit();
                 document.getElementById('ytEdit').classList.add('show');
-                // Show the Edit Lore button (in case it was hidden)
                 document.getElementById('editLoreBtn').style.display = 'block';
             }
         } catch (e) {
@@ -1174,7 +1437,6 @@
         editLocked = false;
         document.getElementById('quoteDisplay').onclick = () => startQuoteEdit();
         document.getElementById('ytEdit').classList.add('show');
-        // Show the Edit Lore button after successful unlock
         document.getElementById('editLoreBtn').style.display = 'block';
     };
 
@@ -1230,61 +1492,52 @@
     }
 
     // ---------- YOUTUBE ----------
-    function onYouTubeIframeAPIReady() {
-        // ready
-    }
+    function onYouTubeIframeAPIReady() {}
 
-    // Updated playYouTube function for iOS compatibility
-function playYouTube() {
-    if (!currentYoutubeUrl) {
-        alert('No YouTube link set for this character.');
-        return;
-    }
-    const videoId = extractVideoId(currentYoutubeUrl);
-    if (!videoId) {
-        alert('Invalid YouTube URL stored.');
-        return;
-    }
+    function playYouTube() {
+        if (!currentYoutubeUrl) {
+            alert('No YouTube link set for this character.');
+            return;
+        }
+        const videoId = extractVideoId(currentYoutubeUrl);
+        if (!videoId) {
+            alert('Invalid YouTube URL stored.');
+            return;
+        }
 
-    const playerDiv = document.getElementById('ytPlayer');
-    
-    // Temporarily make the player visible (1x1 pixel) so iOS recognises it
-    playerDiv.style.display = 'block';
-    playerDiv.style.width = '1px';
-    playerDiv.style.height = '1px';
-    playerDiv.style.opacity = '0.01'; // nearly invisible
+        const playerDiv = document.getElementById('ytPlayer');
+        playerDiv.style.display = 'block';
+        playerDiv.style.width = '1px';
+        playerDiv.style.height = '1px';
+        playerDiv.style.opacity = '0.01'; 
 
-    if (!ytPlayer) {
-        // Create player for the first time
-        ytPlayer = new YT.Player('ytPlayer', {
-            height: '1',   // minimal size
-            width: '1',
-            videoId: videoId,
-            playerVars: { autoplay: 1, controls: 0, modestbranding: 1, rel: 0 },
-            events: {
-                onReady: (event) => {
-                    event.target.playVideo();
-                    // Hide again after a short delay (playback started)
-                    setTimeout(() => {
-                        playerDiv.style.width = '0';
-                        playerDiv.style.height = '0';
-                        playerDiv.style.opacity = '0';
-                    }, 500);
-                },
-                onError: (event) => alert('YouTube error: ' + event.data)
-            }
-        });
-    } else {
-        // Player already exists – load new video and play
-        ytPlayer.loadVideoById(videoId);
-        // Hide after a short delay
-        setTimeout(() => {
-            playerDiv.style.width = '0';
-            playerDiv.style.height = '0';
-            playerDiv.style.opacity = '0';
-        }, 500);
+        if (!ytPlayer) {
+            ytPlayer = new YT.Player('ytPlayer', {
+                height: '1',  
+                width: '1',
+                videoId: videoId,
+                playerVars: { autoplay: 1, controls: 0, modestbranding: 1, rel: 0 },
+                events: {
+                    onReady: (event) => {
+                        event.target.playVideo();
+                        setTimeout(() => {
+                            playerDiv.style.width = '0';
+                            playerDiv.style.height = '0';
+                            playerDiv.style.opacity = '0';
+                        }, 500);
+                    },
+                    onError: (event) => alert('YouTube error: ' + event.data)
+                }
+            });
+        } else {
+            ytPlayer.loadVideoById(videoId);
+            setTimeout(() => {
+                playerDiv.style.width = '0';
+                playerDiv.style.height = '0';
+                playerDiv.style.opacity = '0';
+            }, 500);
+        }
     }
-}
 
     function stopYouTube() {
         if (ytPlayer) {
@@ -1343,7 +1596,6 @@ function playYouTube() {
     }
 
     function showEditLore() {
-        // Prevent entering edit lore if password protected and not unlocked
         if (hasPassword && editLocked) {
             alert('This character is password protected. Please unlock it first using the password prompt above.');
             return;
@@ -1438,7 +1690,6 @@ function playYouTube() {
     }
 
     async function saveLore() {
-        // Prevent saving if password protected and not unlocked
         if (hasPassword && editLocked) {
             alert('You must unlock the character before saving lore.');
             return;
@@ -1464,7 +1715,6 @@ function playYouTube() {
             secret: SYNC_SECRET
         };
 
-        // If the character has a password, include it
         if (hasPassword) {
             if (!editPassword) {
                 alert('No password available. Please unlock again.');
@@ -1485,7 +1735,6 @@ function playYouTube() {
                 showMainView();
             } else {
                 alert('Failed to save lore: ' + (result.error || 'Unknown error'));
-                // If the error is 'Invalid edit password', you may want to lock again
             }
         } catch (e) {
             console.error('Save lore error', e);
@@ -1500,20 +1749,17 @@ function playYouTube() {
             const url = `${API_BASE}/api/relationships?userId=${encodeURIComponent(userId)}&charName=${encodeURIComponent(charName)}&secret=${encodeURIComponent(SYNC_SECRET)}`;
             const response = await fetch(url);
             const bonds = await response.json();
+            
             const select = document.getElementById('bondSelect');
             select.innerHTML = '<option value="">-- SELECT BOND --</option>';
+            bondDataCache = {}; // Reset cache
+            
             bonds.forEach(bond => {
+                // Store the full complex object from the bot in memory
+                bondDataCache[bond.userId] = bond;
                 const option = document.createElement('option');
                 option.value = bond.userId;
                 option.textContent = bond.characterName.toUpperCase();
-                option.dataset.joy = bond.emotions.joy;
-                option.dataset.trust = bond.emotions.trust;
-                option.dataset.fear = bond.emotions.fear;
-                option.dataset.surp = bond.emotions.surp;
-                option.dataset.grief = bond.emotions.grief;
-                option.dataset.disg = bond.emotions.disg;
-                option.dataset.rage = bond.emotions.rage;
-                option.dataset.anti = bond.emotions.anti;
                 select.appendChild(option);
             });
         } catch (e) { console.error('Failed to fetch bonds', e); }
@@ -1521,45 +1767,57 @@ function playYouTube() {
 
     function loadBond() {
         const select = document.getElementById('bondSelect');
-        const option = select.selectedOptions[0];
-        if (!option.value) {
-            if (radarChart.data.datasets.length > 1) {
-                radarChart.data.datasets.pop();
-                radarChart.update();
-            }
+        const toggleBtn = document.getElementById('toggleBondBtn');
+        const selectedId = select.selectedOptions[0]?.value;
+        
+        if (!selectedId) {
+            targetValues = null;
+            targetLabel = "";
+            if (toggleBtn) toggleBtn.style.display = 'none';
+            renderFlower();
             return;
         }
-        const targetData = [
-            parseInt(option.dataset.joy) || 10,
-            parseInt(option.dataset.trust) || 10,
-            parseInt(option.dataset.fear) || 10,
-            parseInt(option.dataset.surp) || 10,
-            parseInt(option.dataset.grief) || 10,
-            parseInt(option.dataset.disg) || 10,
-            parseInt(option.dataset.rage) || 10,
-            parseInt(option.dataset.anti) || 10
+        
+        const data = bondDataCache[selectedId];
+        targetLabel = data.characterName;
+        
+        // Grab both arrays sent from the bot
+        targetBaseValues = [
+            data.baseEmotions.joy, data.baseEmotions.trust, data.baseEmotions.fear, data.baseEmotions.surp,
+            data.baseEmotions.grief, data.baseEmotions.disg, data.baseEmotions.rage, data.baseEmotions.anti
         ];
-        if (radarChart.data.datasets.length > 1) {
-            radarChart.data.datasets[1].data = targetData;
-            radarChart.data.datasets[1].label = option.textContent;
-        } else {
-            radarChart.data.datasets.push({
-                label: option.textContent,
-                data: targetData,
-                backgroundColor: 'rgba(20, 255, 20, 0.2)',
-                borderColor: '#14ff14',
-                pointBackgroundColor: function(context) {
-                    const value = context.dataset.data[context.dataIndex];
-                    return getTargetColor(value);
-                },
-                pointBorderColor: '#fff',
-                pointRadius: 6,
-                pointHoverRadius: 8,
-                dragData: false
-            });
+        
+        targetBondValues = [
+            data.bondEmotions.joy, data.bondEmotions.trust, data.bondEmotions.fear, data.bondEmotions.surp,
+            data.bondEmotions.grief, data.bondEmotions.disg, data.bondEmotions.rage, data.bondEmotions.anti
+        ];
+
+        // Default to Base Personality mode when a new character is picked
+        isShowingBondMode = false;
+        if (toggleBtn) {
+            toggleBtn.innerText = '> VIEW BOND';
+            toggleBtn.style.display = 'inline-block';
         }
-        radarChart.update();
+        
+        targetValues = targetBaseValues;
+        renderFlower();
     }
+
+    // --- NEW TOGGLE FUNCTION ---
+    window.toggleBondMode = function() {
+        const toggleBtn = document.getElementById('toggleBondBtn');
+        isShowingBondMode = !isShowingBondMode;
+        
+        if (isShowingBondMode) {
+            toggleBtn.innerText = '> VIEW BASE';
+            targetValues = targetBondValues; // Switch green petals to Cyan Bond
+        } else {
+            toggleBtn.innerText = '> VIEW BOND';
+            targetValues = targetBaseValues; // Switch Cyan petals back to Green Base
+        }
+        
+        renderFlower(); // Redraw instantly
+    };
 
     // ---------- SYNC (LOAD DATA) ----------
     async function syncToBot() {
@@ -1621,11 +1879,8 @@ function playYouTube() {
                     valueSpans[emo].innerText = data[emo];
                 }
             });
-            radarChart.data.datasets[0].data = [
-                data.joy, data.trust, data.fear, data.surp,
-                data.grief, data.disg, data.rage, data.anti
-            ];
-            radarChart.update();
+
+            renderFlower(); // Update flower instead of old Chart.js
 
             document.getElementById('grit-bar').style.width = data.grit + "%";
             document.getElementById('rot-bar').style.width = data.rot + "%";
@@ -1640,7 +1895,6 @@ function playYouTube() {
                 document.getElementById('slidersPanel').classList.add('edit-locked');
                 document.getElementById('syncBtn').classList.add('edit-locked');
                 document.getElementById('syncBtn').disabled = true;
-                // Hide Edit Lore button if password protected
                 document.getElementById('editLoreBtn').style.display = 'none';
             } else if (!hasPassword) {
                 document.getElementById('passwordPrompt').style.display = 'none';
@@ -1650,7 +1904,6 @@ function playYouTube() {
                 editLocked = false;
                 document.getElementById('quoteDisplay').onclick = () => startQuoteEdit();
                 document.getElementById('ytEdit').classList.add('show');
-                // Show Edit Lore button
                 document.getElementById('editLoreBtn').style.display = 'block';
             }
             alert('Data refreshed');
@@ -1663,19 +1916,9 @@ function playYouTube() {
         const labels = emotions;
         labels.forEach((l, i) => params.set(l, currentValues[i]));
 
-        if (radarChart.data.datasets.length > 1) {
-            const targetData = radarChart.data.datasets[1].data;
-            const targetLabel = radarChart.data.datasets[1].label;
-            params.set('target_oc', targetLabel);
-            labels.forEach((l, i) => params.set('t_' + l, targetData[i]));
-            const select = document.getElementById('bondSelect');
-            if (select.selectedOptions[0] && select.selectedOptions[0].value) {
-                params.set('target_user', select.selectedOptions[0].value);
-            }
-        } else {
-            params.delete('target_oc');
-            params.delete('target_user');
-            labels.forEach(l => params.delete('t_' + l));
+        const select = document.getElementById('bondSelect');
+        if (select.selectedOptions[0] && select.selectedOptions[0].value) {
+            params.set('target_user', select.selectedOptions[0].value);
         }
 
         const newURL = window.location.origin + window.location.pathname + '?' + params.toString();
@@ -1711,22 +1954,73 @@ function playYouTube() {
         indicator.textContent = '▼';
     });
 
-    // ---------- TYPING ANIMATION ----------
+    /// ---------- BOOT & TYPING ANIMATION ----------
     window.addEventListener('load', function() {
-        const typingSpan = document.getElementById('name-typing');
-        const fullText = finalName;
-        let i = 0;
-        function typeNext() {
-            if (i < fullText.length) {
-                typingSpan.textContent += fullText.charAt(i);
-                i++;
-                setTimeout(typeNext, 50);
+        // 1. Setup the Boot Sequence lines
+        const bootScreen = document.getElementById('boot-screen');
+        const bootContainer = document.getElementById('boot-text-container');
+        
+        const bootLines = [
+            "INITIATING PHANTOM_TERMINAL v5.2...",
+            "ESTABLISHING SECURE UPLINK...",
+            "BYPASSING INITIATIVE FIREWALL PROTOCOLS...",
+            "DECRYPTING BIOMETRIC PACKETS...",
+            isCorrupted ? "WARNING: HIGH ROT DECAY DETECTED IN SIGNAL." : "VITALS STABLE. NO ANOMALIES DETECTED.",
+            "SYNCING EMOTIONAL MATRIX...",
+            "ACCESS GRANTED."
+        ];
+        
+        let bootIndex = 0;
+
+        // 2. Play the Boot Sequence
+        function showNextBootLine() {
+            if (bootIndex < bootLines.length) {
+                const line = document.createElement('div');
+                line.className = 'boot-line';
+                // Add some random hex codes to make it look like compiling data
+                const randomHex = Math.floor(Math.random()*16777215).toString(16).toUpperCase().padStart(6, '0');
+                line.innerText = `[0x${randomHex}] > ${bootLines[bootIndex]}`;
+                
+                bootContainer.appendChild(line);
+                bootIndex++;
+                
+                // Random delay between lines for a realistic loading feel (100ms - 400ms)
+                setTimeout(showNextBootLine, Math.random() * 300 + 100);
             } else {
-                document.querySelector('.typing-cursor').style.display = 'none';
+                // Boot complete: Glitch out the screen and reveal the terminal
+                setTimeout(() => {
+                    bootScreen.classList.add('boot-fade-out');
+                    setTimeout(() => {
+                        bootScreen.style.display = 'none';
+                        startMainTerminal(); // Start the header typing once boot is done
+                    }, 300); // Wait for CSS transition
+                }, 600);
             }
         }
-        typeNext();
+
+        // 3. Start the main terminal stuff after boot finishes
+        function startMainTerminal() {
+            const typingSpan = document.getElementById('name-typing');
+            const fullText = finalName;
+            let i = 0;
+            function typeNext() {
+                if (i < fullText.length) {
+                    typingSpan.textContent += fullText.charAt(i);
+                    i++;
+                    setTimeout(typeNext, 50);
+                } else {
+                    document.querySelector('#char-name .typing-cursor').style.display = 'none';
+                }
+            }
+            typeNext();
+        }
+
+        // Initialize background data while boot sequence plays
         checkPasswordStatus();
+        setTimeout(() => { fetchBonds().then(renderFlower); }, 100); 
+        
+        // Start the boot sequence!
+        showNextBootLine();
     });
 
     // ---------- SSE ----------
@@ -1742,11 +2036,9 @@ function playYouTube() {
                         valueSpans[emo].innerText = data[emo];
                     }
                 });
-                radarChart.data.datasets[0].data = [
-                    data.joy, data.trust, data.fear, data.surp,
-                    data.grief, data.disg, data.rage, data.anti
-                ];
-                radarChart.update();
+                
+                renderFlower(); // Update flower instead of old Chart.js
+
                 document.getElementById('grit-bar').style.width = data.grit + "%";
                 document.getElementById('rot-bar').style.width = data.rot + "%";
                 document.getElementById('weird-bar').style.width = data.weird + "%";
